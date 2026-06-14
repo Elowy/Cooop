@@ -1,0 +1,16 @@
+# Függőségek
+/vendor/
+
+# Környezeti változók
+.env
+.env.local
+
+# Logok és ideiglenes fájlok
+*.log
+/tmp/
+
+# Szerkesztő / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
