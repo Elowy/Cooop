@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Net-Trade Hungary – admin felület stílusok
+   (a style.css változóira és alap gombjaira épül)
+   ========================================================================== */
+
+body.admin { background: var(--c-bg-alt); }
+
+.admin-main { padding: 32px 0 64px; }
+.admin-main .container { max-width: 1080px; }
+
+/* ---------- Felső sáv ---------- */
+.admin-bar { background: var(--c-dark); color: #fff; }
+.admin-bar__inner {
+    max-width: 1080px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: center; gap: 24px; height: 60px;
+}
+.admin-brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; font-weight: 700; }
+.admin-brand .brand-mark { width: 34px; height: 34px; font-size: .85rem; }
+.admin-nav { display: flex; gap: 4px; margin-right: auto; flex-wrap: wrap; }
+.admin-nav a { color: #d7cfc2; padding: 8px 12px; border-radius: var(--radius-sm); font-weight: 500; }
+.admin-nav a:hover { background: rgba(255,255,255,.1); color: #fff; }
+.admin-logout { margin: 0; }
+.admin-bar .btn--ghost { color: #fff; border-color: rgba(255,255,255,.3); }
+.admin-bar .btn--ghost:hover { background: rgba(255,255,255,.12); color: #fff; border-color: #fff; }
+
+/* ---------- Fejléc sor ---------- */
+.admin-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.admin-head h1 { font-size: 1.6rem; margin: 0; }
+.admin-head__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Statisztika kártyák ---------- */
+.admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.admin-stat { background: #fff; border: 1px solid var(--c-border); border-radius: var(--radius); padding: 22px; text-align: center; }
+.admin-stat strong { display: block; font-size: 2rem; color: var(--c-primary); line-height: 1; }
+.admin-stat span { color: var(--c-muted); font-size: .9rem; }
+
+/* ---------- Kártya / táblázat ---------- */
+.admin-card { background: #fff; border: 1px solid var(--c-border); border-radius: var(--radius); overflow: hidden; }
+.admin-card__head { display: flex; align-items: baseline; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--c-border); }
+.admin-card__head h2 { margin: 0; font-size: 1.1rem; }
+.admin-card--form { padding: 24px; }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th { text-align: left; padding: 12px 16px; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--c-muted); border-bottom: 1px solid var(--c-border); }
+.admin-table td { padding: 12px 16px; border-bottom: 1px solid var(--c-border); vertical-align: middle; }
+.admin-table tr:last-child td { border-bottom: 0; }
+.admin-table code { background: var(--c-bg-alt); padding: 2px 6px; border-radius: 4px; font-size: .85rem; }
+.admin-thumb img { border-radius: 8px; border: 1px solid var(--c-border); object-fit: contain; background: var(--c-bg-alt); }
+.admin-empty { text-align: center; color: var(--c-muted); padding: 32px; }
+.ta-right { text-align: right; }
+
+.inline-form { display: inline; margin: 0; }
+
+/* ---------- Címkék (pill) ---------- */
+.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+.pill--ok { background: #e6f3ec; color: #1f6e44; }
+.pill--off { background: #f0ece5; color: #8a7d6c; }
+.pill--star { background: #fbf0d8; color: #9a7113; }
+
+/* ---------- Gomb: veszély ---------- */
+.btn--danger { background: var(--c-danger); color: #fff; }
+.btn--danger:hover { background: #973a27; color: #fff; }
+
+/* ---------- Űrlapok ---------- */
+.admin-form { display: flex; flex-direction: column; gap: 16px; }
+.admin-form > label { display: block; font-weight: 600; font-size: .9rem; }
+.admin-form label input, .admin-form label select, .admin-form label textarea { margin-top: 6px; font-weight: 400; }
+.admin-form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.admin-form__actions { display: flex; gap: 10px; margin-top: 8px; }
+.muted { color: var(--c-muted); font-weight: 400; font-size: .82rem; }
+
+.admin-checks { display: flex; flex-direction: column; gap: 10px; }
+.admin-checks .check { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.admin-checks .check input { width: auto; margin: 0; }
+
+.admin-current-img { display: flex; flex-direction: column; gap: 6px; }
+.admin-current-img img { border: 1px solid var(--c-border); border-radius: 8px; background: var(--c-bg-alt); object-fit: contain; padding: 4px; }
+.admin-upload input[type="file"] { padding: 8px; }
+
+/* ---------- Belépés ---------- */
+.admin-auth { min-height: 80vh; display: grid; place-items: center; }
+.admin-auth__card { background: #fff; border: 1px solid var(--c-border); border-radius: var(--radius); padding: 36px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
+.admin-auth__card h1 { font-size: 1.5rem; margin-bottom: 4px; }
+.admin-auth__sub { color: var(--c-muted); margin: 0 0 22px; font-size: .9rem; }
+.admin-auth__hint { margin-top: 18px; text-align: center; font-size: .9rem; }
+
+.admin-message { background: #fff; border: 1px solid var(--c-border); border-radius: var(--radius); padding: 40px; text-align: center; max-width: 520px; margin: 40px auto; }
+
+/* ---------- Értesítések ---------- */
+.alert--error { background: #fbe9e6; color: #973a27; border: 1px solid #f1c7bf; }
+
+@media (max-width: 600px) {
+    .admin-bar__inner { height: auto; padding: 12px 20px; flex-wrap: wrap; }
+    .admin-nav { order: 3; width: 100%; }
+}

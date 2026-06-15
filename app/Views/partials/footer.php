@@ -28,8 +28,9 @@ $contact = $config['contact'];
         <div>
             <h4>Információ</h4>
             <ul>
-                <li><a href="/rolunk">Rólunk</a></li>
+                <li><a href="/rolunk">Bemutatkozás</a></li>
                 <li><a href="/kapcsolat">Kapcsolat</a></li>
+                <li><a href="/admin">Admin</a></li>
             </ul>
         </div>
 

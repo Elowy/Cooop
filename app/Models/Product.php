@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Str;
 
 /**
  * Termék modell.
@@ -78,6 +79,150 @@ final class Product
         $all = self::all();
         $featured = array_values(array_filter($all, static fn ($p) => !empty($p['featured'])));
         return array_slice($featured ?: $all, 0, $limit);
+    }
+
+    /**
+     * Minden termék (aktív és inaktív is) az admin listához.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function adminAll(): array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return self::demo();
+        }
+        $stmt = $pdo->query(
+            'SELECT p.*, c.slug AS category_slug, c.name AS category_name
+             FROM products p LEFT JOIN categories c ON c.id = p.category_id
+             ORDER BY p.id DESC'
+        );
+        return $stmt ? $stmt->fetchAll() : [];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public static function find(int $id): ?array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return null;
+        }
+        $stmt = $pdo->prepare(
+            'SELECT p.*, c.slug AS category_slug, c.name AS category_name
+             FROM products p LEFT JOIN categories c ON c.id = p.category_id
+             WHERE p.id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    /**
+     * Új termék létrehozása. Visszaadja az új azonosítót, vagy false-t.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function create(array $data): int|false
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return false;
+        }
+        $name = trim((string) ($data['name'] ?? ''));
+        if ($name === '') {
+            return false;
+        }
+        $slug = self::uniqueSlug((string) ($data['slug'] ?? '') ?: $name);
+        $stmt = $pdo->prepare(
+            'INSERT INTO products (category_id, slug, name, short, description, price, image, stock, featured, active)
+             VALUES (:cat, :slug, :name, :short, :description, :price, :image, :stock, :featured, :active)'
+        );
+        $stmt->execute(self::params($data, $slug, $name));
+        return (int) $pdo->lastInsertId();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public static function update(int $id, array $data): bool
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return false;
+        }
+        $name = trim((string) ($data['name'] ?? ''));
+        if ($name === '') {
+            return false;
+        }
+        $slug = self::uniqueSlug((string) ($data['slug'] ?? '') ?: $name, $id);
+        $stmt = $pdo->prepare(
+            'UPDATE products SET category_id = :cat, slug = :slug, name = :name, short = :short,
+             description = :description, price = :price, image = :image, stock = :stock,
+             featured = :featured, active = :active WHERE id = :id'
+        );
+        $params = self::params($data, $slug, $name);
+        $params['id'] = $id;
+        return $stmt->execute($params);
+    }
+
+    public static function delete(int $id): bool
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return false;
+        }
+        $stmt = $pdo->prepare('DELETE FROM products WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
+    }
+
+    /**
+     * Beviteli adatok normalizálása paraméter-tömbbé.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private static function params(array $data, string $slug, string $name): array
+    {
+        $catId = (int) ($data['category_id'] ?? 0);
+        return [
+            'cat'         => $catId > 0 ? $catId : null,
+            'slug'        => $slug,
+            'name'        => $name,
+            'short'       => trim((string) ($data['short'] ?? '')) ?: null,
+            'description' => trim((string) ($data['description'] ?? '')) ?: null,
+            'price'       => max(0, (int) round((float) ($data['price'] ?? 0))),
+            'image'       => trim((string) ($data['image'] ?? '')) ?: 'placeholder.svg',
+            'stock'       => max(0, (int) ($data['stock'] ?? 0)),
+            'featured'    => !empty($data['featured']) ? 1 : 0,
+            'active'      => isset($data['active']) ? (!empty($data['active']) ? 1 : 0) : 1,
+        ];
+    }
+
+    private static function uniqueSlug(string $base, ?int $ignoreId = null): string
+    {
+        $pdo = Database::getConnection();
+        $slug = Str::slug($base) ?: 'termek';
+        if ($pdo === null) {
+            return $slug;
+        }
+        $candidate = $slug;
+        $i = 2;
+        while (true) {
+            $sql = 'SELECT COUNT(*) FROM products WHERE slug = :slug';
+            $params = ['slug' => $candidate];
+            if ($ignoreId !== null) {
+                $sql .= ' AND id <> :id';
+                $params['id'] = $ignoreId;
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            if ((int) $stmt->fetchColumn() === 0) {
+                return $candidate;
+            }
+            $candidate = $slug . '-' . $i++;
+        }
     }
 
     /**

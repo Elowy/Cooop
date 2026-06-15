@@ -24,6 +24,15 @@ return [
         'address' => 'Balassagyarmat, Magyarország',
     ],
 
+    'admin' => [
+        // Az adminisztrációs felület belépési adatai. Éles használat előtt
+        // mindenképp állítsd be a környezeti változókkal! Jelszó helyett
+        // megadható előre generált hash is (ADMIN_PASSWORD_HASH).
+        'user'          => getenv('ADMIN_USER') ?: 'admin',
+        'password'      => getenv('ADMIN_PASSWORD') ?: 'admin123',
+        'password_hash' => getenv('ADMIN_PASSWORD_HASH') ?: '',
+    ],
+
     'database' => [
         'driver'   => getenv('DB_DRIVER') ?: 'mysql',
         'host'     => getenv('DB_HOST') ?: '127.0.0.1',
