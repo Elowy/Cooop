@@ -35,6 +35,6 @@ final class Router
         }
 
         http_response_code(404);
-        echo View::render('errors/404', ['title' => 'Az oldal nem található']);
+        echo View::render('errors/404', ['title' => Lang::t('e404.title')]);
     }
 }

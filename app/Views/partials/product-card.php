@@ -6,7 +6,7 @@ use App\Core\View;
 /** @var array<string, mixed> $config */
 $currency = $config['app']['currency'];
 ?>
-<article class="product-card">
+<article class="product-card reveal">
     <a href="/termek/<?= View::e($product['slug']) ?>" class="product-card__media">
         <img src="/assets/img/products/<?= View::e($product['image'] ?? 'placeholder.svg') ?>"
              alt="<?= View::e($product['name']) ?>" loading="lazy" width="320" height="220">
@@ -24,7 +24,7 @@ $currency = $config['app']['currency'];
             <span class="price"><?= View::price((float) $product['price'], $currency) ?><?php if (!empty($product['unit'])): ?><small class="price-unit">/ <?= View::e($product['unit']) ?></small><?php endif; ?></span>
             <form method="post" action="/kosar/hozzaad">
                 <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
-                <button type="submit" class="btn btn--small">Kosárba</button>
+                <button type="submit" class="btn btn--small"><?= View::e(t('btn.add')) ?></button>
             </form>
         </div>
     </div>

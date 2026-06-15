@@ -22,6 +22,7 @@ spl_autoload_register(static function (string $class): void {
 });
 
 use App\Core\Cart;
+use App\Core\Lang;
 use App\Core\Router;
 use App\Core\View;
 use App\Models\Category;
@@ -33,6 +34,8 @@ if ($config['app']['debug']) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
 }
+
+Lang::boot();
 
 $router = new Router();
 
@@ -139,16 +142,39 @@ $router->post('/kapcsolat', static function (): string {
 });
 
 $router->get('/rolunk', static function (): string {
-    return View::render('about', ['title' => 'Rólunk']);
+    return View::render('about', ['title' => Lang::t('nav.about')]);
+});
+
+$router->get('/galeria', static function (): string {
+    return View::render('gallery', ['title' => Lang::t('gallery.title')]);
+});
+
+$router->get('/kalkulator', static function (): string {
+    return View::render('calculator', [
+        'title'    => Lang::t('calc.title'),
+        'products' => Product::all(),
+    ]);
 });
 
 /* ------------------------------------------------------------------ *
- *  Segédfüggvény
+ *  Segédfüggvények
  * ------------------------------------------------------------------ */
 
 function redirect(string $path): void
 {
     header('Location: ' . $path, true, 302);
+}
+
+/** Fordítás (escape-elt kontextusban használandó). */
+function t(string $key): string
+{
+    return Lang::t($key);
+}
+
+/** Aktuális nyelvkód. */
+function lang(): string
+{
+    return Lang::code();
 }
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

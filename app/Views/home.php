@@ -7,55 +7,31 @@ use App\Core\View;
 /** @var array<int, array<string, mixed>> $featured */
 
 $services = [
-    [
-        'icon'  => 'packaging',
-        'title' => 'Ipari csomagolás',
-        'text'  => 'Gépek, gyártósorok és nagy értékű áruk feladatra szabott csomagolása légi, tengeri és közúti szállításhoz – igény szerint RAPID expressz kivitelezéssel.',
-    ],
-    [
-        'icon'  => 'pallet',
-        'title' => 'Faipari gyártás',
-        'text'  => 'Egyedi raklapok, exportládák, ömlesztett fatermékek és speciális faszerkezetek gyártása – kizárólag fenntartható forrásból származó alapanyagból.',
-    ],
-    [
-        'icon'  => 'truck',
-        'title' => 'Nemzetközi fuvarozás',
-        'text'  => '2021 óta saját nyergesvontatóval végzünk közúti fuvarozást – akár a saját logisztikánkhoz, akár megbízásból, több országba.',
-    ],
-    [
-        'icon'  => 'brick',
-        'title' => 'BRITTERM tégla képviselet',
-        'text'  => '2017 óta a szlovák BRITTERM téglagyártó magyarországi képviselője vagyunk – minőségi falazó-, kémény- és blokktéglák kedvező áron.',
-    ],
-    [
-        'icon'  => 'lumber',
-        'title' => 'Fűrészáru és tűzifa',
-        'text'  => 'Közel 30 év tapasztalattal kínálunk minőségi szlovák fenyő fűrészárut és tűzifát nagykereskedelmi mennyiségben, megbízható, folyamatos forrásból.',
-    ],
-    [
-        'icon'  => 'education',
-        'title' => 'Oktatás és képzés',
-        'text'  => 'Családi vállalkozásként a tudás átadása is fontos számunkra: szakmai oktatással és képzésekkel is foglalkozunk.',
-    ],
+    ['icon' => 'packaging', 'title' => t('svc.packaging.title'), 'text' => t('svc.packaging.text')],
+    ['icon' => 'pallet',    'title' => t('svc.woodwork.title'),  'text' => t('svc.woodwork.text')],
+    ['icon' => 'truck',     'title' => t('svc.freight.title'),   'text' => t('svc.freight.text')],
+    ['icon' => 'brick',     'title' => t('svc.brick.title'),     'text' => t('svc.brick.text')],
+    ['icon' => 'lumber',    'title' => t('svc.lumber.title'),    'text' => t('svc.lumber.text')],
+    ['icon' => 'education', 'title' => t('svc.education.title'),  'text' => t('svc.education.text')],
 ];
 ?>
 <section class="hero">
     <div class="container hero-inner">
-        <div class="hero-copy">
-            <p class="eyebrow">Net-Trade Hungary Kft.</p>
-            <h1>Ipari csomagolás, <span>raklap és fűrészáru</span> egy kézből</h1>
-            <p class="lead">Családi vállalkozásként a csomagolástól a faipari gyártáson át a fuvarozásig kísérjük végig partnereinket. „Az ügyfél sikere a mi sikerünk.”</p>
+        <div class="hero-copy reveal">
+            <p class="eyebrow"><?= View::e(t('hero.eyebrow')) ?></p>
+            <h1><?= t('hero.title_html') ?></h1>
+            <p class="lead"><?= View::e(t('hero.lead')) ?></p>
             <div class="hero-actions">
-                <a href="/termekek" class="btn btn--primary">Termékek böngészése</a>
-                <a href="/kapcsolat" class="btn btn--ghost">Ajánlatot kérek</a>
+                <a href="/termekek" class="btn btn--primary"><?= View::e(t('btn.browse')) ?></a>
+                <a href="/kapcsolat" class="btn btn--ghost"><?= View::e(t('btn.quote')) ?></a>
             </div>
             <ul class="hero-usps">
-                <li>✓ 100% minőségi garancia</li>
-                <li>✓ Közel 30 év tapasztalat</li>
-                <li>✓ Saját fuvarozás</li>
+                <li>✓ <?= View::e(t('hero.usp1')) ?></li>
+                <li>✓ <?= View::e(t('hero.usp2')) ?></li>
+                <li>✓ <?= View::e(t('hero.usp3')) ?></li>
             </ul>
         </div>
-        <div class="hero-art" aria-hidden="true">
+        <div class="hero-art reveal" aria-hidden="true">
             <img src="/assets/img/hero.svg" alt="" width="480" height="380">
         </div>
     </div>
@@ -63,12 +39,12 @@ $services = [
 
 <section class="section container">
     <div class="section-head">
-        <h2>Tevékenységeink</h2>
-        <a href="/rolunk" class="link-arrow">Rólunk →</a>
+        <h2><?= View::e(t('home.activities')) ?></h2>
+        <a href="/rolunk" class="link-arrow"><?= View::e(t('link.about')) ?></a>
     </div>
     <div class="feature-row feature-row--services">
         <?php foreach ($services as $s): ?>
-            <div class="feature feature--service">
+            <div class="feature feature--service reveal">
                 <span class="feature__icon" data-icon="<?= View::e($s['icon']) ?>"></span>
                 <h3><?= View::e($s['title']) ?></h3>
                 <p><?= View::e($s['text']) ?></p>
@@ -80,12 +56,12 @@ $services = [
 <section class="section section--alt">
     <div class="container">
         <div class="section-head">
-            <h2>Termékkínálatunk</h2>
-            <a href="/termekek" class="link-arrow">Összes termék →</a>
+            <h2><?= View::e(t('home.range')) ?></h2>
+            <a href="/termekek" class="link-arrow"><?= View::e(t('btn.all')) ?></a>
         </div>
         <div class="category-grid">
             <?php foreach ($categories as $cat): ?>
-                <a href="/termekek?kategoria=<?= View::e($cat['slug']) ?>" class="category-card">
+                <a href="/termekek?kategoria=<?= View::e($cat['slug']) ?>" class="category-card reveal">
                     <span class="category-card__icon" data-icon="<?= View::e($cat['icon'] ?? '') ?>"></span>
                     <span class="category-card__name"><?= View::e($cat['name']) ?></span>
                 </a>
@@ -93,8 +69,8 @@ $services = [
         </div>
 
         <div class="section-head" style="margin-top:48px;">
-            <h2>Kiemelt termékek</h2>
-            <a href="/termekek" class="link-arrow">Tovább →</a>
+            <h2><?= View::e(t('home.featured')) ?></h2>
+            <a href="/termekek" class="link-arrow"><?= View::e(t('btn.more')) ?></a>
         </div>
         <div class="product-grid">
             <?php foreach ($featured as $product): ?>
@@ -106,17 +82,17 @@ $services = [
 
 <section class="section container">
     <div class="feature-row">
-        <div class="feature">
-            <h3>100% minőségi garancia</h3>
-            <p>Minőségi munkát adunk ki a kezünkből; ha mégis hiba lenne, cseréljük vagy javítjuk. Az ügyfél elégedettsége az első.</p>
+        <div class="feature reveal">
+            <h3><?= View::e(t('val.quality.title')) ?></h3>
+            <p><?= View::e(t('val.quality.text')) ?></p>
         </div>
-        <div class="feature">
-            <h3>Fenntartható alapanyag</h3>
-            <p>Csak felelős, fenntartható forrásból származó faanyaggal dolgozunk, és minden faforgácsot igyekszünk hasznosítani.</p>
+        <div class="feature reveal">
+            <h3><?= View::e(t('val.sustain.title')) ?></h3>
+            <p><?= View::e(t('val.sustain.text')) ?></p>
         </div>
-        <div class="feature">
-            <h3>Gyors, megbízható kiszolgálás</h3>
-            <p>Viszonteladói és projektrendeléseket jellemzően 1–1,5 héten belül teljesítünk, saját fuvareszközzel is.</p>
+        <div class="feature reveal">
+            <h3><?= View::e(t('val.service.title')) ?></h3>
+            <p><?= View::e(t('val.service.text')) ?></p>
         </div>
     </div>
 </section>

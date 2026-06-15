@@ -7,24 +7,24 @@ use App\Core\View;
 $currency = $config['app']['currency'];
 ?>
 <section class="page-head">
-    <div class="container"><h1>Kosár</h1></div>
+    <div class="container"><h1><?= View::e(t('cart.title')) ?></h1></div>
 </section>
 
 <section class="section container">
     <?php if (empty($cart['lines'])): ?>
         <div class="empty-state">
-            <p>A kosarad jelenleg üres.</p>
-            <a href="/termekek" class="btn btn--primary">Vásárlás megkezdése</a>
+            <p><?= View::e(t('cart.empty')) ?></p>
+            <a href="/termekek" class="btn btn--primary"><?= View::e(t('cart.start')) ?></a>
         </div>
     <?php else: ?>
         <form method="post" action="/kosar/frissit" class="cart-table-wrap">
             <table class="cart-table">
                 <thead>
                     <tr>
-                        <th>Termék</th>
-                        <th>Egységár</th>
-                        <th>Mennyiség</th>
-                        <th>Részösszeg</th>
+                        <th><?= View::e(t('cart.product')) ?></th>
+                        <th><?= View::e(t('cart.unit')) ?></th>
+                        <th><?= View::e(t('cart.qty')) ?></th>
+                        <th><?= View::e(t('cart.subtotal')) ?></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -52,10 +52,10 @@ $currency = $config['app']['currency'];
             </table>
 
             <div class="cart-foot">
-                <button type="submit" class="btn btn--ghost">Kosár frissítése</button>
+                <button type="submit" class="btn btn--ghost"><?= View::e(t('cart.update')) ?></button>
                 <div class="cart-summary">
-                    <p class="cart-total">Összesen: <strong><?= View::price((float) $cart['total'], $currency) ?></strong></p>
-                    <a href="/penztar" class="btn btn--primary">Tovább a pénztárhoz</a>
+                    <p class="cart-total"><?= View::e(t('cart.total')) ?> <strong><?= View::price((float) $cart['total'], $currency) ?></strong></p>
+                    <a href="/penztar" class="btn btn--primary"><?= View::e(t('cart.checkout')) ?></a>
                 </div>
             </div>
         </form>

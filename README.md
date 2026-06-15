@@ -15,6 +15,13 @@ fenyő fűrészáru- és tűzifa-kereskedelem.
 - Termékkatalógus (raklapok, ládák, fűrészáru, tűzifa, tégla) kategória-szűréssel,
   kereséssel és egységár-mértékegységgel (db / m³ / fm)
 - Munkamenet (session) alapú **kosár / ajánlatkérés** folyamat
+- **Háromnyelvű** felület (HU / EN / DE) – süti alapú nyelvválasztás, külső
+  függőség nélkül (`config/lang.php`, `App\Core\Lang`)
+- **Árkalkulátor** (`/kalkulator`) – termék, mennyiség és méret-szorzó alapján
+  azonnali, tájékoztató nettó ár
+- **Referencia galéria** (`/galeria`) lightbox-os nagyítással
+- **Sötét / világos mód** (mentett választás, rendszerbeállítás követése) és
+  finom belépő animációk (a `prefers-reduced-motion` tiszteletben tartásával)
 - Reszponzív, modern dizájn (mobil menü, sticky fejléc)
 - Egyedi SVG illusztrációk – nincs külső kép-/betűtípus-függőség
 
@@ -22,11 +29,11 @@ fenyő fűrészáru- és tűzifa-kereskedelem.
 
 ```
 app/
-  Core/          Router, View, Database, Cart
+  Core/          Router, View, Database, Cart, Lang
   Controllers/   (útvonal-kezelők jelenleg az index.php-ban)
   Models/        Product, Category
-  Views/         sablonok (layouts, partials, oldalak)
-config/          config.php (env változókból olvas)
+  Views/         sablonok (layouts, partials, oldalak, galéria, kalkulátor)
+config/          config.php, lang.php (HU/EN/DE fordítások)
 database/        schema.sql, seed.sql
 public/          webgyökér (index.php, .htaccess, assets/)
 ```
