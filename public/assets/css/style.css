@@ -139,18 +139,31 @@ h1, h2, h3, h4 { line-height: 1.2; color: var(--c-dark); margin: 0 0 .5em; }
 }
 .nav-toggle span { width: 24px; height: 2px; background: var(--c-dark); border-radius: 2px; transition: .2s; }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (színátmenetes nyitókép) ---------- */
 .hero {
-    background: radial-gradient(120% 120% at 100% 0%, var(--c-primary-light) 0%, var(--c-bg) 55%);
-    padding: 72px 0;
+    background: linear-gradient(135deg, #1c5733 0%, #2f7d46 48%, #c2872c 128%);
+    color: #fff;
+    padding: 88px 0;
+    position: relative;
+    overflow: hidden;
 }
-.hero-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
-.hero-copy h1 { font-size: clamp(2rem, 4vw, 3.1rem); margin-bottom: 16px; }
-.hero-copy h1 span { color: var(--c-primary); }
+.hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(60% 80% at 85% 8%, rgba(255, 255, 255, .18), transparent 60%);
+}
+.hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+.hero .eyebrow { color: rgba(255, 255, 255, .82); }
+.hero-copy h1 { font-size: clamp(2rem, 4vw, 3.1rem); margin-bottom: 16px; color: #fff; }
+.hero-copy h1 span { color: #ffe1ab; }
 .lead { font-size: 1.15rem; color: var(--c-muted); margin: 0 0 28px; max-width: 46ch; }
+.hero .lead { color: rgba(255, 255, 255, .9); }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
-.hero-usps { list-style: none; padding: 0; margin: 0; display: flex; gap: 22px; flex-wrap: wrap; color: var(--c-text); font-weight: 500; font-size: .92rem; }
-.hero-art img { margin-inline: auto; filter: drop-shadow(var(--shadow-lg)); }
+.hero-usps { list-style: none; padding: 0; margin: 0; display: flex; gap: 22px; flex-wrap: wrap; color: #fff; font-weight: 500; font-size: .92rem; }
+.hero .btn--primary { background: #fff; color: #1c5733; }
+.hero .btn--primary:hover { background: #eef3ea; color: #1c5733; }
+.hero .btn--ghost { border-color: rgba(255, 255, 255, .55); color: #fff; background: transparent; }
+.hero .btn--ghost:hover { border-color: #fff; color: #fff; background: rgba(255, 255, 255, .12); }
+.hero-art img { margin-inline: auto; border-radius: var(--radius); filter: drop-shadow(var(--shadow-lg)); }
 
 /* ---------- Categories ---------- */
 .category-grid {
