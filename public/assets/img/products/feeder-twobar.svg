@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none" role="img" aria-label="Kétpálcás madáretető">
+  <line x1="160" y1="14" x2="160" y2="52" stroke="#8a6444" stroke-width="4"/>
+  <polygon points="160,40 230,94 90,94" fill="#5a4030"/>
+  <polygon points="160,40 230,94 216,94 160,52" fill="#000" opacity=".12"/>
+  <rect x="104" y="94" width="11" height="52" fill="#caa06a"/>
+  <rect x="205" y="94" width="11" height="52" fill="#caa06a"/>
+  <rect x="115" y="98" width="90" height="46" fill="#d2b07d"/>
+  <!-- two perch bars -->
+  <rect x="64" y="128" width="192" height="7" rx="3" fill="#a86b2f"/>
+  <rect x="64" y="150" width="192" height="7" rx="3" fill="#a86b2f"/>
+  <ellipse cx="160" cy="146" rx="42" ry="6" fill="#c9962f"/>
+  <circle cx="146" cy="144" r="3" fill="#5a3d22"/><circle cx="160" cy="145" r="3" fill="#5a3d22"/><circle cx="174" cy="144" r="3" fill="#5a3d22"/>
+  <g transform="translate(82,131)">
+    <ellipse cx="0" cy="0" rx="10" ry="8" fill="#7a5230"/>
+    <circle cx="-7" cy="-4" r="5" fill="#7a5230"/>
+    <circle cx="-9" cy="-5" r="1.4" fill="#fff"/>
+    <polygon points="-13,-5 -20,-3 -13,-1" fill="#c9962f"/>
+  </g>
+  <g transform="translate(236,153)">
+    <ellipse cx="0" cy="0" rx="10" ry="8" fill="#2f6e4f"/>
+    <circle cx="7" cy="-4" r="5" fill="#2f6e4f"/>
+    <circle cx="9" cy="-5" r="1.4" fill="#fff"/>
+    <polygon points="13,-5 20,-3 13,-1" fill="#c9962f"/>
+  </g>
+</svg>

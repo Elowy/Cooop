@@ -1,6 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
-  <rect width="320" height="240" fill="#f5f8fc"/>
-  <rect x="110" y="80" width="100" height="80" rx="10" fill="#e4e8ee"/>
-  <circle cx="135" cy="105" r="10" fill="#c4ccd6"/>
-  <path d="M120 155 l30 -34 24 22 18 -16 18 28 z" fill="#c4ccd6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none" role="img" aria-label="Madáretető">
+  <rect width="320" height="240" fill="#f7f2e9"/>
+  <line x1="160" y1="30" x2="160" y2="64" stroke="#8a6444" stroke-width="4"/>
+  <polygon points="160,52 226,104 94,104" fill="#6b4a2f"/>
+  <rect x="106" y="104" width="11" height="50" fill="#caa06a"/>
+  <rect x="203" y="104" width="11" height="50" fill="#caa06a"/>
+  <rect x="117" y="108" width="86" height="46" fill="#d2b07d"/>
+  <rect x="92" y="154" width="136" height="13" rx="4" fill="#c9962f"/>
+  <rect x="86" y="167" width="148" height="9" rx="4" fill="#caa06a"/>
 </svg>

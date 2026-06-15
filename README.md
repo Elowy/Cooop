@@ -1,17 +1,19 @@
-# Net Trade – webshop
+# Net-Trade Hungary – webshop
 
-A [net-trade.hu](https://net-trade.hu) megújult, teljesen saját fejlesztésű PHP
-webáruháza – hálózati és IT eszközök (routerek, switchek, kábelek, kamerák,
-tárolók) értékesítésére.
+A [net-trade.hu](https://net-trade.hu) mintájára épülő, saját fejlesztésű PHP
+webáruház. A **Net-Trade Hungary Kft.** balassagyarmati családi vállalkozás,
+közel 30 év tapasztalattal a borovi fenyő kereskedelmében: egyedi raklapgyártás,
+ipari csomagolás, nemzetközi szállítmányozás és oktatás – webáruházában pedig
+tartós, dekoratív **Vega madáretetők** kaphatók.
 
 ## Jellemzők
 
 - Saját, könnyűsúlyú **MVC** architektúra, keretrendszer és külső függőség nélkül
 - Front controller + reguláris kifejezés alapú **útvonalkezelő**
 - **PDO** adatbázis-réteg (MySQL/MariaDB) – adatbázis nélkül demó adatokra esik vissza
-- Termékkatalógus kategória-szűréssel és kereséssel, termékoldalakkal
+- Termékkatalógus (Vega madáretetők) kategória-szűréssel és kereséssel, termékoldalakkal
 - Munkamenet (session) alapú **kosár** és pénztár folyamat
-- Reszponzív, modern dizájn (mobil menü, sticky fejléc)
+- Reszponzív, természetes (fa / fenyő) arculatú dizájn (mobil menü, sticky fejléc)
 - Egyedi SVG illusztrációk – nincs külső kép-/betűtípus-függőség
 
 ## Mappastruktúra
@@ -59,14 +61,19 @@ Az alkalmazás beállításai környezeti változókkal felülírhatók:
 
 | Változó | Alapérték | Leírás |
 |---|---|---|
-| `APP_NAME` | Net Trade | Bolt neve |
+| `APP_NAME` | Net-Trade Hungary | Bolt neve |
 | `APP_URL` | http://localhost:8000 | Alap URL |
 | `APP_DEBUG` | true | Hibák megjelenítése |
 | `DB_HOST` … | lásd config | Adatbázis-kapcsolat |
 
+## Kapcsolat
+
+A valós cég elérhetősége: **info@net-trade.hu**, **+36 20 387 1450**,
+Balassagyarmat. A termékek, árak és illusztrációk demonstrációs célúak.
+
 ## Következő lépések
 
-- Az eredeti net-trade.hu tartalom (szövegek, termékek, képek) átemelése
+- További Vega madáretető-változatok és valós termékfotók átemelése
 - Rendelés mentése az `orders` táblába és e-mail visszaigazolás
 - Admin felület a termékek kezeléséhez
 - Fizetési szolgáltató integrációja

@@ -20,6 +20,9 @@ $sent = $sent ?? false;
         <div class="contact-info">
             <h2>Elérhetőségeink</h2>
             <ul class="contact-list">
+                <?php if (!empty($contact['person'])): ?>
+                    <li><strong>Kapcsolattartó</strong><span><?= View::e($contact['person']) ?></span></li>
+                <?php endif; ?>
                 <li><strong>E-mail</strong><a href="mailto:<?= View::e($contact['email']) ?>"><?= View::e($contact['email']) ?></a></li>
                 <li><strong>Telefon</strong><a href="tel:<?= View::e(str_replace(' ', '', $contact['phone'])) ?>"><?= View::e($contact['phone']) ?></a></li>
                 <li><strong>Cím</strong><span><?= View::e($contact['address']) ?></span></li>

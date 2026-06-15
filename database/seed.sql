@@ -1,18 +1,17 @@
--- Net Trade – demó adatok
+-- Net-Trade Hungary – demó adatok (Vega madáretetők)
 
 INSERT INTO categories (slug, name, icon) VALUES
-('routerek', 'Routerek', 'router'),
-('switchek', 'Switchek', 'switch'),
-('kabelek',  'Kábelek',  'cable'),
-('kamerak',  'Kamerák',  'camera'),
-('tarolok',  'Tárolók',  'nas');
+('klasszikus',   'Klasszikus',   'feeder'),
+('modern',       'Modern',       'feeder'),
+('nagy',         'Nagy méretű',  'feeder'),
+('fuggesztheto', 'Függeszthető', 'feeder');
 
 INSERT INTO products (category_id, slug, name, short, description, price, image, stock, featured) VALUES
-((SELECT id FROM categories WHERE slug='routerek'), 'wifi6-router-ax3000', 'WiFi 6 Router AX3000', 'Nagy sebességű WiFi 6 router otthonra és kis irodába.', 'Dual-band WiFi 6 (802.11ax) router 3000 Mbps összesített sebességgel, 4 db Gigabit LAN porttal és OFDMA technológiával.', 28990, 'router.svg', 24, 1),
-((SELECT id FROM categories WHERE slug='switchek'), 'gigabit-switch-8-port', 'Gigabit Switch 8 portos', 'Fémházas, csendes 8 portos Gigabit switch.', 'Plug & play 8 portos Gigabit Ethernet switch, fémházban, ventilátor nélküli csendes működéssel.', 12490, 'switch.svg', 50, 1),
-((SELECT id FROM categories WHERE slug='kabelek'), 'cat6-utp-kabel-305m', 'Cat6 UTP kábel 305m', 'Réz CAT6 UTP installációs kábel dobozos kiszerelésben.', '305 méteres CAT6 UTP installációs kábel, tömör réz erekkel, 250 MHz sávszélességgel.', 34900, 'cable.svg', 15, 0),
-((SELECT id FROM categories WHERE slug='kamerak'), 'poe-ip-kamera-4mp', 'PoE IP kamera 4MP', '4 megapixeles kültéri PoE IP biztonsági kamera.', '4MP felbontású kültéri (IP67) PoE IP kamera éjjellátóval (30m IR), mozgásérzékeléssel és H.265 tömörítéssel.', 19990, 'camera.svg', 32, 1),
-((SELECT id FROM categories WHERE slug='routerek'), 'access-point-ceiling-ax1800', 'Access Point mennyezeti AX1800', 'Mennyezetre szerelhető WiFi 6 access point.', 'Mennyezetre szerelhető WiFi 6 access point 1800 Mbps sebességgel, PoE táplálással.', 23490, 'ap.svg', 18, 0),
-((SELECT id FROM categories WHERE slug='kabelek'), 'patch-panel-24-port', 'Patch panel 24 portos', '19" 1U CAT6 patch panel rackszekrénybe.', '19 colos, 1U magas, 24 portos CAT6 patch panel rendezett hálózati szereléshez.', 8990, 'panel.svg', 40, 0),
-((SELECT id FROM categories WHERE slug='tarolok'), 'nas-2-bay', 'NAS adattároló 2 lemezes', 'Kétlemezes hálózati adattároló otthonra és irodába.', 'Kétlemezes (2-bay) NAS központi adattároláshoz, RAID támogatással és gigabites csatlakozással.', 64900, 'nas.svg', 9, 1),
-((SELECT id FROM categories WHERE slug='tarolok'), 'szunetmentes-tapegyseg-650va', 'Szünetmentes tápegység 650VA', 'UPS a hálózati eszközök védelméhez áramkimaradás ellen.', '650VA / 360W szünetmentes tápegység (UPS) túlfeszültség-védelemmel.', 17990, 'ups.svg', 21, 0);
+((SELECT id FROM categories WHERE slug='klasszikus'), 'vega-klasszikus-madareteto', 'Vega klasszikus madáretető', 'Hőkezelt borovi fenyőből készült, időtálló klasszikus etető.', 'A Vega klasszikus madáretető praktikus megoldás, amely különlegessé teszi kertjét vagy erkélyét a téli hónapokban. Hőkezelt borovi fenyőből és farostlemezből készül, IPPC és ISPM 15 szabvány szerint, CE-tanúsítvánnyal.', 4990, 'feeder-classic.svg', 40, 1),
+((SELECT id FROM categories WHERE slug='klasszikus'), 'vega-ketpalcas-madareteto', 'Vega kétpálcás madáretető', 'Két ülőpálcával a kisebb énekesmadaraknak.', 'Két ülőpálcával ellátott klasszikus madáretető, amely stabil, szellős etetőfelületet kínál a kisebb énekesmadaraknak. Hőkezelt borovi fenyőből, tartós kivitelben.', 5490, 'feeder-twobar.svg', 35, 0),
+((SELECT id FROM categories WHERE slug='modern'), 'vega-pagoda-madareteto', 'Vega pagoda madáretető', 'Letisztult pagoda forma, modern kertek dísze.', 'A Vega pagoda madáretető letisztult, modern formavilágával bármely kert dísze lehet. Tágas etetőfelülete több madár egyidejű etetését is lehetővé teszi.', 6990, 'feeder-pagoda.svg', 22, 1),
+((SELECT id FROM categories WHERE slug='modern'), 'vega-modern-madareteto', 'Vega modern madáretető', 'Minimalista vonalvezetés, natúr felület.', 'Minimalista vonalvezetésű, natúr felületű madáretető kortárs homlokzatokhoz és modern kertekhez. Hőkezelt borovi fenyőből készül.', 7490, 'feeder-modern.svg', 18, 0),
+((SELECT id FROM categories WHERE slug='nagy'), 'vega-nagy-csaladi-madareteto', 'Vega nagy családi madáretető', 'Nagyobb befogadóképesség egész télre.', 'Nagy befogadóképességű madáretető, amely több madár egyidejű etetését teszi lehetővé egész télen át. Robusztus, hőkezelt borovi fenyő szerkezet.', 8990, 'feeder-large.svg', 14, 1),
+((SELECT id FROM categories WHERE slug='fuggesztheto'), 'vega-fuggesztheto-madareteto', 'Vega függeszthető madáretető', 'Faágra vagy konzolra akasztható, kompakt etető.', 'Faágra vagy konzolra egyszerűen felakasztható, könnyű és kompakt madáretető a kertbe vagy a balkonra. Hőkezelt borovi fenyőből.', 4490, 'feeder-hanging.svg', 50, 1),
+((SELECT id FROM categories WHERE slug='nagy'), 'vega-oszlopos-madareteto', 'Vega oszlopos madáretető', 'Talajba állítható oszlopos etető nyitott kertbe.', 'Talajba állítható, oszlopos kivitelű madáretető, amely nyitott kertbe, gyepre is kiváló. Stabil láb, tágas tető, hőkezelt borovi fenyőből.', 7990, 'feeder-post.svg', 12, 0),
+((SELECT id FROM categories WHERE slug='fuggesztheto'), 'vega-mini-balkon-madareteto', 'Vega mini balkon madáretető', 'Helytakarékos mini etető erkélyre, ablakpárkányra.', 'Helytakarékos, mini méretű madáretető erkélyre vagy ablakpárkányra, ahol kevés a hely. Könnyen felakasztható, hőkezelt borovi fenyőből.', 3990, 'feeder-mini.svg', 60, 0);
