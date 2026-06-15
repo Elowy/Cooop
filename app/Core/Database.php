@@ -6,10 +6,15 @@ use PDO;
 use PDOException;
 
 /**
- * Egyszerű PDO alapú adatbázis-kapcsolat singleton.
+ * Egyszerű PDO alapú adatbázis-kapcsolat.
  *
- * Ha az adatbázis nem érhető el (pl. fejlesztés közben), a getConnection()
- * null-t ad vissza, a modellek pedig demó adatokra esnek vissza.
+ * Két meghajtót támogat:
+ *  - sqlite : fájl alapú, külső szerver nélkül (alapértelmezett, ha a
+ *             storage/database.sqlite létezik) – ideális fejlesztéshez,
+ *  - mysql  : éles környezethez.
+ *
+ * Ha nincs elérhető adatbázis, a getConnection() null-t ad vissza, és a
+ * modellek a demó adatokra esnek vissza.
  */
 final class Database
 {
@@ -24,27 +29,66 @@ final class Database
 
         self::$attempted = true;
         $config = require dirname(__DIR__, 2) . '/config/config.php';
-        $db = $config['database'];
+
+        try {
+            self::$instance = self::connect($config['database']);
+        } catch (PDOException) {
+            self::$instance = null;
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * A ténylegesen használt meghajtó neve (sqlite vagy mysql).
+     *
+     * @param array<string, mixed> $db
+     */
+    public static function resolveDriver(array $db): string
+    {
+        $driver = (string) ($db['driver'] ?? '');
+        if ($driver !== '') {
+            return $driver;
+        }
+
+        // Automatikus: ha van SQLite fájl, azt használjuk, különben MySQL.
+        return is_file((string) ($db['sqlite'] ?? '')) ? 'sqlite' : 'mysql';
+    }
+
+    /**
+     * Új PDO kapcsolat felépítése (a telepítő is ezt használja).
+     *
+     * @param array<string, mixed> $db
+     */
+    public static function connect(array $db, ?string $driver = null): PDO
+    {
+        $driver = $driver ?: self::resolveDriver($db);
+
+        $options = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ];
+
+        if ($driver === 'sqlite') {
+            $path = (string) $db['sqlite'];
+            $dir = dirname($path);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0775, true);
+            }
+            $pdo = new PDO('sqlite:' . $path, null, null, $options);
+            $pdo->exec('PRAGMA foreign_keys = ON');
+            return $pdo;
+        }
 
         $dsn = sprintf(
-            '%s:host=%s;port=%s;dbname=%s;charset=%s',
-            $db['driver'],
+            'mysql:host=%s;port=%s;dbname=%s;charset=%s',
             $db['host'],
             $db['port'],
             $db['name'],
             $db['charset']
         );
 
-        try {
-            self::$instance = new PDO($dsn, $db['user'], $db['password'], [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ]);
-        } catch (PDOException) {
-            self::$instance = null;
-        }
-
-        return self::$instance;
+        return new PDO($dsn, $db['user'], $db['password'], $options);
     }
 }

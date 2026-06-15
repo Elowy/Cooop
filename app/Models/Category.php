@@ -21,6 +21,37 @@ final class Category
         return $stmt ? $stmt->fetchAll() : self::demo();
     }
 
+    /** @return array<string, mixed>|null */
+    public static function find(int $id): ?array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            foreach (self::demo() as $c) {
+                if ((int) $c['id'] === $id) {
+                    return $c;
+                }
+            }
+            return null;
+        }
+        $stmt = $pdo->prepare('SELECT * FROM categories WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Új kategória létrehozása (ha még nincs ilyen slug). Visszaadja az azonosítót.
+     */
+    public static function create(string $name, string $slug, string $icon = ''): int
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return 0;
+        }
+        $stmt = $pdo->prepare('INSERT INTO categories (slug, name, icon) VALUES (:slug, :name, :icon)');
+        $stmt->execute(['slug' => $slug, 'name' => $name, 'icon' => $icon ?: null]);
+        return (int) $pdo->lastInsertId();
+    }
+
     /**
      * @return array<int, array<string, mixed>>
      */

@@ -429,3 +429,48 @@ label input, label textarea { margin-top: 6px; font-weight: 400; }
 @media (max-width: 720px) {
     .nav-tools { margin: 10px 0 0; padding-top: 12px; border-top: 1px solid var(--c-border); width: 100%; justify-content: flex-start; flex-wrap: wrap; }
 }
+
+/* ==========================================================================
+   Autentikáció és admin felület
+   ========================================================================== */
+
+/* Fejléc: be-/kilépés */
+.logout-form { display: inline; margin: 0; }
+.link-button {
+    background: none; border: 0; cursor: pointer; font: inherit; font-weight: 500;
+    color: var(--c-text); padding: 8px 14px; border-radius: var(--radius-sm);
+    transition: background .15s ease, color .15s ease;
+}
+.link-button:hover { background: var(--c-primary-light); color: var(--c-primary); }
+.main-nav a.nav-admin { color: var(--c-primary); font-weight: 700; }
+
+/* Hibaüzenet */
+.alert--error { background: #fdecea; color: #a3261f; border: 1px solid #f5c6c2; }
+
+/* Belépés / regisztráció kártya */
+.auth-card {
+    max-width: 460px; margin: 0 auto; background: var(--c-surface);
+    border: 1px solid var(--c-border); border-radius: var(--radius);
+    padding: 32px; box-shadow: var(--shadow-sm);
+}
+.auth-alt { margin: 18px 0 0; text-align: center; color: var(--c-muted); font-size: .92rem; }
+
+/* Admin */
+.admin-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.admin-head p { margin: 0; color: var(--c-muted); }
+.table-scroll { overflow-x: auto; }
+.admin-table th, .admin-table td { vertical-align: middle; white-space: nowrap; }
+.admin-actions { display: flex; gap: 8px; align-items: center; }
+.admin-actions form { display: inline; margin: 0; }
+.badge--off { position: static; background: var(--c-muted); }
+.badge--featured { position: static; }
+.btn--danger { background: var(--c-danger); color: #fff; }
+.btn--danger:hover { background: var(--c-danger); color: #fff; filter: brightness(.92); }
+
+.admin-form { max-width: 760px; }
+.admin-form .form-grid { margin: 0 0 8px; }
+.admin-form-actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+.admin-current-img { display: flex; align-items: center; gap: 10px; margin-top: 8px; color: var(--c-muted); font-size: .85rem; }
+.admin-current-img img { border: 1px solid var(--c-border); border-radius: var(--radius-sm); }
+label.checkbox { display: flex; flex-direction: row; align-items: center; gap: 10px; font-weight: 500; }
+label.checkbox input { width: auto; margin: 0; }

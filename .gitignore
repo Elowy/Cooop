@@ -9,6 +9,11 @@
 *.log
 /tmp/
 
+# Adatbázis (SQLite) és tárhely
+/storage/
+*.sqlite
+*.sqlite3
+
 # Szerkesztő / OS
 .DS_Store
 .idea/

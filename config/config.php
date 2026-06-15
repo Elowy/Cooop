@@ -25,7 +25,9 @@ return [
     ],
 
     'database' => [
-        'driver'   => getenv('DB_DRIVER') ?: 'mysql',
+        // '' = automatikus: sqlite ha létezik a storage/database.sqlite, különben mysql
+        'driver'   => getenv('DB_DRIVER') ?: '',
+        'sqlite'   => getenv('DB_DATABASE') ?: dirname(__DIR__) . '/storage/database.sqlite',
         'host'     => getenv('DB_HOST') ?: '127.0.0.1',
         'port'     => getenv('DB_PORT') ?: '3306',
         'name'     => getenv('DB_NAME') ?: 'net_trade',

@@ -81,6 +81,139 @@ final class Product
     }
 
     /**
+     * Egy termék azonosító alapján (admin, aktivitástól függetlenül).
+     *
+     * @return array<string, mixed>|null
+     */
+    public static function find(int $id): ?array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            foreach (self::demo() as $product) {
+                if ((int) $product['id'] === $id) {
+                    return $product;
+                }
+            }
+            return null;
+        }
+        $stmt = $pdo->prepare(
+            'SELECT p.*, c.slug AS category_slug, c.name AS category_name
+             FROM products p LEFT JOIN categories c ON c.id = p.category_id
+             WHERE p.id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Összes termék az admin listához (inaktívak is).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function allForAdmin(): array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return self::demo();
+        }
+        $stmt = $pdo->query(
+            'SELECT p.*, c.name AS category_name FROM products p
+             LEFT JOIN categories c ON c.id = p.category_id
+             ORDER BY p.created_at DESC, p.id DESC'
+        );
+        return $stmt ? $stmt->fetchAll() : [];
+    }
+
+    /**
+     * Új termék létrehozása. Visszaadja az új azonosítót.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function create(array $data): int
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return 0;
+        }
+        $stmt = $pdo->prepare(
+            'INSERT INTO products (category_id, slug, name, short, description, price, unit, image, stock, featured, active)
+             VALUES (:category_id, :slug, :name, :short, :description, :price, :unit, :image, :stock, :featured, :active)'
+        );
+        $stmt->execute(self::bind($data));
+        return (int) $pdo->lastInsertId();
+    }
+
+    /**
+     * Meglévő termék módosítása.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function update(int $id, array $data): void
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return;
+        }
+        $params = self::bind($data);
+        $params['id'] = $id;
+        $stmt = $pdo->prepare(
+            'UPDATE products SET category_id = :category_id, slug = :slug, name = :name,
+                short = :short, description = :description, price = :price, unit = :unit,
+                image = :image, stock = :stock, featured = :featured, active = :active
+             WHERE id = :id'
+        );
+        $stmt->execute($params);
+    }
+
+    public static function delete(int $id): void
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return;
+        }
+        $stmt = $pdo->prepare('DELETE FROM products WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+    }
+
+    /**
+     * Slug képzése névből (ékezetek eltávolításával).
+     */
+    public static function slugify(string $text): string
+    {
+        $map = [
+            'á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ö'=>'o','ő'=>'o','ú'=>'u','ü'=>'u','ű'=>'u',
+            'Á'=>'a','É'=>'e','Í'=>'i','Ó'=>'o','Ö'=>'o','Ő'=>'o','Ú'=>'u','Ü'=>'u','Ű'=>'u',
+        ];
+        $text = strtr($text, $map);
+        $text = strtolower($text);
+        $text = preg_replace('/[^a-z0-9]+/', '-', $text) ?? '';
+        return trim($text, '-') ?: 'termek';
+    }
+
+    /**
+     * Beviteli adatok normalizálása a prepared statementhez.
+     *
+     * @param array<string, mixed> $d
+     * @return array<string, mixed>
+     */
+    private static function bind(array $d): array
+    {
+        return [
+            'category_id' => ($d['category_id'] ?? null) ?: null,
+            'slug'        => (string) ($d['slug'] ?? ''),
+            'name'        => (string) ($d['name'] ?? ''),
+            'short'       => (string) ($d['short'] ?? ''),
+            'description' => (string) ($d['description'] ?? ''),
+            'price'       => (float) ($d['price'] ?? 0),
+            'unit'        => (string) ($d['unit'] ?? 'db'),
+            'image'       => (string) ($d['image'] ?? 'placeholder.svg'),
+            'stock'       => (int) ($d['stock'] ?? 0),
+            'featured'    => !empty($d['featured']) ? 1 : 0,
+            'active'      => !empty($d['active']) ? 1 : 0,
+        ];
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $items
      * @return array<int, array<string, mixed>>
      */

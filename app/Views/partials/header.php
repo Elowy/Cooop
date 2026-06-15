@@ -1,12 +1,15 @@
 <?php
 
+use App\Core\Auth;
 use App\Core\Cart;
+use App\Core\Csrf;
 use App\Core\Lang;
 use App\Core\View;
 
 /** @var array<string, mixed> $config */
 $count = Cart::count();
 $current = Lang::code();
+$user = Auth::user();
 ?>
 <header class="site-header" data-header>
     <div class="container header-inner">
@@ -29,6 +32,19 @@ $current = Lang::code();
             <a href="/kalkulator"><?= View::e(t('nav.calculator')) ?></a>
             <a href="/rolunk"><?= View::e(t('nav.about')) ?></a>
             <a href="/kapcsolat"><?= View::e(t('nav.contact')) ?></a>
+
+            <?php if ($user !== null): ?>
+                <?php if (Auth::isAdmin()): ?>
+                    <a href="/admin" class="nav-admin"><?= View::e(t('nav.admin')) ?></a>
+                <?php endif; ?>
+                <form method="post" action="/kilepes" class="logout-form">
+                    <?= Csrf::field() ?>
+                    <button type="submit" class="link-button"><?= View::e(t('nav.logout')) ?></button>
+                </form>
+            <?php else: ?>
+                <a href="/belepes"><?= View::e(t('nav.login')) ?></a>
+                <a href="/regisztracio"><?= View::e(t('nav.register')) ?></a>
+            <?php endif; ?>
 
             <div class="nav-tools">
                 <button type="button" class="theme-toggle" data-theme-toggle
