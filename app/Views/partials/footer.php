@@ -16,12 +16,12 @@ $contact = $config['contact'];
         </div>
 
         <div>
-            <h4>Vásárlás</h4>
+            <h4>Termékek</h4>
             <ul>
                 <li><a href="/termekek">Összes termék</a></li>
-                <li><a href="/termekek?kategoria=routerek">Routerek</a></li>
-                <li><a href="/termekek?kategoria=switchek">Switchek</a></li>
-                <li><a href="/kosar">Kosár</a></li>
+                <li><a href="/termekek?kategoria=raklapok">Raklapok</a></li>
+                <li><a href="/termekek?kategoria=fureszaru">Fűrészáru</a></li>
+                <li><a href="/termekek?kategoria=teglak">BRITTERM téglák</a></li>
             </ul>
         </div>
 

@@ -9,8 +9,8 @@
 
 return [
     'app' => [
-        'name'     => getenv('APP_NAME') ?: 'Net Trade',
-        'tagline'  => 'Hálózati és IT eszközök webáruháza',
+        'name'     => getenv('APP_NAME') ?: 'Net-Trade Hungary',
+        'tagline'  => 'Ipari csomagolás · Faipari termékek · Fuvarozás',
         'url'      => getenv('APP_URL') ?: 'http://localhost:8000',
         'env'      => getenv('APP_ENV') ?: 'local',
         'debug'    => filter_var(getenv('APP_DEBUG') ?: 'true', FILTER_VALIDATE_BOOL),
@@ -19,8 +19,9 @@ return [
 
     'contact' => [
         'email'   => 'info@net-trade.hu',
-        'phone'   => '+36 1 234 5678',
-        'address' => '1051 Budapest, Példa utca 1.',
+        'phone'   => '+36 20 415 2695',
+        'address' => '2660 Balassagyarmat, Mártírok útja 72.',
+        'hours'   => 'H–P: 8:00–16:00',
     ],
 
     'database' => [

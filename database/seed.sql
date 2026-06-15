@@ -1,18 +1,22 @@
--- Net Trade – demó adatok
+-- Net-Trade Hungary – demó adatok
 
 INSERT INTO categories (slug, name, icon) VALUES
-('routerek', 'Routerek', 'router'),
-('switchek', 'Switchek', 'switch'),
-('kabelek',  'Kábelek',  'cable'),
-('kamerak',  'Kamerák',  'camera'),
-('tarolok',  'Tárolók',  'nas');
+('raklapok',         'Raklapok',            'pallet'),
+('ladak-csomagolas', 'Ládák és csomagolás', 'crate'),
+('fureszaru',        'Fűrészáru',           'lumber'),
+('tuzifa',           'Tűzifa',              'firewood'),
+('teglak',           'BRITTERM téglák',     'brick');
 
-INSERT INTO products (category_id, slug, name, short, description, price, image, stock, featured) VALUES
-((SELECT id FROM categories WHERE slug='routerek'), 'wifi6-router-ax3000', 'WiFi 6 Router AX3000', 'Nagy sebességű WiFi 6 router otthonra és kis irodába.', 'Dual-band WiFi 6 (802.11ax) router 3000 Mbps összesített sebességgel, 4 db Gigabit LAN porttal és OFDMA technológiával.', 28990, 'router.svg', 24, 1),
-((SELECT id FROM categories WHERE slug='switchek'), 'gigabit-switch-8-port', 'Gigabit Switch 8 portos', 'Fémházas, csendes 8 portos Gigabit switch.', 'Plug & play 8 portos Gigabit Ethernet switch, fémházban, ventilátor nélküli csendes működéssel.', 12490, 'switch.svg', 50, 1),
-((SELECT id FROM categories WHERE slug='kabelek'), 'cat6-utp-kabel-305m', 'Cat6 UTP kábel 305m', 'Réz CAT6 UTP installációs kábel dobozos kiszerelésben.', '305 méteres CAT6 UTP installációs kábel, tömör réz erekkel, 250 MHz sávszélességgel.', 34900, 'cable.svg', 15, 0),
-((SELECT id FROM categories WHERE slug='kamerak'), 'poe-ip-kamera-4mp', 'PoE IP kamera 4MP', '4 megapixeles kültéri PoE IP biztonsági kamera.', '4MP felbontású kültéri (IP67) PoE IP kamera éjjellátóval (30m IR), mozgásérzékeléssel és H.265 tömörítéssel.', 19990, 'camera.svg', 32, 1),
-((SELECT id FROM categories WHERE slug='routerek'), 'access-point-ceiling-ax1800', 'Access Point mennyezeti AX1800', 'Mennyezetre szerelhető WiFi 6 access point.', 'Mennyezetre szerelhető WiFi 6 access point 1800 Mbps sebességgel, PoE táplálással.', 23490, 'ap.svg', 18, 0),
-((SELECT id FROM categories WHERE slug='kabelek'), 'patch-panel-24-port', 'Patch panel 24 portos', '19" 1U CAT6 patch panel rackszekrénybe.', '19 colos, 1U magas, 24 portos CAT6 patch panel rendezett hálózati szereléshez.', 8990, 'panel.svg', 40, 0),
-((SELECT id FROM categories WHERE slug='tarolok'), 'nas-2-bay', 'NAS adattároló 2 lemezes', 'Kétlemezes hálózati adattároló otthonra és irodába.', 'Kétlemezes (2-bay) NAS központi adattároláshoz, RAID támogatással és gigabites csatlakozással.', 64900, 'nas.svg', 9, 1),
-((SELECT id FROM categories WHERE slug='tarolok'), 'szunetmentes-tapegyseg-650va', 'Szünetmentes tápegység 650VA', 'UPS a hálózati eszközök védelméhez áramkimaradás ellen.', '650VA / 360W szünetmentes tápegység (UPS) túlfeszültség-védelemmel.', 17990, 'ups.svg', 21, 0);
+INSERT INTO products (category_id, slug, name, short, description, price, unit, image, stock, featured) VALUES
+((SELECT id FROM categories WHERE slug='raklapok'), 'eur-raklap-epal', 'EUR (EPAL) raklap', 'Szabványos 1200×800 mm EUR raklap, EPAL minőségben.', 'Szabványos 1200×800 mm-es EUR raklap, EPAL előírásoknak megfelelő kivitelben, hőkezelt (ISPM-15 / IPPC jelöléssel kérhető) faanyagból. Az ár tájékoztató jellegű, nettó / darab.', 4990, 'db', 'pallet.svg', 100, 1),
+((SELECT id FROM categories WHERE slug='raklapok'), 'egyutas-raklap', 'Egyutas raklap', 'Költséghatékony egyutas raklap egyszeri szállításhoz.', 'Könnyűszerkezetes egyutas raklap egyszeri kiszállításokhoz és exporthoz, ahol nincs szükség visszáru-kezelésre. Több méretben gyártjuk. Az ár tájékoztató jellegű, nettó / darab.', 2490, 'db', 'pallet.svg', 100, 0),
+((SELECT id FROM categories WHERE slug='raklapok'), 'egyedi-meretu-raklap', 'Egyedi méretű raklap', 'Méretre gyártott raklap a termék pontos paramétereihez.', 'A megrendelő terméke és terhelése alapján méretre tervezett és gyártott raklap, megerősített kivitelben is. Egyedi igény esetén kérjen ajánlatot. Az ár tájékoztató jellegű, nettó / darab.', 3990, 'db', 'pallet.svg', 100, 1),
+((SELECT id FROM categories WHERE slug='ladak-csomagolas'), 'exportlada-retegelt', 'Exportláda (rétegelt lemez)', 'Stabil rétegelt lemez exportláda gépek és alkatrészek szállításához.', 'Méretre gyártott rétegelt lemez exportláda raklaptalppal, gépek és nagy értékű áruk tengeri, légi és közúti szállításához. Igény szerint VCI korrózióvédelemmel. Az ár tájékoztató jellegű, nettó / darab.', 14900, 'db', 'crate.svg', 50, 1),
+((SELECT id FROM categories WHERE slug='ladak-csomagolas'), 'falada-deszka', 'Faláda (deszkaláda)', 'Hagyományos deszkaláda nehéz és terjedelmes áruhoz.', 'Tömör fűrészáruból készült deszkaláda nehéz, terjedelmes vagy szabálytalan formájú áruk csomagolásához. Hőkezelt faanyagból, ISPM-15 jelöléssel is kérhető. Az ár tájékoztató jellegű, nettó / darab.', 9900, 'db', 'crate.svg', 50, 0),
+((SELECT id FROM categories WHERE slug='fureszaru'), 'fenyo-fureszaru-gerenda', 'Fenyő fűrészáru – gerenda', 'Szlovák fenyő gerenda, folyamatos, minőségi alapanyagból.', 'Szlovák fűrészüzemekből származó fenyő gerenda tetőszerkezetekhez, ácsmunkákhoz, építkezéshez. Viszonteladói és projektmennyiség 1–1,5 héten belül. Az ár tájékoztató jellegű, nettó / m³.', 145000, 'm³', 'lumber.svg', 200, 1),
+((SELECT id FROM categories WHERE slug='fureszaru'), 'fenyo-pallo-deszka', 'Fenyő palló és deszka', 'Fenyő palló és deszka több méretben, nagykereskedelmi áron.', 'Fenyő palló és deszka különböző vastagságban és hosszban, közel 30 év fakereskedelmi tapasztalattal. Folyamatos, minőség-ellenőrzött szlovák alapanyag. Az ár tájékoztató jellegű, nettó / m³.', 138000, 'm³', 'lumber.svg', 200, 0),
+((SELECT id FROM categories WHERE slug='fureszaru'), 'tetolec-fenyo', 'Fenyő tetőléc', 'Szabványos fenyő tetőléc tetőfedéshez.', 'Egészséges, jól szárított fenyő tetőléc tetőfedéshez és állványozáshoz, több méretben, nagy mennyiségben is. Az ár tájékoztató jellegű, nettó / folyóméter.', 320, 'fm', 'lumber.svg', 5000, 0),
+((SELECT id FROM categories WHERE slug='tuzifa'), 'hasitott-tuzifa-kemenyfa', 'Hasított tűzifa (keményfa)', 'Vegyes keményfa hasított tűzifa, kiszállítással.', 'Vegyes keményfa (tölgy, bükk, gyertyán) hasított tűzifa, kívánságra konyhakészre vágva, kiváló fűtőértékkel, igény szerint kiszállítással. Az ár tájékoztató jellegű, nettó / m³.', 32000, 'm³', 'firewood.svg', 300, 1),
+((SELECT id FROM categories WHERE slug='tuzifa'), 'fenyo-tuzifa', 'Fenyő tűzifa / melléktermék', 'Fenyő tűzifa a faipari feldolgozás melléktermékéből.', 'A faipari feldolgozás során keletkező fenyő melléktermék tűzifaként – nálunk minden faforgács hasznosul. Gyújtósnak és kazánba egyaránt. Az ár tájékoztató jellegű, nettó / m³.', 21000, 'm³', 'firewood.svg', 300, 0),
+((SELECT id FROM categories WHERE slug='teglak'), 'britterm-falazotegla', 'BRITTERM falazótégla', 'Szlovák BRITTERM falazótégla, hivatalos magyar képviselet.', 'A szlovák BRITTERM falazótéglái, melyeket 2017 óta képviselünk Magyarországon. Jó hőszigetelés, pontos méret, kiváló ár-érték arány. Az ár tájékoztató jellegű, nettó / darab.', 280, 'db', 'brick.svg', 10000, 1),
+((SELECT id FROM categories WHERE slug='teglak'), 'britterm-kemenytegla', 'BRITTERM kéménytégla', 'BRITTERM kémény- és blokktégla rendszerelemek.', 'BRITTERM kémény- és blokktégla rendszerelemek megbízható minőségben, közvetlenül a gyártótól. Projektmennyiség egyeztetés alapján. Az ár tájékoztató jellegű, nettó / darab.', 420, 'db', 'brick.svg', 10000, 0);

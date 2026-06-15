@@ -21,7 +21,7 @@ $currency = $config['app']['currency'];
         </h3>
         <p class="product-card__desc"><?= View::e($product['short'] ?? $product['description'] ?? '') ?></p>
         <div class="product-card__foot">
-            <span class="price"><?= View::price((float) $product['price'], $currency) ?></span>
+            <span class="price"><?= View::price((float) $product['price'], $currency) ?><?php if (!empty($product['unit'])): ?><small class="price-unit">/ <?= View::e($product['unit']) ?></small><?php endif; ?></span>
             <form method="post" action="/kosar/hozzaad">
                 <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
                 <button type="submit" class="btn btn--small">Kosárba</button>

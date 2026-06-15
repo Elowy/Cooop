@@ -27,11 +27,11 @@ final class Category
     public static function demo(): array
     {
         return [
-            ['id' => 1, 'slug' => 'routerek', 'name' => 'Routerek', 'icon' => 'router'],
-            ['id' => 2, 'slug' => 'switchek', 'name' => 'Switchek', 'icon' => 'switch'],
-            ['id' => 3, 'slug' => 'kabelek', 'name' => 'Kábelek', 'icon' => 'cable'],
-            ['id' => 4, 'slug' => 'kamerak', 'name' => 'Kamerák', 'icon' => 'camera'],
-            ['id' => 5, 'slug' => 'tarolok', 'name' => 'Tárolók', 'icon' => 'nas'],
+            ['id' => 1, 'slug' => 'raklapok', 'name' => 'Raklapok', 'icon' => 'pallet'],
+            ['id' => 2, 'slug' => 'ladak-csomagolas', 'name' => 'Ládák és csomagolás', 'icon' => 'crate'],
+            ['id' => 3, 'slug' => 'fureszaru', 'name' => 'Fűrészáru', 'icon' => 'lumber'],
+            ['id' => 4, 'slug' => 'tuzifa', 'name' => 'Tűzifa', 'icon' => 'firewood'],
+            ['id' => 5, 'slug' => 'teglak', 'name' => 'BRITTERM téglák', 'icon' => 'brick'],
         ];
     }
 }

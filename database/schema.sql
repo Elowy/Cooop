@@ -1,4 +1,4 @@
--- Net Trade webshop – adatbázis séma (MySQL / MariaDB)
+-- Net-Trade Hungary – adatbázis séma (MySQL / MariaDB)
 
 SET NAMES utf8mb4;
 
@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS products (
     short       VARCHAR(300) DEFAULT NULL,
     description TEXT,
     price       DECIMAL(10,2) NOT NULL DEFAULT 0,
+    unit        VARCHAR(20) NOT NULL DEFAULT 'db',
     image       VARCHAR(140) DEFAULT 'placeholder.svg',
     stock       INT NOT NULL DEFAULT 0,
     featured    TINYINT(1) NOT NULL DEFAULT 0,

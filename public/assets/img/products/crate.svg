@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <rect width="320" height="240" fill="#f4f7f1"/>
+  <!-- crate body -->
+  <rect x="70" y="58" width="180" height="140" rx="6" fill="#d8a85a"/>
+  <rect x="70" y="58" width="180" height="140" rx="6" fill="none" stroke="#a87a32" stroke-width="4"/>
+  <!-- horizontal slats -->
+  <rect x="70" y="92" width="180" height="6" fill="#b9863c"/>
+  <rect x="70" y="128" width="180" height="6" fill="#b9863c"/>
+  <rect x="70" y="164" width="180" height="6" fill="#b9863c"/>
+  <!-- diagonal brace -->
+  <path d="M74 192 L246 64" stroke="#a87a32" stroke-width="6" opacity=".55"/>
+  <!-- pallet base -->
+  <rect x="58" y="198" width="204" height="14" rx="3" fill="#c98f4f"/>
+  <rect x="66" y="212" width="20" height="12" fill="#b9863c"/>
+  <rect x="234" y="212" width="20" height="12" fill="#b9863c"/>
+  <!-- fragile mark -->
+  <circle cx="160" cy="40" r="14" fill="#2f7d46"/>
+  <path d="M154 40l4 4 8-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,16 +1,20 @@
-# Net Trade – webshop
+# Net-Trade Hungary – weboldal
 
-A [net-trade.hu](https://net-trade.hu) megújult, teljesen saját fejlesztésű PHP
-webáruháza – hálózati és IT eszközök (routerek, switchek, kábelek, kamerák,
-tárolók) értékesítésére.
+A [net-trade.hu](https://net-trade.hu) tartalmára épülő, teljesen saját
+fejlesztésű PHP weboldal és katalógus. A **Net-Trade Hungary Kft.** családi
+vállalkozás profilját mutatja be: ipari csomagolás, faipari gyártás (egyedi
+raklapok, exportládák), nemzetközi fuvarozás, BRITTERM tégla képviselet, valamint
+fenyő fűrészáru- és tűzifa-kereskedelem.
 
 ## Jellemzők
 
 - Saját, könnyűsúlyú **MVC** architektúra, keretrendszer és külső függőség nélkül
 - Front controller + reguláris kifejezés alapú **útvonalkezelő**
 - **PDO** adatbázis-réteg (MySQL/MariaDB) – adatbázis nélkül demó adatokra esik vissza
-- Termékkatalógus kategória-szűréssel és kereséssel, termékoldalakkal
-- Munkamenet (session) alapú **kosár** és pénztár folyamat
+- A cég tevékenységeit bemutató **főoldal**, „Rólunk” és „Kapcsolat” oldalak
+- Termékkatalógus (raklapok, ládák, fűrészáru, tűzifa, tégla) kategória-szűréssel,
+  kereséssel és egységár-mértékegységgel (db / m³ / fm)
+- Munkamenet (session) alapú **kosár / ajánlatkérés** folyamat
 - Reszponzív, modern dizájn (mobil menü, sticky fejléc)
 - Egyedi SVG illusztrációk – nincs külső kép-/betűtípus-függőség
 
@@ -39,7 +43,7 @@ php -S localhost:8000 -t public
 
 Majd nyisd meg: http://localhost:8000
 
-> Adatbázis nélkül a webshop a `Product::demo()` mintaadatokból dolgozik,
+> Adatbázis nélkül az oldal a `Product::demo()` mintaadatokból dolgozik,
 > így azonnal megtekinthető.
 
 ## Adatbázis beállítása (opcionális)
@@ -59,14 +63,14 @@ Az alkalmazás beállításai környezeti változókkal felülírhatók:
 
 | Változó | Alapérték | Leírás |
 |---|---|---|
-| `APP_NAME` | Net Trade | Bolt neve |
+| `APP_NAME` | Net-Trade Hungary | Cég neve |
 | `APP_URL` | http://localhost:8000 | Alap URL |
 | `APP_DEBUG` | true | Hibák megjelenítése |
 | `DB_HOST` … | lásd config | Adatbázis-kapcsolat |
 
 ## Következő lépések
 
-- Az eredeti net-trade.hu tartalom (szövegek, termékek, képek) átemelése
-- Rendelés mentése az `orders` táblába és e-mail visszaigazolás
-- Admin felület a termékek kezeléséhez
-- Fizetési szolgáltató integrációja
+- Ajánlatkérés / rendelés mentése az `orders` táblába és e-mail visszaigazolás
+- Admin felület a termékek és kategóriák kezeléséhez
+- Galéria a referencia-csomagolásokról és gyártott termékekről
+- Többnyelvűség (a net-trade.hu több nyelven is elérhető)

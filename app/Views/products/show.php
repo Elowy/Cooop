@@ -23,10 +23,10 @@ $inStock = (int) ($product['stock'] ?? 0) > 0;
         <div class="product-detail__info">
             <span class="product-card__cat"><?= View::e($product['category_name'] ?? '') ?></span>
             <h1><?= View::e($product['name']) ?></h1>
-            <p class="price price--lg"><?= View::price((float) $product['price'], $currency) ?></p>
+            <p class="price price--lg"><?= View::price((float) $product['price'], $currency) ?><?php if (!empty($product['unit'])): ?><small class="price-unit">/ <?= View::e($product['unit']) ?></small><?php endif; ?></p>
 
             <p class="stock <?= $inStock ? 'stock--in' : 'stock--out' ?>">
-                <?= $inStock ? '● Raktáron' : '○ Jelenleg nem elérhető' ?>
+                <?= $inStock ? '● ' . View::e($product['stock_label'] ?? 'Raktáron') : '○ Jelenleg nem elérhető' ?>
             </p>
 
             <p class="product-detail__desc"><?= View::e($product['description'] ?? '') ?></p>
@@ -43,9 +43,9 @@ $inStock = (int) ($product['stock'] ?? 0) > 0;
             </form>
 
             <ul class="product-detail__meta">
-                <li>Gyors kiszállítás 1–2 munkanap alatt</li>
-                <li>Garancia minden termékre</li>
-                <li>Szakértői támogatás vásárlás előtt és után</li>
+                <li>100% minőségi garancia – csere vagy javítás</li>
+                <li>Saját nyergesvontatóval is szállítunk</li>
+                <li>Egyedi méret és nagy mennyiség egyeztetés alapján</li>
             </ul>
         </div>
     </div>

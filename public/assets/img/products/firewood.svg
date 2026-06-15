@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <rect width="320" height="240" fill="#f4f7f1"/>
+  <!-- log ends (split firewood pile) -->
+  <g stroke="#8f5a2a" stroke-width="3">
+    <circle cx="120" cy="150" r="30" fill="#d8a85a"/>
+    <circle cx="185" cy="150" r="30" fill="#cf9a47"/>
+    <circle cx="152" cy="96"  r="30" fill="#e0b878"/>
+  </g>
+  <!-- split lines + rings -->
+  <g stroke="#8f5a2a" stroke-width="2" fill="none" opacity=".7">
+    <circle cx="120" cy="150" r="14"/>
+    <circle cx="185" cy="150" r="14"/>
+    <circle cx="152" cy="96"  r="14"/>
+    <path d="M120 120v60M90 150h60"/>
+    <path d="M185 120v60M155 150h60"/>
+    <path d="M152 66v60M122 96h60"/>
+  </g>
+  <!-- ground -->
+  <rect x="60" y="186" width="200" height="8" rx="4" fill="#cdbfa0"/>
+</svg>
