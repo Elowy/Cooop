@@ -9,8 +9,8 @@
 
 return [
     'app' => [
-        'name'     => getenv('APP_NAME') ?: 'Net Trade',
-        'tagline'  => 'Hálózati és IT eszközök webáruháza',
+        'name'     => getenv('APP_NAME') ?: 'Net-Trade Hungary',
+        'tagline'  => 'Raklap, ipari csomagolás és Vega madáretetők',
         'url'      => getenv('APP_URL') ?: 'http://localhost:8000',
         'env'      => getenv('APP_ENV') ?: 'local',
         'debug'    => filter_var(getenv('APP_DEBUG') ?: 'true', FILTER_VALIDATE_BOOL),
@@ -19,8 +19,18 @@ return [
 
     'contact' => [
         'email'   => 'info@net-trade.hu',
-        'phone'   => '+36 1 234 5678',
-        'address' => '1051 Budapest, Példa utca 1.',
+        'phone'   => '+36 20 387 1450',
+        'person'  => 'Nagy László, projektmenedzser',
+        'address' => 'Balassagyarmat, Magyarország',
+    ],
+
+    'admin' => [
+        // Az adminisztrációs felület belépési adatai. Éles használat előtt
+        // mindenképp állítsd be a környezeti változókkal! Jelszó helyett
+        // megadható előre generált hash is (ADMIN_PASSWORD_HASH).
+        'user'          => getenv('ADMIN_USER') ?: 'admin',
+        'password'      => getenv('ADMIN_PASSWORD') ?: 'admin123',
+        'password_hash' => getenv('ADMIN_PASSWORD_HASH') ?: '',
     ],
 
     'database' => [

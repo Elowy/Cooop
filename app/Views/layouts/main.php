@@ -15,7 +15,7 @@ $pageTitle = isset($title) && $title ? "{$title} – {$appName}" : "{$appName} �
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="<?= View::e($config['app']['tagline']) ?> – routerek, switchek, kábelek, kamerák és hálózati eszközök kedvező áron.">
+    <meta name="description" content="<?= View::e($config['app']['tagline']) ?> – egyedi raklapgyártás, ipari csomagolás, nemzetközi szállítmányozás és tartós Vega madáretetők hőkezelt borovi fenyőből.">
     <title><?= View::e($pageTitle) ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="/assets/css/style.css">

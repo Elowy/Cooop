@@ -9,17 +9,17 @@ use App\Core\View;
 <section class="hero">
     <div class="container hero-inner">
         <div class="hero-copy">
-            <p class="eyebrow">Hálózati szakáruház</p>
-            <h1>Megbízható <span>hálózati eszközök</span> otthonra és vállalkozásnak</h1>
-            <p class="lead">Routerek, switchek, kábelek, kamerák és tárolók egy helyen – szakértői tanácsadással és gyors kiszállítással.</p>
+            <p class="eyebrow">Borovi fenyő • 1995 óta a szakmában</p>
+            <h1>Minőségi <span>faipari megoldások</span>, generációkon át</h1>
+            <p class="lead">Egyedi raklapgyártás, ipari csomagolás és nemzetközi szállítmányozás egy kézből – webáruházunkban pedig tartós, dekoratív Vega madáretetők várják.</p>
             <div class="hero-actions">
-                <a href="/termekek" class="btn btn--primary">Termékek böngészése</a>
-                <a href="/kapcsolat" class="btn btn--ghost">Tanácsot kérek</a>
+                <a href="/termekek" class="btn btn--primary">Madáretetők böngészése</a>
+                <a href="/kapcsolat" class="btn btn--ghost">Ajánlatot kérek</a>
             </div>
             <ul class="hero-usps">
-                <li>✓ Gyors kiszállítás</li>
-                <li>✓ Szakértői támogatás</li>
-                <li>✓ Garancia minden termékre</li>
+                <li>✓ Közel 30 év tapasztalat</li>
+                <li>✓ ISPM 15 hőkezelés, CE</li>
+                <li>✓ 1–1,5 hét átfutási idő</li>
             </ul>
         </div>
         <div class="hero-art" aria-hidden="true">
@@ -30,7 +30,7 @@ use App\Core\View;
 
 <section class="section container">
     <div class="section-head">
-        <h2>Kategóriák</h2>
+        <h2>Madáretető kategóriák</h2>
         <a href="/termekek" class="link-arrow">Összes termék →</a>
     </div>
     <div class="category-grid">
@@ -60,16 +60,16 @@ use App\Core\View;
 <section class="section container">
     <div class="feature-row">
         <div class="feature">
-            <h3>Szakértői tanácsadás</h3>
-            <p>Segítünk kiválasztani a vállalkozásodhoz vagy otthonodhoz legjobban illő hálózati megoldást.</p>
+            <h3>Egyedi raklapgyártás</h3>
+            <p>Szabványos és egyedi méretű raklapok megbízható, folyamatos alapanyag-forrásból.</p>
         </div>
         <div class="feature">
-            <h3>Gyors kiszállítás</h3>
-            <p>Raktáron lévő termékeinket 1–2 munkanapon belül kézbesítjük országszerte.</p>
+            <h3>Ipari csomagolás</h3>
+            <p>Egyedi faládák és csomagolási megoldások a biztonságos, nemzetközi szállításért.</p>
         </div>
         <div class="feature">
-            <h3>Garancia és szerviz</h3>
-            <p>Minden termékre garanciát vállalunk, probléma esetén pedig gyorsan intézkedünk.</p>
+            <h3>Nemzetközi szállítmányozás</h3>
+            <p>Projektrendeléseket a megrendeléstől számított 1–1,5 héten belül teljesítünk.</p>
         </div>
     </div>
 </section>

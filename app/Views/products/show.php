@@ -43,9 +43,9 @@ $inStock = (int) ($product['stock'] ?? 0) > 0;
             </form>
 
             <ul class="product-detail__meta">
-                <li>Gyors kiszállítás 1–2 munkanap alatt</li>
-                <li>Garancia minden termékre</li>
-                <li>Szakértői támogatás vásárlás előtt és után</li>
+                <li>Hőkezelt borovi fenyő, ISPM 15 szabvány</li>
+                <li>CE-tanúsítvány, környezetbarát gyártás</li>
+                <li>Saját gyártás – egyedi méret is kérhető</li>
             </ul>
         </div>
     </div>

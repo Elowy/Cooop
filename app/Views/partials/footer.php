@@ -19,8 +19,8 @@ $contact = $config['contact'];
             <h4>Vásárlás</h4>
             <ul>
                 <li><a href="/termekek">Összes termék</a></li>
-                <li><a href="/termekek?kategoria=routerek">Routerek</a></li>
-                <li><a href="/termekek?kategoria=switchek">Switchek</a></li>
+                <li><a href="/termekek?kategoria=klasszikus">Klasszikus etetők</a></li>
+                <li><a href="/termekek?kategoria=fuggesztheto">Függeszthető etetők</a></li>
                 <li><a href="/kosar">Kosár</a></li>
             </ul>
         </div>
@@ -28,8 +28,9 @@ $contact = $config['contact'];
         <div>
             <h4>Információ</h4>
             <ul>
-                <li><a href="/rolunk">Rólunk</a></li>
+                <li><a href="/rolunk">Bemutatkozás</a></li>
                 <li><a href="/kapcsolat">Kapcsolat</a></li>
+                <li><a href="/admin">Admin</a></li>
             </ul>
         </div>
 

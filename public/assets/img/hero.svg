@@ -1,23 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 380" fill="none">
   <defs>
-    <linearGradient id="hb" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1763d6"/>
-      <stop offset="1" stop-color="#0f4aa3"/>
+    <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a7d56"/>
+      <stop offset="1" stop-color="#225239"/>
     </linearGradient>
   </defs>
-  <rect x="40" y="40" width="400" height="300" rx="24" fill="#e8f1fe"/>
-  <!-- Router -->
-  <rect x="120" y="150" width="240" height="70" rx="12" fill="url(#hb)"/>
-  <circle cx="150" cy="185" r="6" fill="#16c79a"/>
-  <circle cx="172" cy="185" r="6" fill="#fff" opacity=".8"/>
-  <circle cx="194" cy="185" r="6" fill="#fff" opacity=".5"/>
-  <line x1="170" y1="150" x2="170" y2="90" stroke="#0f4aa3" stroke-width="4"/>
-  <line x1="240" y1="150" x2="240" y2="70" stroke="#0f4aa3" stroke-width="4"/>
-  <line x1="310" y1="150" x2="310" y2="90" stroke="#0f4aa3" stroke-width="4"/>
-  <circle cx="170" cy="88" r="9" fill="#16c79a"/>
-  <circle cx="240" cy="68" r="9" fill="#16c79a"/>
-  <circle cx="310" cy="88" r="9" fill="#16c79a"/>
-  <!-- Signal arcs -->
-  <path d="M150 250 q90 60 180 0" stroke="#1763d6" stroke-width="4" opacity=".4" fill="none"/>
-  <path d="M170 270 q70 45 140 0" stroke="#1763d6" stroke-width="4" opacity=".25" fill="none"/>
+  <rect x="40" y="40" width="400" height="300" rx="24" fill="#e7f1ea"/>
+  <!-- background pines -->
+  <polygon points="90,250 120,180 150,250" fill="#7fae8c" opacity=".5"/>
+  <polygon points="350,250 380,170 410,250" fill="#7fae8c" opacity=".5"/>
+  <!-- hanging cord -->
+  <line x1="240" y1="60" x2="240" y2="96" stroke="#8a6444" stroke-width="5"/>
+  <!-- roof -->
+  <polygon points="240,80 360,170 120,170" fill="url(#roof)"/>
+  <polygon points="240,80 360,170 340,170 240,94" fill="#1c4530" opacity=".5"/>
+  <!-- posts -->
+  <rect x="138" y="170" width="16" height="92" fill="#caa06a"/>
+  <rect x="326" y="170" width="16" height="92" fill="#caa06a"/>
+  <!-- back wall -->
+  <rect x="154" y="174" width="172" height="84" fill="#d2b07d"/>
+  <rect x="154" y="174" width="172" height="84" fill="none" stroke="#6b4a2f" stroke-width="3" opacity=".3"/>
+  <!-- platform -->
+  <rect x="120" y="258" width="240" height="20" rx="5" fill="#c9962f"/>
+  <rect x="112" y="278" width="256" height="14" rx="5" fill="#caa06a"/>
+  <!-- seed -->
+  <ellipse cx="240" cy="258" rx="64" ry="11" fill="#c9962f"/>
+  <circle cx="212" cy="255" r="4" fill="#5a3d22"/><circle cx="240" cy="257" r="4" fill="#5a3d22"/><circle cx="268" cy="255" r="4" fill="#5a3d22"/>
+  <!-- bird -->
+  <g transform="translate(296,230)">
+    <ellipse cx="0" cy="0" rx="18" ry="14" fill="#2f6e4f"/>
+    <circle cx="12" cy="-7" r="9" fill="#2f6e4f"/>
+    <circle cx="15" cy="-9" r="2.4" fill="#fff"/>
+    <polygon points="22,-9 33,-6 22,-3" fill="#c9962f"/>
+    <path d="M-4,-3 q-14,3 -18,13 q11,-2 19,-5 z" fill="#1c4530"/>
+  </g>
 </svg>

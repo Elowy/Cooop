@@ -3,17 +3,17 @@
    ========================================================================== */
 
 :root {
-    --c-primary: #1763d6;
-    --c-primary-dark: #0f4aa3;
-    --c-primary-light: #e8f1fe;
-    --c-accent: #16c79a;
-    --c-dark: #0e1726;
-    --c-text: #25303f;
-    --c-muted: #6b7785;
-    --c-border: #e4e8ee;
+    --c-primary: #2f6e4f;
+    --c-primary-dark: #225239;
+    --c-primary-light: #e7f1ea;
+    --c-accent: #c9962f;
+    --c-dark: #2b2118;
+    --c-text: #33291f;
+    --c-muted: #7a6e60;
+    --c-border: #e7dfd2;
     --c-bg: #ffffff;
-    --c-bg-alt: #f5f8fc;
-    --c-danger: #e0405a;
+    --c-bg-alt: #f7f2e9;
+    --c-danger: #b4452f;
 
     --radius: 12px;
     --radius-sm: 8px;
@@ -146,9 +146,9 @@ h1, h2, h3, h4 { line-height: 1.2; color: var(--c-dark); margin: 0 0 .5em; }
     width: 52px; height: 52px; border-radius: 14px; background: var(--c-primary-light);
     display: grid; place-items: center;
 }
-.category-card__icon::before { content: ""; width: 26px; height: 26px; background: var(--c-primary); -webkit-mask: center/contain no-repeat; mask: center/contain no-repeat;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M4 6h16v4H4zm0 8h16v4H4z'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M4 6h16v4H4zm0 8h16v4H4z'/%3E%3C/svg%3E"); }
+.category-card__icon::before { content: ""; width: 28px; height: 28px; background: var(--c-primary); -webkit-mask: center/contain no-repeat; mask: center/contain no-repeat;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 2 2 9h2v11h6v-6h4v6h6V9h2L12 2z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 2 2 9h2v11h6v-6h4v6h6V9h2L12 2z'/%3E%3C/svg%3E"); }
 
 /* ---------- Product grid & cards ---------- */
 .product-grid {

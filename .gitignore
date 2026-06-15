@@ -9,6 +9,9 @@
 *.log
 /tmp/
 
+# Futásidejű adatok (SQLite visszaesés)
+/storage/*.sqlite
+
 # Szerkesztő / OS
 .DS_Store
 .idea/

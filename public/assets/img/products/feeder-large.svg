@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none" role="img" aria-label="Nagy családi madáretető">
+  <line x1="160" y1="8" x2="160" y2="40" stroke="#8a6444" stroke-width="5"/>
+  <polygon points="160,30 268,92 52,92" fill="#6b4a2f"/>
+  <polygon points="160,30 268,92 252,92 160,44" fill="#000" opacity=".12"/>
+  <rect x="70" y="92" width="13" height="66" fill="#bfa069"/>
+  <rect x="237" y="92" width="13" height="66" fill="#bfa069"/>
+  <rect x="83" y="96" width="154" height="58" fill="#caa06a"/>
+  <rect x="83" y="96" width="154" height="58" fill="none" stroke="#6b4a2f" stroke-width="2" opacity=".25"/>
+  <rect x="60" y="158" width="200" height="16" rx="4" fill="#c9962f"/>
+  <rect x="52" y="174" width="216" height="10" rx="4" fill="#bfa069"/>
+  <ellipse cx="160" cy="158" rx="64" ry="8" fill="#c9962f"/>
+  <circle cx="138" cy="155" r="3" fill="#5a3d22"/><circle cx="160" cy="156" r="3" fill="#5a3d22"/><circle cx="182" cy="155" r="3" fill="#5a3d22"/>
+  <g transform="translate(96,138)">
+    <ellipse cx="0" cy="0" rx="12" ry="9" fill="#7a5230"/>
+    <circle cx="-8" cy="-4" r="6" fill="#7a5230"/>
+    <circle cx="-10" cy="-5" r="1.6" fill="#fff"/>
+    <polygon points="-15,-5 -22,-3 -15,-1" fill="#c9962f"/>
+  </g>
+  <g transform="translate(224,138)">
+    <ellipse cx="0" cy="0" rx="12" ry="9" fill="#2f6e4f"/>
+    <circle cx="8" cy="-4" r="6" fill="#2f6e4f"/>
+    <circle cx="10" cy="-5" r="1.6" fill="#fff"/>
+    <polygon points="15,-5 22,-3 15,-1" fill="#c9962f"/>
+  </g>
+</svg>

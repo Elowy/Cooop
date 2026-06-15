@@ -1,0 +1,4 @@
+# A storage mappa futásidejű adatokat tartalmaz (pl. SQLite adatbázis),
+# ezek nem kerülnek verziókezelésbe – a mappa azonban létezzen.
+*
+!.gitignore

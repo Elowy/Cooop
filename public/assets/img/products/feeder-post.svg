@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none" role="img" aria-label="Oszlopos madáretető">
+  <polygon points="160,26 226,76 94,76" fill="#6b4a2f"/>
+  <polygon points="160,26 226,76 212,76 160,38" fill="#000" opacity=".12"/>
+  <rect x="108" y="76" width="10" height="40" fill="#caa06a"/>
+  <rect x="202" y="76" width="10" height="40" fill="#caa06a"/>
+  <rect x="118" y="80" width="84" height="36" fill="#d2b07d"/>
+  <rect x="100" y="116" width="120" height="13" rx="4" fill="#c9962f"/>
+  <rect x="94" y="129" width="132" height="9" rx="4" fill="#caa06a"/>
+  <ellipse cx="160" cy="116" rx="32" ry="6" fill="#c9962f"/>
+  <!-- post leg -->
+  <rect x="151" y="138" width="18" height="78" fill="#8a6444"/>
+  <rect x="151" y="138" width="6" height="78" fill="#000" opacity=".12"/>
+  <!-- ground -->
+  <ellipse cx="160" cy="218" rx="46" ry="8" fill="#4a6b44" opacity=".4"/>
+  <g transform="translate(196,98)">
+    <ellipse cx="0" cy="0" rx="10" ry="8" fill="#2f6e4f"/>
+    <circle cx="7" cy="-4" r="5" fill="#2f6e4f"/>
+    <circle cx="9" cy="-5" r="1.4" fill="#fff"/>
+    <polygon points="13,-5 20,-3 13,-1" fill="#c9962f"/>
+  </g>
+</svg>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Str;
 
 /**
  * Termék modell.
@@ -81,6 +82,150 @@ final class Product
     }
 
     /**
+     * Minden termék (aktív és inaktív is) az admin listához.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function adminAll(): array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return self::demo();
+        }
+        $stmt = $pdo->query(
+            'SELECT p.*, c.slug AS category_slug, c.name AS category_name
+             FROM products p LEFT JOIN categories c ON c.id = p.category_id
+             ORDER BY p.id DESC'
+        );
+        return $stmt ? $stmt->fetchAll() : [];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public static function find(int $id): ?array
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return null;
+        }
+        $stmt = $pdo->prepare(
+            'SELECT p.*, c.slug AS category_slug, c.name AS category_name
+             FROM products p LEFT JOIN categories c ON c.id = p.category_id
+             WHERE p.id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    /**
+     * Új termék létrehozása. Visszaadja az új azonosítót, vagy false-t.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function create(array $data): int|false
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return false;
+        }
+        $name = trim((string) ($data['name'] ?? ''));
+        if ($name === '') {
+            return false;
+        }
+        $slug = self::uniqueSlug((string) ($data['slug'] ?? '') ?: $name);
+        $stmt = $pdo->prepare(
+            'INSERT INTO products (category_id, slug, name, short, description, price, image, stock, featured, active)
+             VALUES (:cat, :slug, :name, :short, :description, :price, :image, :stock, :featured, :active)'
+        );
+        $stmt->execute(self::params($data, $slug, $name));
+        return (int) $pdo->lastInsertId();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public static function update(int $id, array $data): bool
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return false;
+        }
+        $name = trim((string) ($data['name'] ?? ''));
+        if ($name === '') {
+            return false;
+        }
+        $slug = self::uniqueSlug((string) ($data['slug'] ?? '') ?: $name, $id);
+        $stmt = $pdo->prepare(
+            'UPDATE products SET category_id = :cat, slug = :slug, name = :name, short = :short,
+             description = :description, price = :price, image = :image, stock = :stock,
+             featured = :featured, active = :active WHERE id = :id'
+        );
+        $params = self::params($data, $slug, $name);
+        $params['id'] = $id;
+        return $stmt->execute($params);
+    }
+
+    public static function delete(int $id): bool
+    {
+        $pdo = Database::getConnection();
+        if ($pdo === null) {
+            return false;
+        }
+        $stmt = $pdo->prepare('DELETE FROM products WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
+    }
+
+    /**
+     * Beviteli adatok normalizálása paraméter-tömbbé.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private static function params(array $data, string $slug, string $name): array
+    {
+        $catId = (int) ($data['category_id'] ?? 0);
+        return [
+            'cat'         => $catId > 0 ? $catId : null,
+            'slug'        => $slug,
+            'name'        => $name,
+            'short'       => trim((string) ($data['short'] ?? '')) ?: null,
+            'description' => trim((string) ($data['description'] ?? '')) ?: null,
+            'price'       => max(0, (int) round((float) ($data['price'] ?? 0))),
+            'image'       => trim((string) ($data['image'] ?? '')) ?: 'placeholder.svg',
+            'stock'       => max(0, (int) ($data['stock'] ?? 0)),
+            'featured'    => !empty($data['featured']) ? 1 : 0,
+            'active'      => isset($data['active']) ? (!empty($data['active']) ? 1 : 0) : 1,
+        ];
+    }
+
+    private static function uniqueSlug(string $base, ?int $ignoreId = null): string
+    {
+        $pdo = Database::getConnection();
+        $slug = Str::slug($base) ?: 'termek';
+        if ($pdo === null) {
+            return $slug;
+        }
+        $candidate = $slug;
+        $i = 2;
+        while (true) {
+            $sql = 'SELECT COUNT(*) FROM products WHERE slug = :slug';
+            $params = ['slug' => $candidate];
+            if ($ignoreId !== null) {
+                $sql .= ' AND id <> :id';
+                $params['id'] = $ignoreId;
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            if ((int) $stmt->fetchColumn() === 0) {
+                return $candidate;
+            }
+            $candidate = $slug . '-' . $i++;
+        }
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $items
      * @return array<int, array<string, mixed>>
      */
@@ -103,60 +248,60 @@ final class Product
     {
         return [
             [
-                'id' => 1, 'slug' => 'wifi6-router-ax3000', 'name' => 'WiFi 6 Router AX3000',
-                'price' => 28990, 'category_slug' => 'routerek', 'category_name' => 'Routerek',
-                'image' => 'router.svg', 'featured' => 1, 'stock' => 24,
-                'short' => 'Nagy sebességű WiFi 6 router otthonra és kis irodába.',
-                'description' => 'Dual-band WiFi 6 (802.11ax) router 3000 Mbps összesített sebességgel, 4 db Gigabit LAN porttal és OFDMA technológiával a stabil, gyors kapcsolatért akár sok eszköz esetén is.',
+                'id' => 1, 'slug' => 'vega-klasszikus-madareteto', 'name' => 'Vega klasszikus madáretető',
+                'price' => 4990, 'category_slug' => 'klasszikus', 'category_name' => 'Klasszikus',
+                'image' => 'feeder-classic.svg', 'featured' => 1, 'stock' => 40,
+                'short' => 'Hőkezelt borovi fenyőből készült, időtálló klasszikus etető.',
+                'description' => 'A Vega klasszikus madáretető praktikus megoldás, amely különlegessé teszi kertjét vagy erkélyét a téli hónapokban. Hőkezelt borovi fenyőből és farostlemezből készül, IPPC és ISPM 15 szabvány szerint, CE-tanúsítvánnyal. A gyártás során nem használtunk és nem keletkezett környezetre káros anyag.',
             ],
             [
-                'id' => 2, 'slug' => 'gigabit-switch-8-port', 'name' => 'Gigabit Switch 8 portos',
-                'price' => 12490, 'category_slug' => 'switchek', 'category_name' => 'Switchek',
-                'image' => 'switch.svg', 'featured' => 1, 'stock' => 50,
-                'short' => 'Fémházas, csendes 8 portos Gigabit switch.',
-                'description' => 'Plug & play 8 portos Gigabit Ethernet switch, fémházban, ventilátor nélküli csendes működéssel. Ideális hálózat bővítéséhez otthon vagy irodában.',
+                'id' => 2, 'slug' => 'vega-ketpalcas-madareteto', 'name' => 'Vega kétpálcás madáretető',
+                'price' => 5490, 'category_slug' => 'klasszikus', 'category_name' => 'Klasszikus',
+                'image' => 'feeder-twobar.svg', 'featured' => 0, 'stock' => 35,
+                'short' => 'Két ülőpálcával a kisebb énekesmadaraknak.',
+                'description' => 'Két ülőpálcával ellátott klasszikus madáretető, amely stabil, szellős etetőfelületet kínál a kisebb énekesmadaraknak. Hőkezelt borovi fenyőből, tartós kivitelben, kertbe és erkélyre egyaránt.',
             ],
             [
-                'id' => 3, 'slug' => 'cat6-utp-kabel-305m', 'name' => 'Cat6 UTP kábel 305m',
-                'price' => 34900, 'category_slug' => 'kabelek', 'category_name' => 'Kábelek',
-                'image' => 'cable.svg', 'featured' => 0, 'stock' => 15,
-                'short' => 'Réz CAT6 UTP installációs kábel dobozos kiszerelésben.',
-                'description' => '305 méteres CAT6 UTP installációs kábel, tömör réz erekkel, 250 MHz sávszélességgel strukturált hálózatok kiépítéséhez.',
+                'id' => 3, 'slug' => 'vega-pagoda-madareteto', 'name' => 'Vega pagoda madáretető',
+                'price' => 6990, 'category_slug' => 'modern', 'category_name' => 'Modern',
+                'image' => 'feeder-pagoda.svg', 'featured' => 1, 'stock' => 22,
+                'short' => 'Letisztult pagoda forma, modern kertek dísze.',
+                'description' => 'A Vega pagoda madáretető letisztult, modern formavilágával bármely kert dísze lehet. Tágas etetőfelülete több madár egyidejű etetését is lehetővé teszi. Hőkezelt borovi fenyőből, CE-tanúsítvánnyal.',
             ],
             [
-                'id' => 4, 'slug' => 'poe-ip-kamera-4mp', 'name' => 'PoE IP kamera 4MP',
-                'price' => 19990, 'category_slug' => 'kamerak', 'category_name' => 'Kamerák',
-                'image' => 'camera.svg', 'featured' => 1, 'stock' => 32,
-                'short' => '4 megapixeles kültéri PoE IP biztonsági kamera.',
-                'description' => '4MP felbontású kültéri (IP67) PoE IP kamera éjjellátóval (30m IR), mozgásérzékeléssel és H.265 tömörítéssel a hatékony tárolásért.',
+                'id' => 4, 'slug' => 'vega-modern-madareteto', 'name' => 'Vega modern madáretető',
+                'price' => 7490, 'category_slug' => 'modern', 'category_name' => 'Modern',
+                'image' => 'feeder-modern.svg', 'featured' => 0, 'stock' => 18,
+                'short' => 'Minimalista vonalvezetés, natúr felület.',
+                'description' => 'Minimalista vonalvezetésű, natúr felületű madáretető kortárs homlokzatokhoz és modern kertekhez. Hőkezelt borovi fenyőből készül, időtálló és esztétikus megoldás.',
             ],
             [
-                'id' => 5, 'slug' => 'access-point-ceiling-ax1800', 'name' => 'Access Point mennyezeti AX1800',
-                'price' => 23490, 'category_slug' => 'routerek', 'category_name' => 'Routerek',
-                'image' => 'ap.svg', 'featured' => 0, 'stock' => 18,
-                'short' => 'Mennyezetre szerelhető WiFi 6 access point.',
-                'description' => 'Mennyezetre szerelhető WiFi 6 access point 1800 Mbps sebességgel, PoE táplálással és központi menedzsment támogatással nagyobb terek lefedéséhez.',
+                'id' => 5, 'slug' => 'vega-nagy-csaladi-madareteto', 'name' => 'Vega nagy családi madáretető',
+                'price' => 8990, 'category_slug' => 'nagy', 'category_name' => 'Nagy méretű',
+                'image' => 'feeder-large.svg', 'featured' => 1, 'stock' => 14,
+                'short' => 'Nagyobb befogadóképesség egész télre.',
+                'description' => 'Nagy befogadóképességű madáretető, amely több madár egyidejű etetését teszi lehetővé egész télen át. Robusztus, hőkezelt borovi fenyő szerkezet, ISPM 15 szabvány szerint.',
             ],
             [
-                'id' => 6, 'slug' => 'patch-panel-24-port', 'name' => 'Patch panel 24 portos',
-                'price' => 8990, 'category_slug' => 'kabelek', 'category_name' => 'Kábelek',
-                'image' => 'panel.svg', 'featured' => 0, 'stock' => 40,
-                'short' => '19" 1U CAT6 patch panel rackszekrénybe.',
-                'description' => '19 colos, 1U magas, 24 portos CAT6 patch panel rendezett, professzionális hálózati szereléshez rackszekrényekbe.',
+                'id' => 6, 'slug' => 'vega-fuggesztheto-madareteto', 'name' => 'Vega függeszthető madáretető',
+                'price' => 4490, 'category_slug' => 'fuggesztheto', 'category_name' => 'Függeszthető',
+                'image' => 'feeder-hanging.svg', 'featured' => 1, 'stock' => 50,
+                'short' => 'Faágra vagy konzolra akasztható, kompakt etető.',
+                'description' => 'Faágra vagy konzolra egyszerűen felakasztható, könnyű és kompakt madáretető a kertbe vagy a balkonra. Hőkezelt borovi fenyőből, tartós kivitelben.',
             ],
             [
-                'id' => 7, 'slug' => 'nas-2-bay', 'name' => 'NAS adattároló 2 lemezes',
-                'price' => 64900, 'category_slug' => 'tarolok', 'category_name' => 'Tárolók',
-                'image' => 'nas.svg', 'featured' => 1, 'stock' => 9,
-                'short' => 'Kétlemezes hálózati adattároló otthonra és irodába.',
-                'description' => 'Kétlemezes (2-bay) NAS központi adattároláshoz, automatikus mentéshez és médiaszerver funkcióhoz, RAID támogatással és gigabites hálózati csatlakozással.',
+                'id' => 7, 'slug' => 'vega-oszlopos-madareteto', 'name' => 'Vega oszlopos madáretető',
+                'price' => 7990, 'category_slug' => 'nagy', 'category_name' => 'Nagy méretű',
+                'image' => 'feeder-post.svg', 'featured' => 0, 'stock' => 12,
+                'short' => 'Talajba állítható oszlopos etető nyitott kertbe.',
+                'description' => 'Talajba állítható, oszlopos kivitelű madáretető, amely nyitott kertbe, gyepre is kiváló. Stabil láb, tágas tető, hőkezelt borovi fenyőből, CE-tanúsítvánnyal.',
             ],
             [
-                'id' => 8, 'slug' => 'szunetmentes-tapegyseg-650va', 'name' => 'Szünetmentes tápegység 650VA',
-                'price' => 17990, 'category_slug' => 'tarolok', 'category_name' => 'Tárolók',
-                'image' => 'ups.svg', 'featured' => 0, 'stock' => 21,
-                'short' => 'UPS a hálózati eszközök védelméhez áramkimaradás ellen.',
-                'description' => '650VA / 360W szünetmentes tápegység (UPS) túlfeszültség-védelemmel, ami áramkimaradás esetén is biztosítja a router és NAS folyamatos működését.',
+                'id' => 8, 'slug' => 'vega-mini-balkon-madareteto', 'name' => 'Vega mini balkon madáretető',
+                'price' => 3990, 'category_slug' => 'fuggesztheto', 'category_name' => 'Függeszthető',
+                'image' => 'feeder-mini.svg', 'featured' => 0, 'stock' => 60,
+                'short' => 'Helytakarékos mini etető erkélyre, ablakpárkányra.',
+                'description' => 'Helytakarékos, mini méretű madáretető erkélyre vagy ablakpárkányra, ahol kevés a hely. Könnyen felakasztható, hőkezelt borovi fenyőből készült, esztétikus darab.',
             ],
         ];
     }
