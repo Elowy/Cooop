@@ -104,19 +104,19 @@ h1, h2, h3, h4 { line-height: 1.2; color: var(--c-dark); margin: 0 0 .5em; }
     transition: box-shadow .2s ease;
 }
 .site-header.is-scrolled { box-shadow: var(--shadow-sm); }
-.header-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 84px; }
 
 .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--c-dark); }
 .brand:hover { color: var(--c-dark); }
 .brand-mark {
-    width: 42px; height: 42px; border-radius: 10px; flex: 0 0 auto;
+    width: 54px; height: 54px; border-radius: 12px; flex: 0 0 auto;
     background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
     color: #fff; font-weight: 800; letter-spacing: -.02em;
-    display: grid; place-items: center; font-size: 1.05rem;
+    display: grid; place-items: center; font-size: 1.32rem;
 }
 .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-.brand-text strong { font-size: 1.15rem; }
-.brand-text small { color: var(--c-muted); font-size: .72rem; }
+.brand-text strong { font-size: 1.34rem; }
+.brand-text small { color: var(--c-muted); font-size: .78rem; }
 
 .main-nav { display: flex; align-items: center; gap: 8px; }
 .main-nav a {
@@ -239,7 +239,7 @@ h1, h2, h3, h4 { line-height: 1.2; color: var(--c-dark); margin: 0 0 .5em; }
 
 /* ---------- Shop layout ---------- */
 .shop-layout { display: grid; grid-template-columns: 250px 1fr; gap: 32px; align-items: start; }
-.shop-sidebar { position: sticky; top: 92px; }
+.shop-sidebar { position: sticky; top: 104px; }
 .search-form { display: flex; gap: 8px; margin-bottom: 24px; }
 .search-form input { flex: 1; min-width: 0; }
 .sidebar-title { font-size: 1rem; text-transform: uppercase; letter-spacing: .05em; color: var(--c-muted); }
@@ -294,7 +294,7 @@ label input, label textarea { margin-top: 6px; font-weight: 400; }
 .checkout-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: start; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 24px; }
 .form-grid .span-2 { grid-column: 1 / -1; }
-.order-summary { background: var(--c-bg-alt); border-radius: var(--radius); padding: 28px; position: sticky; top: 92px; }
+.order-summary { background: var(--c-bg-alt); border-radius: var(--radius); padding: 28px; position: sticky; top: 104px; }
 .order-lines { list-style: none; padding: 0; margin: 0 0 16px; }
 .order-lines li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--c-border); font-size: .92rem; }
 .order-total { display: flex; justify-content: space-between; font-size: 1.1rem; padding: 14px 0; }
@@ -345,7 +345,7 @@ label input, label textarea { margin-top: 6px; font-weight: 400; }
 @media (max-width: 720px) {
     .nav-toggle { display: flex; }
     .main-nav {
-        position: fixed; inset: 72px 0 auto 0; flex-direction: column; align-items: stretch;
+        position: fixed; inset: 84px 0 auto 0; flex-direction: column; align-items: stretch;
         background: var(--c-surface); padding: 12px 20px 20px; border-bottom: 1px solid var(--c-border);
         box-shadow: var(--shadow); transform: translateY(-120%); transition: transform .25s ease;
     }
@@ -415,7 +415,7 @@ label input, label textarea { margin-top: 6px; font-weight: 400; }
 /* ---------- Árkalkulátor ---------- */
 .calc-layout { display: grid; grid-template-columns: 1.3fr .9fr; gap: 36px; align-items: start; }
 .calc-form { display: flex; flex-direction: column; gap: 18px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 28px; }
-.calc-result { background: var(--c-bg-alt); border-radius: var(--radius); padding: 28px; position: sticky; top: 92px; }
+.calc-result { background: var(--c-bg-alt); border-radius: var(--radius); padding: 28px; position: sticky; top: 104px; }
 .calc-result__label { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--c-muted); font-weight: 700; margin: 0 0 4px; }
 .calc-result__unit { font-size: 1.1rem; font-weight: 700; color: var(--c-text); margin: 0 0 18px; }
 .calc-result__total { font-size: 2rem; font-weight: 800; color: var(--c-primary); margin: 0 0 20px; }
