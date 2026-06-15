@@ -1,0 +1,21 @@
+# ==========================================================================
+#  Tartalék átirányítás, ha a webgyökér (document root) a PROJEKT GYÖKERE,
+#  nem pedig a public/ mappa.
+#
+#  A helyes megoldás: a domain / aldomain document rootját a .../public
+#  mappára állítani (lásd README). Ahol ez nem lehetséges (pl. fix
+#  public_html a tárhelyen), ez a fájl minden kérést a public/ alá irányít,
+#  így az oldal a domain gyökeréről is működik.
+# ==========================================================================
+
+# Könyvtárlistázás kikapcsolása
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # A már public/ alatti kéréseket ne írjuk át újra (végtelen ciklus ellen)
+    RewriteCond %{REQUEST_URI} !^/public/
+    # Minden mást a public/ alá irányítunk (a public/.htaccess innen veszi át)
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
