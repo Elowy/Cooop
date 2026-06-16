@@ -1,41 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 380" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 520" fill="none">
   <defs>
-    <linearGradient id="hb" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2f7d46"/>
-      <stop offset="1" stop-color="#215c33"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e7c987"/>
+      <stop offset="1" stop-color="#c39a45"/>
     </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0" stop-color="#cba14e" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#cba14e" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect x="30" y="40" width="420" height="300" rx="24" fill="#e7f3ec"/>
 
-  <!-- stacked crate on a pallet -->
-  <g stroke="#a87a32" stroke-width="3">
-    <rect x="150" y="90" width="170" height="130" rx="6" fill="#d8a85a"/>
+  <circle cx="280" cy="230" r="220" fill="url(#glow)"/>
+  <circle cx="280" cy="230" r="180" stroke="url(#gold)" stroke-opacity=".25" stroke-width="1.5"/>
+  <circle cx="280" cy="230" r="140" stroke="url(#gold)" stroke-opacity=".15" stroke-width="1.5"/>
+
+  <g stroke="url(#gold)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- iso crate: top face -->
+    <path d="M280 120 L408 188 L280 256 L152 188 Z" fill="#cba14e" fill-opacity=".05"/>
+    <!-- left face -->
+    <path d="M152 188 L280 256 L280 392 L152 324 Z" fill="#cba14e" fill-opacity=".08"/>
+    <!-- right face -->
+    <path d="M408 188 L280 256 L280 392 L408 324 Z" fill="#cba14e" fill-opacity=".03"/>
+    <!-- slats -->
+    <path d="M188 207 L316 275 M244 237 L372 305" stroke-opacity=".5"/>
+    <path d="M372 207 L244 275 M316 237 L188 305" stroke-opacity=".5"/>
+    <path d="M280 256 L280 392" stroke-opacity=".7"/>
   </g>
-  <rect x="150" y="120" width="170" height="6" fill="#b9863c"/>
-  <rect x="150" y="156" width="170" height="6" fill="#b9863c"/>
-  <rect x="150" y="192" width="170" height="6" fill="#b9863c"/>
-  <path d="M154 216 L316 94" stroke="#a87a32" stroke-width="5" opacity=".5"/>
-
-  <!-- quality check badge -->
-  <circle cx="235" cy="74" r="18" fill="url(#hb)"/>
-  <path d="M227 74l5 5 11-11" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- pallet base -->
-  <rect x="132" y="220" width="206" height="18" rx="3" fill="#cf9a47"/>
-  <rect x="140" y="238" width="26" height="22" rx="3" fill="#b9863c"/>
-  <rect x="222" y="238" width="26" height="22" rx="3" fill="#b9863c"/>
-  <rect x="304" y="238" width="26" height="22" rx="3" fill="#b9863c"/>
-
-  <!-- lumber stack -->
-  <g stroke="#a87a32" stroke-width="2">
-    <rect x="60" y="250" width="70" height="16" rx="3" fill="#e0b878"/>
-    <rect x="60" y="270" width="70" height="16" rx="3" fill="#d8a85a"/>
-    <rect x="60" y="290" width="70" height="16" rx="3" fill="#e0b878"/>
+  <g stroke="url(#gold)" stroke-width="2.4" stroke-opacity=".7" stroke-linecap="round">
+    <path d="M150 360 L280 428 L410 360"/>
+    <path d="M150 392 L280 460 L410 392"/>
+    <path d="M188 414 L188 446 M280 444 L280 476 M372 414 L372 446"/>
   </g>
 
-  <!-- brick stack -->
-  <g stroke="#e7f3ec" stroke-width="3">
-    <rect x="350" y="270" width="70" height="16" rx="2" fill="#b5532e"/>
-    <rect x="350" y="290" width="70" height="16" rx="2" fill="#c25e36"/>
-  </g>
+  <!-- accents -->
+  <circle cx="430" cy="120" r="5" fill="url(#gold)"/>
+  <circle cx="120" cy="300" r="4" fill="url(#gold)" fill-opacity=".7"/>
+  <circle cx="448" cy="300" r="3" fill="url(#gold)" fill-opacity=".6"/>
+  <path d="M96 150 l10 0 M101 145 l0 10" stroke="url(#gold)" stroke-width="2" stroke-opacity=".7"/>
 </svg>

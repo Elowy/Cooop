@@ -20,7 +20,7 @@ final class Router
         $this->routes['POST'][$pattern] = $handler;
     }
 
-    public function dispatch(string $method, string $uri): void
+    public function dispatch(string $method, string $uri): string
     {
         $path = '/' . trim(parse_url($uri, PHP_URL_PATH) ?? '/', '/');
         $path = $path === '//' ? '/' : $path;
@@ -29,12 +29,11 @@ final class Router
             $regex = '#^' . preg_replace('#\{([a-z_]+)\}#', '(?P<$1>[^/]+)', $pattern) . '$#';
             if (preg_match($regex, $path, $matches)) {
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                echo $handler($params);
-                return;
+                return (string) $handler($params);
             }
         }
 
         http_response_code(404);
-        echo View::render('errors/404', ['title' => Lang::t('e404.title')]);
+        return View::render('errors/404', ['title' => 'Az oldal nem található']);
     }
 }
