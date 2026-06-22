@@ -45,4 +45,10 @@ final class View
     {
         return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
+
+    /** Forint formázás, pl. 12000 → "12 000 Ft". */
+    public static function huf(int $amount): string
+    {
+        return number_format($amount, 0, ',', "\u{00A0}") . "\u{00A0}Ft";
+    }
 }

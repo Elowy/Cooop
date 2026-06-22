@@ -1,17 +1,20 @@
 <?php
 
+use App\Core\Cart;
 use App\Core\View;
 
 /** @var array<string, mixed> $config */
 $nav = [
-    '#tevekenysegek' => 'Tevékenységek',
-    '#rolunk'        => 'Rólunk',
-    '#kapcsolat'     => 'Kapcsolat',
+    '/webshop'        => 'Webshop',
+    '/#tevekenysegek' => 'Tevékenységek',
+    '/#rolunk'        => 'Rólunk',
+    '/#kapcsolat'     => 'Kapcsolat',
 ];
+$cartCount = Cart::count();
 ?>
 <header class="site-header" data-header>
     <div class="container header-inner">
-        <a href="#top" class="brand" aria-label="<?= View::e($config['app']['name']) ?>">
+        <a href="/" class="brand" aria-label="<?= View::e($config['app']['name']) ?>">
             <span class="brand-mark"><?= View::e($config['app']['short']) ?></span>
             <span class="brand-text">
                 <strong><?= View::e($config['app']['name']) ?></strong>
@@ -27,7 +30,14 @@ $nav = [
             <?php foreach ($nav as $href => $label): ?>
                 <a href="<?= View::e($href) ?>"><?= View::e($label) ?></a>
             <?php endforeach; ?>
-            <a href="#kapcsolat" class="btn btn--gold btn--sm">Ajánlatkérés</a>
+            <a href="/kosar" class="cart-link<?= $cartCount > 0 ? ' has-items' : '' ?>" aria-label="Kosár">
+                <svg class="cart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>
+                </svg>
+                <span>Kosár</span>
+                <?php if ($cartCount > 0): ?><span class="cart-badge"><?= (int) $cartCount ?></span><?php endif; ?>
+            </a>
         </nav>
     </div>
 </header>
