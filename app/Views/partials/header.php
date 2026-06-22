@@ -5,10 +5,10 @@ use App\Core\View;
 
 /** @var array<string, mixed> $config */
 $nav = [
-    '/webshop'        => 'Webshop',
-    '/#tevekenysegek' => 'Tevékenységek',
-    '/#rolunk'        => 'Rólunk',
-    '/#kapcsolat'     => 'Kapcsolat',
+    '/webshop'     => 'Webshop',
+    '/#kategoriak' => 'Kategóriák',
+    '/#rolunk'     => 'Rólunk',
+    '/#kapcsolat'  => 'Kapcsolat',
 ];
 $cartCount = Cart::count();
 ?>

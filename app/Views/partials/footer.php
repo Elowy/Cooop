@@ -27,7 +27,8 @@ $contact = $config['contact'];
         <div class="footer-col">
             <h4>Oldal</h4>
             <ul>
-                <li><a href="#tevekenysegek">Tevékenységek</a></li>
+                <li><a href="/webshop">Webshop</a></li>
+                <li><a href="/#kategoriak">Kategóriák</a></li>
                 <li><a href="#rolunk">Rólunk</a></li>
                 <li><a href="#top">Vissza fel</a></li>
             </ul>

@@ -17,6 +17,7 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+use App\Catalog\Categories;
 use App\Core\Cart;
 use App\Core\Csrf;
 use App\Core\Router;
@@ -35,6 +36,9 @@ session_start();
 // Az Axel-kapu egyetlen példánya. Éles bekötéskor itt cseréljük a megvalósítást.
 $axel = new MockAxelGateway();
 
+// Kategóriafa (config/categories.php).
+$cats = new Categories();
+
 /** Átirányítás + futás leállítása (POST műveletek után). */
 $redirect = static function (string $to): string {
     header('Location: ' . $to, true, 303);
@@ -46,28 +50,44 @@ $router = new Router();
 $router->get('/', static fn (): string => View::render('home', [
     'title' => null,
     'featured' => array_slice($axel->products(), 0, 3),
+    'topCats' => $cats->topLevel(),
 ]));
 
-$router->get('/webshop', static function () use ($axel): string {
-    $cat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
+$router->get('/webshop', static function () use ($axel, $cats): string {
+    $activeCat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
     $products = $axel->products();
-    if ($cat !== '') {
-        $products = array_values(array_filter($products, static fn ($p) => $p->category === $cat));
+    $path = [];
+
+    if ($activeCat !== '' && $cats->find($activeCat) !== null) {
+        $branch = $cats->branch($activeCat);
+        $products = array_values(array_filter($products, static fn ($p) => in_array($p->category, $branch, true)));
+        $path = $cats->path($activeCat);
+    } else {
+        $activeCat = '';
     }
+
     return View::render('shop/index', [
-        'title' => 'Webshop',
+        'title' => $activeCat !== '' ? $cats->name($activeCat) : 'Webshop',
         'products' => $products,
-        'activeCat' => $cat,
+        'catsTree' => $cats->tree(),
+        'activeCat' => $activeCat,
+        'activePath' => $path,
+        'cats' => $cats,
     ]);
 });
 
-$router->get('/termek/{slug}', static function (array $params) use ($axel): string {
+$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats): string {
     $product = $axel->findProduct($params['slug'] ?? '');
     if ($product === null) {
         http_response_code(404);
         return View::render('errors/404', ['title' => 'A termék nem található']);
     }
-    return View::render('shop/show', ['title' => $product->name, 'product' => $product]);
+    return View::render('shop/show', [
+        'title' => $product->name,
+        'product' => $product,
+        'catPath' => $cats->path($product->category),
+        'cats' => $cats,
+    ]);
 });
 
 $router->get('/kosar', static function () use ($axel): string {

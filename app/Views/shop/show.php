@@ -1,14 +1,25 @@
 <?php
 
+use App\Catalog\Categories;
 use App\Core\Csrf;
 use App\Core\View;
 use App\Integration\Product;
 
 /** @var Product $product */
+/** @var string[] $catPath */
+/** @var Categories $cats */
 ?>
 <section class="section section--clear-top product-detail">
     <div class="container">
-        <p class="breadcrumb"><a href="/webshop">← Vissza a webshopba</a></p>
+        <nav class="breadcrumb" aria-label="Morzsamenü">
+            <a href="/webshop">Webshop</a>
+            <?php foreach ($catPath as $key): ?>
+                <span class="sep">/</span>
+                <a href="/webshop?kat=<?= urlencode($key) ?>"><?= View::e($cats->name($key)) ?></a>
+            <?php endforeach; ?>
+            <span class="sep">/</span>
+            <span class="current"><?= View::e($product->name) ?></span>
+        </nav>
 
         <div class="detail-grid">
             <div class="detail-media reveal" data-icon="<?= View::e($product->icon) ?>" aria-hidden="true">

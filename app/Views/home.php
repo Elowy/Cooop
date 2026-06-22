@@ -5,13 +5,14 @@ use App\Integration\Product;
 
 /** @var array<string, mixed> $config */
 /** @var Product[] $featured */
+/** @var array<int, array<string, mixed>> $topCats */
 
-$activities = [
-    ['icon' => 'packaging', 'title' => 'Ipari csomagolás',  'text' => 'Gépek és nagy értékű áruk feladatra szabott csomagolása.'],
-    ['icon' => 'wood',      'title' => 'Faipari gyártás',    'text' => 'Egyedi raklapok, exportládák és faszerkezetek.'],
-    ['icon' => 'truck',     'title' => 'Nemzetközi fuvarozás', 'text' => 'Saját nyergesvontatóval, megbízható kiszolgálással.'],
-    ['icon' => 'lumber',    'title' => 'Fűrészáru & tűzifa', 'text' => 'Minőségi fenyő fűrészáru és tűzifa nagykereskedés.'],
-    ['icon' => 'brick',     'title' => 'BRITTERM tégla',     'text' => 'A szlovák BRITTERM hivatalos magyar képviselete.'],
+// Megjelenítési adatok a fő kategóriákhoz (ikon + rövid leírás).
+$catMeta = [
+    'epitoanyagok'     => ['icon' => 'brick', 'text' => 'Tégla, áthidaló, homok és faanyag.'],
+    'kert-szabadido'   => ['icon' => 'leaf',  'text' => 'Kert, háziállat, játszótér és növény.'],
+    'fahazak'          => ['icon' => 'house', 'text' => 'Nyaraló, lombház, pavilon, úszóház.'],
+    'design-dekoracio' => ['icon' => 'deco',  'text' => 'Lakás- és üzletdekoráció, cégtáblák.'],
 ];
 
 $stats = [
@@ -35,7 +36,7 @@ $stats = [
             </p>
             <div class="hero-actions">
                 <a href="/webshop" class="btn btn--gold">Irány a webshop</a>
-                <a href="#tevekenysegek" class="btn btn--outline">Tevékenységeink</a>
+                <a href="#kategoriak" class="btn btn--outline">Kategóriák</a>
             </div>
         </div>
         <div class="hero-visual reveal" aria-hidden="true">
@@ -86,22 +87,22 @@ $stats = [
 </section>
 <?php endif; ?>
 
-<section class="section" id="tevekenysegek">
+<section class="section" id="kategoriak">
     <div class="container">
         <header class="section-head reveal">
-            <p class="eyebrow"><span class="eyebrow-dot"></span> Tevékenységek</p>
-            <h2 class="display">Amivel foglalkozunk</h2>
-            <p class="section-sub">Rövid placeholder leírás a fő szolgáltatási területekről.</p>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Kategóriák</p>
+            <h2 class="display">Fő kategóriáink</h2>
+            <p class="section-sub">Négy fő terület — a webshopban tovább böngészhető alkategóriákkal.</p>
         </header>
 
         <div class="card-grid">
-            <?php foreach ($activities as $a): ?>
-                <article class="card reveal">
-                    <span class="card-icon" data-icon="<?= View::e($a['icon']) ?>"></span>
-                    <h3><?= View::e($a['title']) ?></h3>
-                    <p><?= View::e($a['text']) ?></p>
-                    <span class="card-link">Részletek →</span>
-                </article>
+            <?php foreach ($topCats as $cat): $meta = $catMeta[$cat['key']] ?? ['icon' => 'packaging', 'text' => '']; ?>
+                <a class="card cat-card reveal" href="/webshop?kat=<?= urlencode($cat['key']) ?>">
+                    <span class="card-icon" data-icon="<?= View::e($meta['icon']) ?>"></span>
+                    <h3><?= View::e($cat['name']) ?></h3>
+                    <p><?= View::e($meta['text']) ?></p>
+                    <span class="card-link"><?= count($cat['children']) ?> alkategória →</span>
+                </a>
             <?php endforeach; ?>
         </div>
     </div>
