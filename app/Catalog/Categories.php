@@ -51,6 +51,18 @@ final class Categories
         return array_values(array_filter($this->flat, static fn ($n) => $n['parent'] === null));
     }
 
+    /** Minden kategória laposított listája (key => csomópont). */
+    public function all(): array
+    {
+        return $this->flat;
+    }
+
+    /** Levél-kategóriák (nincs gyerekük) száma. */
+    public function leafCount(): int
+    {
+        return count(array_filter($this->flat, static fn ($n) => $n['children'] === []));
+    }
+
     public function find(string $key): ?array
     {
         return $this->flat[$key] ?? null;

@@ -18,6 +18,7 @@ spl_autoload_register(static function (string $class): void {
 });
 
 use App\Catalog\Categories;
+use App\Core\Auth;
 use App\Core\Cart;
 use App\Core\Csrf;
 use App\Core\Router;
@@ -125,6 +126,116 @@ $router->post('/kosar/torol', static function () use ($redirect): string {
         Cart::remove((string) $_POST['sku']);
     }
     return $redirect('/kosar');
+});
+
+/* ------------------------------------------------------------------ */
+/* Vezérlőpult (admin)                                                 */
+/* ------------------------------------------------------------------ */
+
+$adminPw = (string) ($config['admin']['password'] ?? '');
+$lowStock = (int) ($config['admin']['low_stock'] ?? 10);
+$pwWeak = $adminPw === '' || $adminPw === 'admin';
+
+/** Admin nézet a közös adatokkal + admin layouttal. */
+$adminView = static function (string $tpl, string $active, array $extra = []) use ($pwWeak): string {
+    return View::render($tpl, array_merge(['active' => $active, 'pwWeak' => $pwWeak], $extra), 'admin');
+};
+
+/** Belépés-ellenőrzés; ha nincs jogosultság, átirányít. */
+$guard = static function () use ($redirect): void {
+    if (!Auth::check()) {
+        $redirect('/admin/login');
+    }
+};
+
+$router->get('/admin/login', static function () use ($redirect): string {
+    if (Auth::check()) {
+        return $redirect('/admin');
+    }
+    return View::render('admin/login', ['title' => 'Belépés', 'error' => isset($_GET['hiba'])], '');
+});
+
+$router->post('/admin/login', static function () use ($adminPw, $redirect): string {
+    if (Csrf::check($_POST['_csrf'] ?? null) && Auth::attempt((string) ($_POST['password'] ?? ''), $adminPw)) {
+        return $redirect('/admin');
+    }
+    return $redirect('/admin/login?hiba=1');
+});
+
+$router->post('/admin/logout', static function () use ($redirect): string {
+    Auth::logout();
+    return $redirect('/admin/login');
+});
+
+$router->get('/admin', static function () use ($axel, $cats, $adminView, $guard, $lowStock): string {
+    $guard();
+    $products = $axel->products();
+    $inStock = array_filter($products, static fn ($p) => $p->inStock());
+    $low = array_filter($products, static fn ($p) => $p->stock > 0 && $p->stock < $lowStock);
+    $stockValue = array_sum(array_map(static fn ($p) => $p->priceGross() * $p->stock, $products));
+
+    return $adminView('admin/dashboard', 'dashboard', [
+        'title' => 'Áttekintés',
+        'cats' => $cats,
+        'lowStockItems' => array_values($low),
+        'lowStock' => $lowStock,
+        'kpi' => [
+            'products' => count($products),
+            'categories' => $cats->leafCount(),
+            'inStock' => count($inStock),
+            'out' => count($products) - count($inStock),
+            'stockValue' => $stockValue,
+        ],
+    ]);
+});
+
+$router->get('/admin/termekek', static function () use ($axel, $cats, $adminView, $guard, $lowStock): string {
+    $guard();
+    $products = $axel->products();
+    $kat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
+    $q = trim((string) ($_GET['q'] ?? ''));
+
+    if ($kat !== '' && $cats->find($kat) !== null) {
+        $branch = $cats->branch($kat);
+        $products = array_filter($products, static fn ($p) => in_array($p->category, $branch, true));
+    }
+    if ($q !== '') {
+        $products = array_filter($products, static fn ($p) => mb_stripos($p->name, $q) !== false || stripos($p->sku, $q) !== false);
+    }
+
+    return $adminView('admin/products', 'products', [
+        'title' => 'Termékek és készlet',
+        'products' => array_values($products),
+        'cats' => $cats,
+        'kat' => $kat,
+        'q' => $q,
+        'lowStock' => $lowStock,
+    ]);
+});
+
+$router->get('/admin/kategoriak', static function () use ($axel, $cats, $adminView, $guard): string {
+    $guard();
+    $products = $axel->products();
+    $counts = [];
+    foreach ($cats->all() as $key => $node) {
+        $branch = $cats->branch($key);
+        $counts[$key] = count(array_filter($products, static fn ($p) => in_array($p->category, $branch, true)));
+    }
+    return $adminView('admin/categories', 'categories', [
+        'title' => 'Kategóriák',
+        'catsTree' => $cats->tree(),
+        'counts' => $counts,
+    ]);
+});
+
+$router->get('/admin/rendelesek', static function () use ($adminView, $guard): string {
+    $guard();
+    return $adminView('admin/orders', 'orders', ['title' => 'Rendelések']);
+});
+
+$router->get('/admin/integracio', static function () use ($adminView, $guard): string {
+    $guard();
+    return $adminView('admin/integration', 'integration', ['title' => 'Axel integráció']);
 });
 
 echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

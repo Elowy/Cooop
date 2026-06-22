@@ -18,4 +18,10 @@ return [
         'phone'   => '+36 20 415 2695',
         'address' => '2660 Balassagyarmat, Mártírok útja 72.',
     ],
+
+    // Vezérlőpult belépés. Élesben az ADMIN_PASSWORD környezeti változóval add meg!
+    'admin' => [
+        'password'  => getenv('ADMIN_PASSWORD') ?: 'admin',
+        'low_stock' => 10, // ennyi alatt figyelmeztet a készletre
+    ],
 ];

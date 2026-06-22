@@ -29,8 +29,8 @@ $contact = $config['contact'];
             <ul>
                 <li><a href="/webshop">Webshop</a></li>
                 <li><a href="/#kategoriak">Kategóriák</a></li>
-                <li><a href="#rolunk">Rólunk</a></li>
-                <li><a href="#top">Vissza fel</a></li>
+                <li><a href="/#rolunk">Rólunk</a></li>
+                <li><a href="/admin">Vezérlőpult</a></li>
             </ul>
         </div>
     </div>
