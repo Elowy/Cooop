@@ -77,6 +77,14 @@ final class Schema
                 photo VARCHAR(255) NOT NULL DEFAULT '',
                 created_at VARCHAR(40) NOT NULL
             )$suffix",
+
+            "CREATE TABLE IF NOT EXISTS product_seo (
+                sku VARCHAR(64) PRIMARY KEY,
+                title VARCHAR(255) NOT NULL DEFAULT '',
+                description $txt,
+                keywords VARCHAR(255) NOT NULL DEFAULT '',
+                og_image VARCHAR(500) NOT NULL DEFAULT ''
+            )$suffix",
         ];
 
         foreach ($tables as $sql) {

@@ -7,6 +7,7 @@ use App\Map\PoiStore;
 use App\Message\MessageStore;
 use App\Order\OrderStore;
 use App\Reference\ReferenceStore;
+use App\Seo\ProductSeoStore;
 use App\Settings\SettingsStore;
 use PDO;
 
@@ -75,6 +76,16 @@ final class Importer
             if (count($db->all()) === 0) {
                 foreach ((new OrderStore())->all() as $order) {
                     $db->save($order);
+                }
+            }
+        });
+
+        // Termék-SEO
+        self::guard(static function () use ($pdo): void {
+            $db = new ProductSeoStore($pdo);
+            if (count($db->all()) === 0) {
+                foreach ((new ProductSeoStore())->all() as $sku => $row) {
+                    $db->save((string) $sku, $row);
                 }
             }
         });

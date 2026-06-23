@@ -19,13 +19,15 @@ if (!empty($config['installed'])) {
     }
 }
 $seo = (new SettingsStore($seoPdo))->all();
+$meta = $meta ?? []; // oldal-specifikus felülírás (pl. termékoldal)
 
 $defaultDesc = 'Net-Trade Hungary Kft. – egyedi raklapgyártás, ipari csomagolás, nemzetközi árufuvarozás és fűrészáru-nagykereskedelem.';
 $baseTitle = trim((string) ($seo['seo_title'] ?? '')) ?: ($appName . ' — ' . $config['app']['tagline']);
-$pageTitle = (isset($title) && $title) ? "{$title} — {$appName}" : $baseTitle;
-$metaDesc = trim((string) ($seo['seo_description'] ?? '')) ?: $defaultDesc;
-$metaKeywords = trim((string) ($seo['seo_keywords'] ?? ''));
-$ogImage = trim((string) ($seo['seo_og_image'] ?? ''));
+$ovTitle = trim((string) ($meta['title'] ?? ''));
+$pageTitle = $ovTitle !== '' ? $ovTitle : ((isset($title) && $title) ? "{$title} — {$appName}" : $baseTitle);
+$metaDesc = trim((string) ($meta['description'] ?? '')) ?: (trim((string) ($seo['seo_description'] ?? '')) ?: $defaultDesc);
+$metaKeywords = trim((string) ($meta['keywords'] ?? '')) ?: trim((string) ($seo['seo_keywords'] ?? ''));
+$ogImage = trim((string) ($meta['og_image'] ?? '')) ?: trim((string) ($seo['seo_og_image'] ?? ''));
 $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?? '/');
 ?>
 <!DOCTYPE html>

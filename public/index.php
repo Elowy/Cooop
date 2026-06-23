@@ -34,6 +34,7 @@ use App\Message\MessageStore;
 use App\Order\OrderStore;
 use App\Payment\MockPaymentGateway;
 use App\Reference\ReferenceStore;
+use App\Seo\ProductSeoStore;
 use App\Settings\SettingsStore;
 
 $config = require dirname(__DIR__) . '/config/config.php';
@@ -83,6 +84,7 @@ $settings = new SettingsStore($pdo);
 $references = new ReferenceStore($pdo);
 $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
+$productSeo = new ProductSeoStore($pdo);
 $users = $pdo ? new UserRepository($pdo) : null;
 
 // Általános képfeltöltő (referencia-logó, vezető-fotó) a megadott mappába.
@@ -317,17 +319,25 @@ $router->get('/webshop', static function () use ($axel, $cats): string {
     ]);
 });
 
-$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats): string {
+$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo): string {
     $product = $axel->findProduct($params['slug'] ?? '');
     if ($product === null) {
         http_response_code(404);
         return View::render('errors/404', ['title' => 'A termék nem található']);
     }
+    $pseo = $productSeo->find($product->sku) ?? [];
+    $meta = [
+        'title' => (string) ($pseo['title'] ?? ''),
+        'description' => trim((string) ($pseo['description'] ?? '')) !== '' ? (string) $pseo['description'] : $product->short,
+        'keywords' => (string) ($pseo['keywords'] ?? ''),
+        'og_image' => (string) ($pseo['og_image'] ?? ''),
+    ];
     return View::render('shop/show', [
         'title' => $product->name,
         'product' => $product,
         'catPath' => $cats->path($product->category),
         'cats' => $cats,
+        'meta' => $meta,
     ]);
 });
 
@@ -792,6 +802,48 @@ $router->post('/admin/seo', static function () use ($guard, $settings, $redirect
         $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'SEO beállítások mentve.'];
     }
     return $redirect('/admin/seo');
+});
+
+$router->get('/admin/termek-seo', static function () use ($adminView, $guard, $axel, $productSeo): string {
+    $guard();
+    $sku = (string) ($_GET['sku'] ?? '');
+    $product = null;
+    foreach ($axel->products() as $p) {
+        if ($p->sku === $sku) {
+            $product = $p;
+            break;
+        }
+    }
+    if ($product === null) {
+        http_response_code(404);
+        return $adminView('admin/product-seo', 'products', ['title' => 'Termék SEO', 'product' => null, 'values' => []]);
+    }
+    $pseo = $productSeo->find($sku) ?? [];
+    return $adminView('admin/product-seo', 'products', [
+        'title' => 'SEO · ' . $product->name,
+        'product' => $product,
+        'values' => [
+            'title' => (string) ($pseo['title'] ?? ''),
+            'description' => (string) ($pseo['description'] ?? ''),
+            'keywords' => (string) ($pseo['keywords'] ?? ''),
+            'og_image' => (string) ($pseo['og_image'] ?? ''),
+        ],
+    ]);
+});
+
+$router->post('/admin/termek-seo', static function () use ($guard, $productSeo, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    if (Csrf::check($_POST['_csrf'] ?? null) && $sku !== '') {
+        $productSeo->save($sku, [
+            'title' => trim((string) ($_POST['title'] ?? '')),
+            'description' => trim((string) ($_POST['description'] ?? '')),
+            'keywords' => trim((string) ($_POST['keywords'] ?? '')),
+            'og_image' => trim((string) ($_POST['og_image'] ?? '')),
+        ]);
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Termék SEO mentve.'];
+    }
+    return $redirect('/admin/termekek');
 });
 
 $router->get('/admin/referenciak', static function () use ($adminView, $guard, $references): string {
