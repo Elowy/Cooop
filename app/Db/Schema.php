@@ -34,6 +34,8 @@ final class Schema
                 logo VARCHAR(255) NOT NULL DEFAULT '',
                 short_text $txt,
                 long_text $txt,
+                url VARCHAR(500) NOT NULL DEFAULT '',
+                featured INT NOT NULL DEFAULT 0,
                 created_at VARCHAR(40) NOT NULL
             )$suffix",
 
@@ -106,6 +108,50 @@ final class Schema
 
         foreach ($tables as $sql) {
             $pdo->exec($sql);
+        }
+
+        // Meglévő (korábban létrehozott) táblák kiegészítése új oszlopokkal.
+        self::migrate($pdo, $driver);
+    }
+
+    /**
+     * Hiányzó oszlopok pótlása meglévő táblákon (idempotens, driver-független).
+     * Új funkciók deploykor a régi adatbázist is naprakésszé teszi.
+     */
+    public static function migrate(PDO $pdo, string $driver): void
+    {
+        self::addColumn($pdo, $driver, 'refs', 'url', "VARCHAR(500) NOT NULL DEFAULT ''");
+        self::addColumn($pdo, $driver, 'refs', 'featured', 'INT NOT NULL DEFAULT 0');
+    }
+
+    private static function addColumn(PDO $pdo, string $driver, string $table, string $col, string $definition): void
+    {
+        if (self::hasColumn($pdo, $driver, $table, $col)) {
+            return;
+        }
+        try {
+            $pdo->exec("ALTER TABLE {$table} ADD COLUMN {$col} {$definition}");
+        } catch (\Throwable $e) {
+            // pl. már létezik vagy nem támogatott – nem végzetes
+        }
+    }
+
+    private static function hasColumn(PDO $pdo, string $driver, string $table, string $col): bool
+    {
+        try {
+            if ($driver === 'sqlite') {
+                foreach ($pdo->query("PRAGMA table_info({$table})") as $r) {
+                    if (($r['name'] ?? '') === $col) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            $stmt = $pdo->prepare('SHOW COLUMNS FROM ' . $table . ' LIKE ?');
+            $stmt->execute([$col]);
+            return $stmt->fetch() !== false;
+        } catch (\Throwable $e) {
+            return false;
         }
     }
 }

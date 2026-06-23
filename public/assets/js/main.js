@@ -128,6 +128,11 @@
             shortEl.style.display = r.short ? '' : 'none';
             var longEl = refModal.querySelector('[data-ref-long]');
             longEl.innerHTML = r.long ? rEsc(r.long).replace(/\n/g, '<br>') : (r.short ? '' : 'Ehhez a referenciához még nincs bővebb leírás.');
+            var linkEl = refModal.querySelector('[data-ref-link]');
+            if (linkEl) {
+                if (r.url) { linkEl.href = r.url; linkEl.hidden = false; }
+                else { linkEl.removeAttribute('href'); linkEl.hidden = true; }
+            }
             refModal.hidden = false;
             document.body.classList.add('modal-open');
         };

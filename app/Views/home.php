@@ -162,7 +162,8 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
         </header>
         <div class="reference-grid">
             <?php foreach ($references as $ref): ?>
-                <a class="reference-card reveal" href="/referencia/<?= (int) $ref['id'] ?>" data-ref-open="<?= (int) $ref['id'] ?>">
+                <a class="reference-card reveal<?= !empty($ref['featured']) ? ' reference-card--featured' : '' ?>" href="/referencia/<?= (int) $ref['id'] ?>" data-ref-open="<?= (int) $ref['id'] ?>">
+                    <?php if (!empty($ref['featured'])): ?><span class="reference-badge">★ Kiemelt</span><?php endif; ?>
                     <span class="reference-logo">
                         <?php if (!empty($ref['logo'])): ?>
                             <img src="/uploads/references/<?= View::e((string) $ref['logo']) ?>" alt="<?= View::e((string) $ref['name']) ?>" loading="lazy">
@@ -189,12 +190,14 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
             </div>
             <p class="modal-short muted" data-ref-short></p>
             <div class="modal-body" data-ref-long></div>
+            <a class="btn btn--outline modal-link" data-ref-link target="_blank" rel="noopener" hidden>Weboldal megtekintése →</a>
         </div>
     </div>
     <script>
     window.NT_REFS = <?= json_encode(array_map(static fn ($r) => [
         'id' => (int) $r['id'], 'name' => (string) $r['name'], 'logo' => (string) ($r['logo'] ?? ''),
         'short' => (string) ($r['short'] ?? ''), 'long' => (string) ($r['long'] ?? ''),
+        'url' => (string) ($r['url'] ?? ''),
     ], $references), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
     </script>
 </section>

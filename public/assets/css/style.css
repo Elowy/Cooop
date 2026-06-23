@@ -730,8 +730,14 @@ a.panel-link:hover { color: var(--gold-2); }
 
 /* Referenciák */
 .reference-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-.reference-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; color: var(--text); transition: border-color .15s, transform .15s; }
+.reference-card { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; color: var(--text); transition: border-color .15s, transform .15s, box-shadow .15s; }
 .reference-card:hover { border-color: var(--line-gold); transform: translateY(-4px); color: var(--text); }
+.reference-card--featured { border-color: var(--gold); background: linear-gradient(180deg, var(--gold-soft), var(--surface) 62%); box-shadow: 0 0 0 1px var(--gold-soft), 0 14px 36px rgba(0, 0, 0, .35); }
+.reference-card--featured:hover { border-color: var(--gold-2); box-shadow: 0 0 0 1px var(--line-gold), 0 18px 44px rgba(0, 0, 0, .42); }
+.reference-badge { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: .66rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #1c1709; background: linear-gradient(135deg, var(--gold-2), var(--gold)); box-shadow: 0 4px 12px rgba(203, 161, 78, .35); }
+.reference-detail--featured .reference-detail-logo { box-shadow: 0 0 0 2px var(--gold); }
+.reference-detail .reference-badge { position: static; margin-bottom: 10px; }
+.modal-link { margin-top: 18px; }
 .reference-logo { width: 84px; height: 84px; border-radius: 12px; background: #fff; display: grid; place-items: center; overflow: hidden; }
 .reference-logo img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 8px; }
 .reference-monogram { width: 84px; height: 84px; border-radius: 12px; display: grid; place-items: center; font-family: var(--serif); font-weight: 600; font-size: 2rem; color: #1c1709; background: linear-gradient(135deg, var(--gold-2), var(--gold)); }

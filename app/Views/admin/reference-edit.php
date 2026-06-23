@@ -28,6 +28,16 @@ $ref = $ref ?? [];
         </div>
 
         <div class="field">
+            <label>Hivatkozás (a partner weboldala, nem kötelező)</label>
+            <input name="url" type="url" value="<?= View::e((string) ($ref['url'] ?? '')) ?>" placeholder="https://partner.hu">
+        </div>
+
+        <label class="check" style="display:flex;align-items:center;gap:9px;margin-bottom:16px">
+            <input type="checkbox" name="featured" value="1"<?= !empty($ref['featured']) ? ' checked' : '' ?>>
+            <span>Kiemelt partner (arany szegéllyel, elöl jelenik meg)</span>
+        </label>
+
+        <div class="field">
             <label>Rövid leírás (a kártyán látszik)</label>
             <input name="short" value="<?= View::e((string) ($ref['short'] ?? '')) ?>">
         </div>

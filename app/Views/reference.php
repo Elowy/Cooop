@@ -6,12 +6,13 @@ use App\Core\View;
 
 $long = trim((string) ($ref['long'] ?? ''));
 $short = trim((string) ($ref['short'] ?? ''));
+$url = trim((string) ($ref['url'] ?? ''));
 ?>
 <section class="section section--clear-top">
     <div class="container narrow">
         <p class="breadcrumb"><a href="/#referenciak">← Referenciák</a></p>
 
-        <div class="reference-detail">
+        <div class="reference-detail<?= !empty($ref['featured']) ? ' reference-detail--featured' : '' ?>">
             <div class="reference-detail-logo">
                 <?php if (!empty($ref['logo'])): ?>
                     <img src="/uploads/references/<?= View::e((string) $ref['logo']) ?>" alt="<?= View::e((string) $ref['name']) ?>">
@@ -20,8 +21,12 @@ $short = trim((string) ($ref['short'] ?? ''));
                 <?php endif; ?>
             </div>
             <div>
+                <?php if (!empty($ref['featured'])): ?><span class="reference-badge">★ Kiemelt partner</span><?php endif; ?>
                 <h1 class="display"><?= View::e((string) $ref['name']) ?></h1>
                 <?php if ($short !== ''): ?><p class="reference-detail-short"><?= View::e($short) ?></p><?php endif; ?>
+                <?php if ($url !== ''): ?>
+                    <p style="margin-top:12px"><a href="<?= View::e($url) ?>" class="btn btn--outline btn--sm" target="_blank" rel="noopener">Weboldal megtekintése →</a></p>
+                <?php endif; ?>
             </div>
         </div>
 

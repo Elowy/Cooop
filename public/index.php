@@ -1095,6 +1095,8 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
         'name' => trim((string) ($_POST['name'] ?? '')),
         'short' => trim((string) ($_POST['short'] ?? '')),
         'long' => trim((string) ($_POST['long'] ?? '')),
+        'url' => trim((string) ($_POST['url'] ?? '')),
+        'featured' => isset($_POST['featured']) ? 1 : 0,
         'logo' => $existing['logo'] ?? '',
     ];
     if ($id > 0) {

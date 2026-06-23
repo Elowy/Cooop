@@ -26,7 +26,11 @@ use App\Core\View;
                                 <span class="reference-monogram reference-monogram--sm"><?= View::e(mb_strtoupper(mb_substr((string) $ref['name'], 0, 1))) ?></span>
                             <?php endif; ?>
                         </td>
-                        <td><a href="/admin/referenciak/szerkesztes?id=<?= (int) $ref['id'] ?>"><?= View::e((string) $ref['name']) ?></a></td>
+                        <td>
+                            <a href="/admin/referenciak/szerkesztes?id=<?= (int) $ref['id'] ?>"><?= View::e((string) $ref['name']) ?></a>
+                            <?php if (!empty($ref['featured'])): ?> <span class="pill pill--ok">★ Kiemelt</span><?php endif; ?>
+                            <?php if (!empty($ref['url'])): ?><br><a class="muted" style="font-size:.8rem" href="<?= View::e((string) $ref['url']) ?>" target="_blank" rel="noopener"><?= View::e((string) $ref['url']) ?></a><?php endif; ?>
+                        </td>
                         <td class="muted"><?= View::e((string) ($ref['short'] ?? '')) ?></td>
                         <td><?= !empty($ref['long']) ? '✓' : '<span class="muted">—</span>' ?></td>
                         <td class="ta-r">

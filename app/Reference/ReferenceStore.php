@@ -29,11 +29,12 @@ final class ReferenceStore
     {
         if ($this->pdo) {
             $out = [];
-            $rows = $this->pdo->query('SELECT id, name, logo, short_text, long_text FROM refs ORDER BY id');
+            $rows = $this->pdo->query('SELECT id, name, logo, short_text, long_text, url, featured FROM refs ORDER BY featured DESC, id');
             foreach ($rows as $r) {
                 $out[] = [
                     'id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'],
                     'short' => (string) $r['short_text'], 'long' => (string) $r['long_text'],
+                    'url' => (string) ($r['url'] ?? ''), 'featured' => (int) ($r['featured'] ?? 0),
                 ];
             }
             return $out;
@@ -41,19 +42,30 @@ final class ReferenceStore
         if (!is_file($this->file)) {
             $seed = $this->seed();
             $this->persist($seed);
-            return $seed;
+            return self::sort($seed);
         }
         $data = json_decode((string) file_get_contents($this->file), true);
-        return is_array($data) ? $data : [];
+        return is_array($data) ? self::sort($data) : [];
+    }
+
+    /** Kiemeltek előre, azon belül id szerint. */
+    private static function sort(array $refs): array
+    {
+        usort($refs, static function ($a, $b) {
+            $fa = (int) ($a['featured'] ?? 0);
+            $fb = (int) ($b['featured'] ?? 0);
+            return $fa === $fb ? ((int) ($a['id'] ?? 0) <=> (int) ($b['id'] ?? 0)) : ($fb <=> $fa);
+        });
+        return $refs;
     }
 
     public function find(int $id): ?array
     {
         if ($this->pdo) {
-            $stmt = $this->pdo->prepare('SELECT id, name, logo, short_text, long_text FROM refs WHERE id = ?');
+            $stmt = $this->pdo->prepare('SELECT id, name, logo, short_text, long_text, url, featured FROM refs WHERE id = ?');
             $stmt->execute([$id]);
             $r = $stmt->fetch();
-            return $r ? ['id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'], 'short' => (string) $r['short_text'], 'long' => (string) $r['long_text']] : null;
+            return $r ? ['id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'], 'short' => (string) $r['short_text'], 'long' => (string) $r['long_text'], 'url' => (string) ($r['url'] ?? ''), 'featured' => (int) ($r['featured'] ?? 0)] : null;
         }
         foreach ($this->all() as $ref) {
             if ((int) $ref['id'] === $id) {
@@ -67,12 +79,12 @@ final class ReferenceStore
     {
         if ($this->pdo) {
             if (!empty($ref['id'])) {
-                $this->pdo->prepare('UPDATE refs SET name=?, logo=?, short_text=?, long_text=? WHERE id=?')
-                    ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', (int) $ref['id']]);
+                $this->pdo->prepare('UPDATE refs SET name=?, logo=?, short_text=?, long_text=?, url=?, featured=? WHERE id=?')
+                    ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', $ref['url'] ?? '', (int) ($ref['featured'] ?? 0), (int) $ref['id']]);
                 return (int) $ref['id'];
             }
-            $this->pdo->prepare('INSERT INTO refs (name, logo, short_text, long_text, created_at) VALUES (?, ?, ?, ?, ?)')
-                ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', date('c')]);
+            $this->pdo->prepare('INSERT INTO refs (name, logo, short_text, long_text, url, featured, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+                ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', $ref['url'] ?? '', (int) ($ref['featured'] ?? 0), date('c')]);
             return (int) $this->pdo->lastInsertId();
         }
         return $this->fileSave($ref);
@@ -116,7 +128,7 @@ final class ReferenceStore
         $out = [];
         $i = 0;
         foreach ($rows as $p) {
-            $out[] = ['id' => ++$i, 'name' => (string) ($p['name'] ?? ''), 'logo' => '', 'short' => (string) ($p['note'] ?? ''), 'long' => '', 'created' => date('c')];
+            $out[] = ['id' => ++$i, 'name' => (string) ($p['name'] ?? ''), 'logo' => '', 'short' => (string) ($p['note'] ?? ''), 'long' => '', 'url' => '', 'featured' => 0, 'created' => date('c')];
         }
         return $out;
     }
