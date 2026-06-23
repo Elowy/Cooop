@@ -31,9 +31,15 @@ use App\Core\View;
 
         <form method="post" action="/admin/login">
             <?= Csrf::field() ?>
+            <?php if (!empty($installed)): ?>
+                <label class="login-field">
+                    <span>E-mail</span>
+                    <input type="email" name="email" autocomplete="username" autofocus required>
+                </label>
+            <?php endif; ?>
             <label class="login-field">
                 <span>Jelszó</span>
-                <input type="password" name="password" autocomplete="current-password" autofocus required>
+                <input type="password" name="password" autocomplete="current-password"<?= empty($installed) ? ' autofocus' : '' ?> required>
             </label>
             <button type="submit" class="btn btn--gold btn--block">Belépés</button>
         </form>

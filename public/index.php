@@ -23,6 +23,9 @@ use App\Core\Cart;
 use App\Core\Csrf;
 use App\Core\Router;
 use App\Core\View;
+use App\Db\Database;
+use App\Db\Schema;
+use App\User\UserRepository;
 use App\Integration\MockAxelGateway;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
@@ -61,6 +64,16 @@ $messages = new MessageStore($config['contact']['messages_dir']);
 $settings = new SettingsStore();
 $references = new ReferenceStore();
 $pois = new PoiStore();
+
+// Adatbázis és felhasználók – csak ha a telepítő már lefutott.
+$users = null;
+if ($config['installed']) {
+    try {
+        $users = new UserRepository(Database::instance($config['db']));
+    } catch (\Throwable $e) {
+        $users = null; // DB nem elérhető; a belépés ilyenkor nem működik
+    }
+}
 
 // Referencia-logó feltöltése a public/uploads/references mappába.
 $uploadsDir = dirname(__DIR__) . '/public/uploads/references';
@@ -126,6 +139,79 @@ $router->get('/', static fn (): string => View::render('home', [
     'topCats' => $cats->topLevel(),
     'references' => $references->all(),
 ]));
+
+/* ------------------------------------------------------------------ */
+/* Telepítő                                                            */
+/* ------------------------------------------------------------------ */
+
+$router->get('/telepito', static function () use ($config): string {
+    return View::render('install', [
+        'title' => 'Telepítő',
+        'done' => (bool) $config['installed'],
+        'errors' => [],
+        'old' => [],
+    ], '');
+});
+
+$router->post('/telepito', static function () use ($config, $redirect): string {
+    if ($config['installed']) {
+        return $redirect('/');
+    }
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/telepito');
+    }
+
+    $driver = in_array($_POST['driver'] ?? 'mysql', ['mysql', 'sqlite'], true) ? (string) $_POST['driver'] : 'mysql';
+    $dbcfg = [
+        'driver' => $driver,
+        'host' => trim((string) ($_POST['host'] ?? 'localhost')),
+        'port' => trim((string) ($_POST['port'] ?? '3306')),
+        'name' => trim((string) ($_POST['name'] ?? '')),
+        'user' => trim((string) ($_POST['user'] ?? '')),
+        'pass' => (string) ($_POST['pass'] ?? ''),
+    ];
+    $adminName = trim((string) ($_POST['admin_name'] ?? ''));
+    $adminEmail = trim((string) ($_POST['admin_email'] ?? ''));
+    $adminPass = (string) ($_POST['admin_password'] ?? '');
+
+    $errors = [];
+    if ($driver === 'mysql' && $dbcfg['name'] === '') {
+        $errors[] = 'Add meg az adatbázis nevét.';
+    }
+    if ($adminName === '') {
+        $errors[] = 'Add meg az admin nevét.';
+    }
+    if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Érvényes admin e-mail cím szükséges.';
+    }
+    if (strlen($adminPass) < 6) {
+        $errors[] = 'Az admin jelszó legalább 6 karakter legyen.';
+    }
+
+    if (!$errors) {
+        try {
+            $pdo = Database::make($dbcfg);
+            Schema::create($pdo, $driver);
+            $repo = new UserRepository($pdo);
+            if ($repo->findByEmail($adminEmail) === null) {
+                $repo->create($adminName, $adminEmail, password_hash($adminPass, PASSWORD_DEFAULT), 'admin');
+            }
+            file_put_contents(
+                dirname(__DIR__) . '/config/db.php',
+                "<?php\n\nreturn " . var_export($dbcfg, true) . ";\n"
+            );
+            $user = $repo->findByEmail($adminEmail);
+            if ($user !== null) {
+                Auth::loginUser($user);
+            }
+            return $redirect('/admin');
+        } catch (\Throwable $e) {
+            $errors[] = 'Adatbázis hiba: ' . $e->getMessage();
+        }
+    }
+
+    return View::render('install', ['title' => 'Telepítő', 'done' => false, 'errors' => $errors, 'old' => $_POST], '');
+});
 
 $router->get('/referencia/{id}', static function (array $params) use ($references): string {
     $ref = $references->find((int) ($params['id'] ?? 0));
@@ -435,22 +521,47 @@ $adminView = static function (string $tpl, string $active, array $extra = []) us
     return View::render($tpl, array_merge(['active' => $active, 'pwWeak' => $pwWeak], $extra), 'admin');
 };
 
-/** Belépés-ellenőrzés; ha nincs jogosultság, átirányít. */
+/** Vezérlőpult-hozzáférés (admin vagy szerkesztő); különben átirányít. */
 $guard = static function () use ($redirect): void {
-    if (!Auth::check()) {
+    if (!Auth::isStaff()) {
         $redirect('/admin/login');
     }
 };
+/** Csak adminnak engedélyezett művelet. */
+$guardAdmin = static function () use ($redirect): void {
+    if (!Auth::isAdmin()) {
+        $redirect('/admin');
+    }
+};
 
-$router->get('/admin/login', static function () use ($redirect): string {
-    if (Auth::check()) {
+$router->get('/admin/login', static function () use ($config, $redirect): string {
+    if (Auth::isStaff()) {
         return $redirect('/admin');
     }
-    return View::render('admin/login', ['title' => 'Belépés', 'error' => isset($_GET['hiba'])], '');
+    return View::render('admin/login', [
+        'title' => 'Belépés',
+        'error' => isset($_GET['hiba']),
+        'installed' => (bool) $config['installed'],
+    ], '');
 });
 
-$router->post('/admin/login', static function () use ($adminPw, $redirect): string {
-    if (Csrf::check($_POST['_csrf'] ?? null) && Auth::attempt((string) ($_POST['password'] ?? ''), $adminPw)) {
+$router->post('/admin/login', static function () use ($config, $adminPw, $users, $redirect): string {
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/login');
+    }
+    if ($config['installed'] && $users !== null) {
+        $email = trim((string) ($_POST['email'] ?? ''));
+        $password = (string) ($_POST['password'] ?? '');
+        $user = $users->findByEmail($email);
+        if ($user !== null && password_verify($password, $user['password'])
+            && in_array($user['role'], ['admin', 'editor'], true)) {
+            Auth::loginUser($user);
+            return $redirect('/admin');
+        }
+        return $redirect('/admin/login?hiba=1');
+    }
+    // Telepítés előtti, egyszerű jelszavas belépés.
+    if (Auth::attemptLegacy((string) ($_POST['password'] ?? ''), $adminPw)) {
         return $redirect('/admin');
     }
     return $redirect('/admin/login?hiba=1');
@@ -545,6 +656,70 @@ $router->get('/admin/integracio', static function () use ($adminView, $guard): s
 $router->get('/admin/uzenetek', static function () use ($adminView, $guard, $messages): string {
     $guard();
     return $adminView('admin/messages', 'messages', ['title' => 'Üzenetek', 'messages' => $messages->all()]);
+});
+
+$router->get('/admin/felhasznalok', static function () use ($adminView, $guard, $guardAdmin, $users): string {
+    $guard();
+    $guardAdmin();
+    return $adminView('admin/users', 'users', ['title' => 'Felhasználók', 'users' => $users ? $users->all() : []]);
+});
+
+$router->get('/admin/felhasznalok/szerkesztes', static function () use ($adminView, $guard, $guardAdmin, $users): string {
+    $guard();
+    $guardAdmin();
+    $id = (int) ($_GET['id'] ?? 0);
+    $user = ($users && $id > 0) ? $users->find($id) : null;
+    return $adminView('admin/user-edit', 'users', [
+        'title' => $user ? 'Felhasználó szerkesztése' : 'Új felhasználó',
+        'user' => $user,
+    ]);
+});
+
+$router->post('/admin/felhasznalok/mentes', static function () use ($guard, $guardAdmin, $users, $redirect): string {
+    $guard();
+    $guardAdmin();
+    if (!Csrf::check($_POST['_csrf'] ?? null) || $users === null) {
+        return $redirect('/admin/felhasznalok');
+    }
+    $id = (int) ($_POST['id'] ?? 0);
+    $name = trim((string) ($_POST['name'] ?? ''));
+    $email = trim((string) ($_POST['email'] ?? ''));
+    $role = in_array($_POST['role'] ?? 'customer', array_keys(UserRepository::ROLES), true) ? (string) $_POST['role'] : 'customer';
+    $password = (string) ($_POST['password'] ?? '');
+
+    if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return $redirect('/admin/felhasznalok/szerkesztes' . ($id ? '?id=' . $id : ''));
+    }
+    try {
+        if ($id > 0) {
+            $fields = ['name' => $name, 'email' => $email, 'role' => $role];
+            if ($password !== '') {
+                $fields['password'] = password_hash($password, PASSWORD_DEFAULT);
+            }
+            $users->update($id, $fields);
+        } else {
+            if (strlen($password) < 6) {
+                return $redirect('/admin/felhasznalok/szerkesztes');
+            }
+            $users->create($name, $email, password_hash($password, PASSWORD_DEFAULT), $role);
+        }
+    } catch (\Throwable $e) {
+        // pl. duplikált e-mail – csendben visszairányít
+    }
+    return $redirect('/admin/felhasznalok');
+});
+
+$router->post('/admin/felhasznalok/torles', static function () use ($guard, $guardAdmin, $users, $redirect): string {
+    $guard();
+    $guardAdmin();
+    if (Csrf::check($_POST['_csrf'] ?? null) && $users !== null) {
+        $id = (int) ($_POST['id'] ?? 0);
+        $me = Auth::user();
+        if ($me && (int) $me['id'] !== $id) {
+            $users->delete($id);
+        }
+    }
+    return $redirect('/admin/felhasznalok');
 });
 
 $router->get('/admin/beallitasok', static function () use ($adminView, $guard, $settings, $config): string {

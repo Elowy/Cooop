@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\View;
 
@@ -18,6 +19,7 @@ $nav = [
     'references'  => ['/admin/referenciak', 'Referenciák', 'star'],
     'map'         => ['/admin/terkep', 'Térkép', 'pin'],
     'integration' => ['/admin/integracio', 'Axel integráció', 'plug'],
+    'users'       => ['/admin/felhasznalok', 'Felhasználók', 'users'],
     'settings'    => ['/admin/beallitasok', 'Beállítások', 'gear'],
 ];
 ?>
@@ -40,6 +42,7 @@ $nav = [
         </a>
         <nav class="admin-nav">
             <?php foreach ($nav as $key => [$href, $label, $icon]): ?>
+                <?php if ($key === 'users' && !Auth::isAdmin()) { continue; } ?>
                 <a href="<?= View::e($href) ?>" class="<?= $active === $key ? 'is-active' : '' ?>">
                     <span class="adm-ico" data-aico="<?= $icon ?>" aria-hidden="true"></span>
                     <?= View::e($label) ?>

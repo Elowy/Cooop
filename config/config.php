@@ -46,6 +46,17 @@ $config = [
         'currency'   => 'HUF',
         'orders_dir' => getenv('ORDERS_DIR') ?: dirname(__DIR__) . '/storage/orders',
     ],
+
+    // Adatbázis. A telepítő (/telepito) írja felül a config/db.php fájlban.
+    'installed' => false,
+    'db' => [
+        'driver' => 'mysql',  // mysql | sqlite
+        'host'   => 'localhost',
+        'port'   => '3306',
+        'name'   => '',
+        'user'   => '',
+        'pass'   => '',
+    ],
 ];
 
 // Helyi felülírás (titkok, éles útvonalak) – ha létezik.
@@ -54,6 +65,16 @@ if (is_file($localFile)) {
     $override = require $localFile;
     if (is_array($override)) {
         $config = array_replace_recursive($config, $override);
+    }
+}
+
+// Adatbázis-kapcsolat a telepítőtől (config/db.php). Ha létezik → telepítve van.
+$dbFile = __DIR__ . '/db.php';
+if (is_file($dbFile)) {
+    $db = require $dbFile;
+    if (is_array($db)) {
+        $config['db'] = array_merge($config['db'], $db);
+        $config['installed'] = true;
     }
 }
 
