@@ -13,7 +13,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kód kicsekkolása
+        uses: actions/checkout@v4
+
+      - name: Eszközök verziói
+        run: php -v && node -v
+
+      - name: PHP szintaxis-ellenőrzés (teljes kódbázis)
+        run: |
+          status=0
+          while IFS= read -r f; do
+            if ! php -l "$f" >/dev/null 2>&1; then
+              echo "::error file=$f::$(php -l "$f" 2>&1 | grep -i error | head -1)"
+              status=1
+            fi
+          done < <(find app public config -name '*.php')
+          [ "$status" -eq 0 ] && echo "Minden PHP fájl rendben."
+          exit $status
+
+      - name: JS szintaxis-ellenőrzés
+        run: node --check public/assets/js/main.js
+
+      - name: CSS zárójel-egyensúly
+        run: |
+          o=$(grep -o '{' public/assets/css/style.css | wc -l)
+          c=$(grep -o '}' public/assets/css/style.css | wc -l)
+          echo "Kapcsos zárójelek: { = $o, } = $c"
+          [ "$o" = "$c" ] || { echo "::error::CSS zárójel-eltérés a style.css-ben"; exit 1; }
+
   deploy:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Kód kicsekkolása
