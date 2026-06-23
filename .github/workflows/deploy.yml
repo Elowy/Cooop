@@ -47,6 +47,7 @@ jobs:
             **/.git*
             **/.git*/**
             .github/**
+            .claude/**
             **/*.md
             config/config.local.php
             storage/**
