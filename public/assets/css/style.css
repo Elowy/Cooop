@@ -686,7 +686,7 @@ a.panel-link:hover { color: var(--gold-2); }
 }
 
 /* Vissza a tetejére gomb (görgetésre, középen alul) */
-.to-top { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 16px); z-index: 65; padding: 11px 20px; border-radius: 999px; border: 1px solid var(--line-gold); background: rgba(20, 21, 15, .92); color: var(--gold-2); font-weight: 600; font-size: .88rem; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease, border-color .15s; }
+.to-top { position: fixed; left: 50%; bottom: 92px; transform: translate(-50%, 16px); z-index: 65; padding: 11px 20px; border-radius: 999px; border: 1px solid var(--line-gold); background: rgba(20, 21, 15, .92); color: var(--gold-2); font-weight: 600; font-size: .88rem; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease, border-color .15s; }
 .to-top.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 .to-top:hover { border-color: var(--gold); }
 
