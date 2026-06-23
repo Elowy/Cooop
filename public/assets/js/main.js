@@ -1,13 +1,13 @@
-/* Net Trade – kliensoldali interakciók */
+/* Net-Trade Hungary – kliensoldali interakciók */
 (function () {
     'use strict';
 
-    // Mobil menü nyitás/zárás
-    const toggle = document.querySelector('[data-nav-toggle]');
-    const nav = document.querySelector('[data-nav]');
+    // Mobil menü
+    var toggle = document.querySelector('[data-nav-toggle]');
+    var nav = document.querySelector('[data-nav]');
     if (toggle && nav) {
         toggle.addEventListener('click', function () {
-            const open = nav.classList.toggle('is-open');
+            var open = nav.classList.toggle('is-open');
             toggle.setAttribute('aria-expanded', String(open));
         });
         nav.querySelectorAll('a').forEach(function (link) {
@@ -18,13 +18,37 @@
         });
     }
 
-    // Árnyék a fejlécre görgetéskor
-    const header = document.querySelector('[data-header]');
+    // Fejléc háttér görgetéskor
+    var header = document.querySelector('[data-header]');
     if (header) {
-        const onScroll = function () {
-            header.classList.toggle('is-scrolled', window.scrollY > 8);
-        };
+        var onScroll = function () { header.classList.toggle('is-scrolled', window.scrollY > 10); };
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    // Pénztár: szállítási mezők ki/be
+    var shipToggle = document.querySelector('[data-ship-toggle]');
+    var shipFields = document.querySelector('[data-ship-fields]');
+    if (shipToggle && shipFields) {
+        shipToggle.addEventListener('change', function () {
+            shipFields.hidden = !shipToggle.checked;
+        });
+    }
+
+    // Belépő animációk
+    var reveals = document.querySelectorAll('.reveal');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) {
+        reveals.forEach(function (el) { el.classList.add('is-visible'); });
+    } else {
+        var io = new IntersectionObserver(function (entries, obs) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        reveals.forEach(function (el) { io.observe(el); });
     }
 })();

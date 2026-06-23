@@ -1,35 +1,60 @@
 <?php
 
 /**
- * Alkalmazás konfiguráció.
+ * Alkalmazás-konfiguráció.
  *
- * Az értékek környezeti változókból olvashatók, így a beállítások
- * nem kerülnek be a verziókezelésbe. Lokálisan a lenti alapértékek lépnek életbe.
+ * Az értékek környezeti változókkal felülírhatók, VAGY – ami Windows/IIS
+ * alatt kényelmesebb – egy config/config.local.php fájllal, ami ezt a tömböt
+ * rekurzívan felülírja. (Lásd config/config.local.php.example.)
+ * A config.local.php nem kerül a verziókövetésbe.
  */
 
-return [
+$config = [
     'app' => [
-        'name'     => getenv('APP_NAME') ?: 'Net Trade',
-        'tagline'  => 'Hálózati és IT eszközök webáruháza',
-        'url'      => getenv('APP_URL') ?: 'http://localhost:8000',
-        'env'      => getenv('APP_ENV') ?: 'local',
-        'debug'    => filter_var(getenv('APP_DEBUG') ?: 'true', FILTER_VALIDATE_BOOL),
-        'currency' => 'Ft',
+        'name'    => getenv('APP_NAME') ?: 'Net-Trade Hungary',
+        'short'   => 'NT',
+        'tagline' => 'Ipari csomagolás · Faipari gyártás · Logisztika',
+        'url'     => getenv('APP_URL') ?: 'http://localhost:8000',
+        // Élesben maradjon false! Lokális fejlesztéshez: APP_DEBUG=true.
+        'debug'   => filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOL),
     ],
 
     'contact' => [
-        'email'   => 'info@net-trade.hu',
-        'phone'   => '+36 1 234 5678',
-        'address' => '1051 Budapest, Példa utca 1.',
+        'email'        => 'info@net-trade.hu',
+        'phone'        => '+36 20 387 1450',
+        'person'       => 'Nagy László (projektvezető)',
+        'address'      => '2660 Balassagyarmat, Mártírok útja 72.',
+        'messages_dir' => getenv('MESSAGES_DIR') ?: dirname(__DIR__) . '/storage/messages',
     ],
 
-    'database' => [
-        'driver'   => getenv('DB_DRIVER') ?: 'mysql',
-        'host'     => getenv('DB_HOST') ?: '127.0.0.1',
-        'port'     => getenv('DB_PORT') ?: '3306',
-        'name'     => getenv('DB_NAME') ?: 'net_trade',
-        'user'     => getenv('DB_USER') ?: 'root',
-        'password' => getenv('DB_PASSWORD') ?: '',
-        'charset'  => 'utf8mb4',
+    // Vezérlőpult belépés. Élesben adj meg erős jelszót (ADMIN_PASSWORD vagy config.local.php)!
+    'admin' => [
+        'password'  => getenv('ADMIN_PASSWORD') ?: 'admin',
+        'low_stock' => 10, // ennyi alatt figyelmeztet a készletre
+    ],
+
+    // Axel Pro integráció. Ugyanazon a gépen (VPS) futó Axelhez helyi mappás
+    // adatcsere. A 'gateway' később 'xml'-re vált, ha kész az XmlAxelGateway.
+    'axel' => [
+        'gateway'      => getenv('AXEL_GATEWAY') ?: 'mock',     // mock | xml | rest
+        'exchange_dir' => getenv('AXEL_DIR') ?: dirname(__DIR__) . '/storage/axel',
+    ],
+
+    // Webshop / pénztár.
+    'shop' => [
+        'payment'    => getenv('PAYMENT_GATEWAY') ?: 'mock',    // mock | simplepay | barion | stripe
+        'currency'   => 'HUF',
+        'orders_dir' => getenv('ORDERS_DIR') ?: dirname(__DIR__) . '/storage/orders',
     ],
 ];
+
+// Helyi felülírás (titkok, éles útvonalak) – ha létezik.
+$localFile = __DIR__ . '/config.local.php';
+if (is_file($localFile)) {
+    $override = require $localFile;
+    if (is_array($override)) {
+        $config = array_replace_recursive($config, $override);
+    }
+}
+
+return $config;

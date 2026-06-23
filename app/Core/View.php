@@ -12,8 +12,7 @@ final class View
      */
     public static function render(string $template, array $data = [], string $layout = 'main'): string
     {
-        $config = require dirname(__DIR__, 2) . '/config/config.php';
-        $data['config'] = $config;
+        $data['config'] = require dirname(__DIR__, 2) . '/config/config.php';
 
         $content = self::capture("Views/{$template}", $data);
 
@@ -32,7 +31,7 @@ final class View
     {
         $file = dirname(__DIR__) . '/' . $path . '.php';
         if (!is_file($file)) {
-            return "<!-- Hiányzó sablon: {$path} -->";
+            return "<!-- hiányzó sablon: {$path} -->";
         }
 
         extract($data, EXTR_SKIP);
@@ -47,9 +46,9 @@ final class View
         return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
-    /** Ár formázása. */
-    public static function price(float|int $amount, string $currency = 'Ft'): string
+    /** Forint formázás, pl. 12000 → "12 000 Ft". */
+    public static function huf(int $amount): string
     {
-        return number_format((float) $amount, 0, ',', ' ') . ' ' . $currency;
+        return number_format($amount, 0, ',', "\u{00A0}") . "\u{00A0}Ft";
     }
 }

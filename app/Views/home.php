@@ -1,75 +1,167 @@
 <?php
 
 use App\Core\View;
+use App\Integration\Product;
 
 /** @var array<string, mixed> $config */
-/** @var array<int, array<string, mixed>> $categories */
-/** @var array<int, array<string, mixed>> $featured */
+/** @var Product[] $featured */
+/** @var array<int, array<string, mixed>> $topCats */
+/** @var array<int, array<string, mixed>> $partners */
+
+// Megjelenítési adatok a fő kategóriákhoz (ikon + rövid leírás).
+$catMeta = [
+    'epitoanyagok'     => ['icon' => 'brick', 'text' => 'Tégla, áthidaló, homok és faanyag.'],
+    'kert-szabadido'   => ['icon' => 'leaf',  'text' => 'Kert, háziállat, játszótér és növény.'],
+    'fahazak'          => ['icon' => 'house', 'text' => 'Nyaraló, lombház, pavilon, úszóház.'],
+    'design-dekoracio' => ['icon' => 'deco',  'text' => 'Lakás- és üzletdekoráció, cégtáblák.'],
+];
+
+$stats = [
+    ['n' => '30+', 'l' => 'év tapasztalat'],
+    ['n' => (string) count($partners), 'l' => 'partnercég'],
+    ['n' => '5', 'l' => 'fő tevékenység'],
+    ['n' => '3', 'l' => 'szállítási mód'],
+];
 ?>
-<section class="hero">
+<section class="hero" id="top">
+    <div class="hero-glow" aria-hidden="true"></div>
     <div class="container hero-inner">
-        <div class="hero-copy">
-            <p class="eyebrow">Hálózati szakáruház</p>
-            <h1>Megbízható <span>hálózati eszközök</span> otthonra és vállalkozásnak</h1>
-            <p class="lead">Routerek, switchek, kábelek, kamerák és tárolók egy helyen – szakértői tanácsadással és gyors kiszállítással.</p>
+        <div class="hero-copy reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Az ügyfél sikere a mi sikerünk!</p>
+            <h1 class="display">
+                Amit ránk bíznak,<br><span class="gold">azt biztonságban</span> szállítjuk.
+            </h1>
+            <p class="hero-lead">
+                Családi vállalkozás: egyedi raklapgyártás, ipari csomagolás, nemzetközi
+                árufuvarozás és fűrészáru-nagykereskedelem. Megoldásaink a tengeri, közúti
+                és légi szállítás szigorú követelményeihez igazodnak.
+            </p>
             <div class="hero-actions">
-                <a href="/termekek" class="btn btn--primary">Termékek böngészése</a>
-                <a href="/kapcsolat" class="btn btn--ghost">Tanácsot kérek</a>
+                <a href="/webshop" class="btn btn--gold">Irány a webshop</a>
+                <a href="#kategoriak" class="btn btn--outline">Kategóriák</a>
             </div>
-            <ul class="hero-usps">
-                <li>✓ Gyors kiszállítás</li>
-                <li>✓ Szakértői támogatás</li>
-                <li>✓ Garancia minden termékre</li>
-            </ul>
         </div>
-        <div class="hero-art" aria-hidden="true">
-            <img src="/assets/img/hero.svg" alt="" width="480" height="380">
+        <div class="hero-visual reveal" aria-hidden="true">
+            <img src="/assets/img/hero.svg" alt="" width="560" height="520">
         </div>
     </div>
-</section>
 
-<section class="section container">
-    <div class="section-head">
-        <h2>Kategóriák</h2>
-        <a href="/termekek" class="link-arrow">Összes termék →</a>
-    </div>
-    <div class="category-grid">
-        <?php foreach ($categories as $cat): ?>
-            <a href="/termekek?kategoria=<?= View::e($cat['slug']) ?>" class="category-card">
-                <span class="category-card__icon" data-icon="<?= View::e($cat['icon'] ?? '') ?>"></span>
-                <span class="category-card__name"><?= View::e($cat['name']) ?></span>
-            </a>
-        <?php endforeach; ?>
-    </div>
-</section>
-
-<section class="section section--alt">
     <div class="container">
-        <div class="section-head">
-            <h2>Kiemelt termékek</h2>
-            <a href="/termekek" class="link-arrow">Tovább →</a>
-        </div>
-        <div class="product-grid">
-            <?php foreach ($featured as $product): ?>
-                <?php include dirname(__DIR__) . '/Views/partials/product-card.php'; ?>
+        <div class="stats-bar reveal">
+            <?php foreach ($stats as $s): ?>
+                <div class="stat">
+                    <span class="stat-n display"><?= View::e($s['n']) ?></span>
+                    <span class="stat-l"><?= View::e($s['l']) ?></span>
+                </div>
             <?php endforeach; ?>
         </div>
     </div>
 </section>
 
-<section class="section container">
-    <div class="feature-row">
-        <div class="feature">
-            <h3>Szakértői tanácsadás</h3>
-            <p>Segítünk kiválasztani a vállalkozásodhoz vagy otthonodhoz legjobban illő hálózati megoldást.</p>
+<?php if (!empty($featured)): ?>
+<section class="section section--alt" id="kiemelt">
+    <div class="container">
+        <header class="section-head reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Webshop</p>
+            <h2 class="display">Kiemelt termékek</h2>
+            <p class="section-sub">Néhány cikk a kínálatból.</p>
+        </header>
+
+        <div class="card-grid product-grid">
+            <?php foreach ($featured as $p): ?>
+                <article class="card product-card reveal">
+                    <a class="product-media" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
+                        <span class="badge">Raktáron</span>
+                    </a>
+                    <h3><a href="/termek/<?= View::e($p->slug) ?>"><?= View::e($p->name) ?></a></h3>
+                    <p><?= View::e($p->short) ?></p>
+                    <div class="price-row">
+                        <span class="price"><?= View::huf($p->priceGross()) ?></span>
+                        <span class="price-unit">/ <?= View::e($p->unit) ?> · bruttó</span>
+                    </div>
+                    <a href="/termek/<?= View::e($p->slug) ?>" class="card-link">Megnézem →</a>
+                </article>
+            <?php endforeach; ?>
         </div>
-        <div class="feature">
-            <h3>Gyors kiszállítás</h3>
-            <p>Raktáron lévő termékeinket 1–2 munkanapon belül kézbesítjük országszerte.</p>
+
+        <p class="center-cta reveal"><a href="/webshop" class="btn btn--outline">Összes termék</a></p>
+    </div>
+</section>
+<?php endif; ?>
+
+<section class="section" id="kategoriak">
+    <div class="container">
+        <header class="section-head reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Kategóriák</p>
+            <h2 class="display">Fő kategóriáink</h2>
+            <p class="section-sub">Négy fő terület — a webshopban tovább böngészhető alkategóriákkal.</p>
+        </header>
+
+        <div class="card-grid">
+            <?php foreach ($topCats as $cat): $meta = $catMeta[$cat['key']] ?? ['icon' => 'packaging', 'text' => '']; ?>
+                <a class="card cat-card reveal" href="/webshop?kat=<?= urlencode($cat['key']) ?>">
+                    <span class="card-icon" data-icon="<?= View::e($meta['icon']) ?>"></span>
+                    <h3><?= View::e($cat['name']) ?></h3>
+                    <p><?= View::e($meta['text']) ?></p>
+                    <span class="card-link"><?= count($cat['children']) ?> alkategória →</span>
+                </a>
+            <?php endforeach; ?>
         </div>
-        <div class="feature">
-            <h3>Garancia és szerviz</h3>
-            <p>Minden termékre garanciát vállalunk, probléma esetén pedig gyorsan intézkedünk.</p>
+    </div>
+</section>
+
+<section class="section section--alt" id="rolunk">
+    <div class="container about-grid">
+        <div class="about-visual reveal" aria-hidden="true">
+            <img src="/assets/img/about.svg" alt="" width="520" height="440">
         </div>
+        <div class="about-copy reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Bemutatkozás</p>
+            <h2 class="display">Több évtizedes tapasztalat, <span class="gold">megbízható kézből</span></h2>
+            <p>
+                Cégünk több évtizedes tapasztalattal foglalkozik fa alapú raklapok, ládák és
+                csomagolóanyagok gyártásával, valamint ipari gépek és berendezések szakszerű
+                csomagolásával.
+            </p>
+            <p>
+                Megoldásainkat úgy alakítjuk ki, hogy megfeleljenek a tengeri, közúti és légi
+                szállítás szigorú követelményeinek, így partnereink biztonságban tudhatják
+                termékeiket a világ bármely pontjára történő szállítás során.
+            </p>
+            <ul class="ticks">
+                <li>Standard és egyedi méretű raklapok, fa ládák</li>
+                <li>Ipari gépek és berendezések csomagolása</li>
+                <li>Export csomagolás a nemzetközi szállításhoz</li>
+            </ul>
+            <a href="/kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="partnerek">
+    <div class="container">
+        <header class="section-head reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Referenciák</p>
+            <h2 class="display">Partnereink</h2>
+            <p class="section-sub">Akiknek dolgozunk – az iparág meghatározó szereplői.</p>
+        </header>
+        <div class="partner-grid reveal">
+            <?php foreach ($partners as $partner): ?>
+                <div class="partner">
+                    <span class="partner-name"><?= View::e((string) $partner['name']) ?></span>
+                    <?php if (!empty($partner['note'])): ?>
+                        <span class="partner-note"><?= View::e((string) $partner['note']) ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container cta-inner reveal">
+        <h2 class="display">Dolgozzunk együtt</h2>
+        <p>Mondja el, mire van szüksége — visszajelzünk egy ajánlattal.</p>
+        <a href="/kapcsolat" class="btn btn--gold btn--lg">Ajánlatkérés</a>
     </div>
 </section>

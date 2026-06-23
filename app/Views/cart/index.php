@@ -1,63 +1,53 @@
 <?php
 
+use App\Core\Csrf;
 use App\Core\View;
 
-/** @var array<string, mixed> $config */
-/** @var array{lines: array<int, array<string, mixed>>, total: float} $cart */
-$currency = $config['app']['currency'];
+/** @var array<int, array{product: \App\Integration\Product, qty: int, subtotal: int}> $lines */
+/** @var int $total */
 ?>
-<section class="page-head">
-    <div class="container"><h1>Kosár</h1></div>
-</section>
+<section class="section section--clear-top">
+    <div class="container cart-wrap">
+        <h1 class="display">Kosár</h1>
 
-<section class="section container">
-    <?php if (empty($cart['lines'])): ?>
-        <div class="empty-state">
-            <p>A kosarad jelenleg üres.</p>
-            <a href="/termekek" class="btn btn--primary">Vásárlás megkezdése</a>
-        </div>
-    <?php else: ?>
-        <form method="post" action="/kosar/frissit" class="cart-table-wrap">
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>Termék</th>
-                        <th>Egységár</th>
-                        <th>Mennyiség</th>
-                        <th>Részösszeg</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($cart['lines'] as $line): $p = $line['product']; ?>
-                        <tr>
-                            <td data-label="Termék" class="cart-product">
-                                <img src="/assets/img/products/<?= View::e($p['image'] ?? 'placeholder.svg') ?>"
-                                     alt="" width="64" height="48">
-                                <a href="/termek/<?= View::e($p['slug']) ?>"><?= View::e($p['name']) ?></a>
-                            </td>
-                            <td data-label="Egységár"><?= View::price((float) $p['price'], $currency) ?></td>
-                            <td data-label="Mennyiség">
-                                <input type="number" name="qty[<?= (int) $p['id'] ?>]"
-                                       value="<?= (int) $line['qty'] ?>" min="0" max="99" class="qty-input">
-                            </td>
-                            <td data-label="Részösszeg"><?= View::price((float) $line['subtotal'], $currency) ?></td>
-                            <td data-label="">
-                                <button type="submit" formaction="/kosar/torol" name="product_id"
-                                        value="<?= (int) $p['id'] ?>" class="link-danger" aria-label="Törlés">✕</button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-
-            <div class="cart-foot">
-                <button type="submit" class="btn btn--ghost">Kosár frissítése</button>
-                <div class="cart-summary">
-                    <p class="cart-total">Összesen: <strong><?= View::price((float) $cart['total'], $currency) ?></strong></p>
-                    <a href="/penztar" class="btn btn--primary">Tovább a pénztárhoz</a>
-                </div>
+        <?php if (!$lines): ?>
+            <div class="empty-cart">
+                <p>A kosarad jelenleg üres.</p>
+                <a href="/webshop" class="btn btn--gold">Irány a webshop</a>
             </div>
-        </form>
-    <?php endif; ?>
+        <?php else: ?>
+            <div class="cart-table">
+                <?php foreach ($lines as $line): $p = $line['product']; ?>
+                    <div class="cart-row">
+                        <span class="cart-thumb" data-icon="<?= View::e($p->icon) ?>" aria-hidden="true"></span>
+                        <div class="cart-info">
+                            <a href="/termek/<?= View::e($p->slug) ?>" class="cart-name"><?= View::e($p->name) ?></a>
+                            <small><?= View::huf($p->priceGross()) ?> / <?= View::e($p->unit) ?></small>
+                        </div>
+                        <form method="post" action="/kosar/frissit" class="cart-qty">
+                            <?= Csrf::field() ?>
+                            <input type="hidden" name="sku" value="<?= View::e($p->sku) ?>">
+                            <input type="number" name="qty" value="<?= (int) $line['qty'] ?>" min="1" max="<?= max(1, (int) $p->stock) ?>" aria-label="Mennyiség">
+                            <button type="submit" class="btn btn--outline btn--sm">Frissít</button>
+                        </form>
+                        <span class="cart-sub"><?= View::huf($line['subtotal']) ?></span>
+                        <form method="post" action="/kosar/torol" class="cart-del">
+                            <?= Csrf::field() ?>
+                            <input type="hidden" name="sku" value="<?= View::e($p->sku) ?>">
+                            <button type="submit" class="icon-btn" aria-label="Törlés">×</button>
+                        </form>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Végösszeg (bruttó)</span>
+                    <strong class="display"><?= View::huf($total) ?></strong>
+                </div>
+                <a href="/penztar" class="btn btn--gold btn--lg">Tovább a pénztárhoz</a>
+                <p class="note">A fizetés jelenleg teszt módban van; az éles fizetés és az Axel Pro számlázás bekötése a következő kör.</p>
+            </div>
+        <?php endif; ?>
+    </div>
 </section>

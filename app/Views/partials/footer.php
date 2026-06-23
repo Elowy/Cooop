@@ -7,42 +7,38 @@ $contact = $config['contact'];
 ?>
 <footer class="site-footer">
     <div class="container footer-grid">
-        <div>
-            <div class="brand brand--footer">
-                <span class="brand-mark">NT</span>
-                <strong><?= View::e($config['app']['name']) ?></strong>
+        <div class="footer-brand">
+            <span class="brand-mark"><?= View::e($config['app']['short']) ?></span>
+            <div>
+                <strong><?= View::e($config['app']['name']) ?> Kft.</strong>
+                <p><?= View::e($config['app']['tagline']) ?></p>
             </div>
-            <p class="footer-tagline"><?= View::e($config['app']['tagline']) ?></p>
         </div>
 
-        <div>
-            <h4>Vásárlás</h4>
-            <ul>
-                <li><a href="/termekek">Összes termék</a></li>
-                <li><a href="/termekek?kategoria=routerek">Routerek</a></li>
-                <li><a href="/termekek?kategoria=switchek">Switchek</a></li>
-                <li><a href="/kosar">Kosár</a></li>
-            </ul>
-        </div>
-
-        <div>
-            <h4>Információ</h4>
-            <ul>
-                <li><a href="/rolunk">Rólunk</a></li>
-                <li><a href="/kapcsolat">Kapcsolat</a></li>
-            </ul>
-        </div>
-
-        <div>
+        <div class="footer-col">
             <h4>Elérhetőség</h4>
-            <ul class="footer-contact">
+            <ul>
                 <li><a href="mailto:<?= View::e($contact['email']) ?>"><?= View::e($contact['email']) ?></a></li>
                 <li><a href="tel:<?= View::e(str_replace(' ', '', $contact['phone'])) ?>"><?= View::e($contact['phone']) ?></a></li>
+                <?php if (!empty($contact['person'])): ?><li><?= View::e($contact['person']) ?></li><?php endif; ?>
                 <li><?= View::e($contact['address']) ?></li>
             </ul>
         </div>
+
+        <div class="footer-col">
+            <h4>Oldal</h4>
+            <ul>
+                <li><a href="/webshop">Webshop</a></li>
+                <li><a href="/#kategoriak">Kategóriák</a></li>
+                <li><a href="/#partnerek">Partnerek</a></li>
+                <li><a href="/kapcsolat">Kapcsolat</a></li>
+                <li><a href="/admin">Vezérlőpult</a></li>
+            </ul>
+        </div>
     </div>
+
     <div class="container footer-bottom">
-        <small>&copy; <?= date('Y') ?> <?= View::e($config['app']['name']) ?>. Minden jog fenntartva.</small>
+        <small>&copy; <?= date('Y') ?> <?= View::e($config['app']['name']) ?> Kft. — Minden jog fenntartva.</small>
+        <small class="footer-note">Az ügyfél sikere a mi sikerünk!</small>
     </div>
 </footer>

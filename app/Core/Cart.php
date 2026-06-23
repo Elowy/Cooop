@@ -2,44 +2,44 @@
 
 namespace App\Core;
 
-use App\Models\Product;
-
 /**
- * Munkamenet alapú kosár.
+ * Munkamenet-alapú kosár. Csak SKU → mennyiség párokat tárol; az árakat és
+ * a készletet mindig az AxelGateway adja, hogy ne avuljanak el a kosárban.
  */
 final class Cart
 {
     private const KEY = 'cart';
+    private const MAX = 9999;
 
-    /** @return array<int, int> termék id => mennyiség */
+    /** @return array<string, int> SKU => mennyiség */
     public static function items(): array
     {
         return $_SESSION[self::KEY] ?? [];
     }
 
-    public static function add(int $productId, int $qty = 1): void
+    public static function add(string $sku, int $qty = 1): void
     {
         $items = self::items();
-        $items[$productId] = ($items[$productId] ?? 0) + max(1, $qty);
-        $_SESSION[self::KEY] = $items;
+        $items[$sku] = self::clamp(($items[$sku] ?? 0) + $qty);
+        self::store($items);
     }
 
-    public static function update(int $productId, int $qty): void
+    public static function set(string $sku, int $qty): void
     {
         $items = self::items();
         if ($qty <= 0) {
-            unset($items[$productId]);
+            unset($items[$sku]);
         } else {
-            $items[$productId] = $qty;
+            $items[$sku] = self::clamp($qty);
         }
-        $_SESSION[self::KEY] = $items;
+        self::store($items);
     }
 
-    public static function remove(int $productId): void
+    public static function remove(string $sku): void
     {
         $items = self::items();
-        unset($items[$productId]);
-        $_SESSION[self::KEY] = $items;
+        unset($items[$sku]);
+        self::store($items);
     }
 
     public static function clear(): void
@@ -47,48 +47,20 @@ final class Cart
         unset($_SESSION[self::KEY]);
     }
 
+    /** Összes darabszám (kosár jelvény). */
     public static function count(): int
     {
         return array_sum(self::items());
     }
 
-    /**
-     * Kosár tartalma termékadatokkal kiegészítve.
-     *
-     * @return array{lines: array<int, array<string, mixed>>, total: float}
-     */
-    public static function detailed(): array
+    private static function clamp(int $qty): int
     {
-        $lines = [];
-        $total = 0.0;
-
-        foreach (self::items() as $id => $qty) {
-            $product = self::lookup((int) $id);
-            if ($product === null) {
-                continue;
-            }
-            $subtotal = (float) $product['price'] * $qty;
-            $total += $subtotal;
-            $lines[] = [
-                'product'  => $product,
-                'qty'      => $qty,
-                'subtotal' => $subtotal,
-            ];
-        }
-
-        return ['lines' => $lines, 'total' => $total];
+        return max(1, min(self::MAX, $qty));
     }
 
-    /**
-     * @return array<string, mixed>|null
-     */
-    private static function lookup(int $id): ?array
+    /** @param array<string, int> $items */
+    private static function store(array $items): void
     {
-        foreach (Product::all() as $product) {
-            if ((int) $product['id'] === $id) {
-                return $product;
-            }
-        }
-        return null;
+        $_SESSION[self::KEY] = $items;
     }
 }

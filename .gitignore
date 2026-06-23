@@ -1,13 +1,17 @@
 # Függőségek
 /vendor/
 
-# Környezeti változók
+# Környezeti változók / helyi konfiguráció
 .env
 .env.local
+config/config.local.php
 
 # Logok és ideiglenes fájlok
 *.log
 /tmp/
+
+# Helyi adat (rendelések, Axel-csere)
+/storage/
 
 # Szerkesztő / OS
 .DS_Store
