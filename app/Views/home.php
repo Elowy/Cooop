@@ -6,6 +6,7 @@ use App\Integration\Product;
 /** @var array<string, mixed> $config */
 /** @var Product[] $featured */
 /** @var array<int, array<string, mixed>> $topCats */
+/** @var array<int, array<string, mixed>> $partners */
 
 // Megjelenítési adatok a fő kategóriákhoz (ikon + rövid leírás).
 $catMeta = [
@@ -16,23 +17,24 @@ $catMeta = [
 ];
 
 $stats = [
-    ['n' => '30', 'l' => 'év tapasztalat'],
-    ['n' => '100%', 'l' => 'minőségi garancia'],
-    ['n' => '5+', 'l' => 'fő tevékenység'],
-    ['n' => '1', 'l' => 'megbízható partner'],
+    ['n' => '30+', 'l' => 'év tapasztalat'],
+    ['n' => (string) count($partners), 'l' => 'partnercég'],
+    ['n' => '5', 'l' => 'fő tevékenység'],
+    ['n' => '3', 'l' => 'szállítási mód'],
 ];
 ?>
 <section class="hero" id="top">
     <div class="hero-glow" aria-hidden="true"></div>
     <div class="container hero-inner">
         <div class="hero-copy reveal">
-            <p class="eyebrow"><span class="eyebrow-dot"></span> <?= View::e($config['app']['tagline']) ?></p>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Az ügyfél sikere a mi sikerünk!</p>
             <h1 class="display">
                 Amit ránk bíznak,<br><span class="gold">azt biztonságban</span> szállítjuk.
             </h1>
             <p class="hero-lead">
-                Placeholder bevezető szöveg a Net-Trade Hungary Kft.-ről — ipari csomagolás,
-                faipari gyártás és logisztika egy kézből. (A végleges szöveg később.)
+                Családi vállalkozás: egyedi raklapgyártás, ipari csomagolás, nemzetközi
+                árufuvarozás és fűrészáru-nagykereskedelem. Megoldásaink a tengeri, közúti
+                és légi szállítás szigorú követelményeihez igazodnak.
             </p>
             <div class="hero-actions">
                 <a href="/webshop" class="btn btn--gold">Irány a webshop</a>
@@ -62,7 +64,7 @@ $stats = [
         <header class="section-head reveal">
             <p class="eyebrow"><span class="eyebrow-dot"></span> Webshop</p>
             <h2 class="display">Kiemelt termékek</h2>
-            <p class="section-sub">Néhány cikk a kínálatból — placeholder ár és készlet.</p>
+            <p class="section-sub">Néhány cikk a kínálatból.</p>
         </header>
 
         <div class="card-grid product-grid">
@@ -114,18 +116,44 @@ $stats = [
             <img src="/assets/img/about.svg" alt="" width="520" height="440">
         </div>
         <div class="about-copy reveal">
-            <p class="eyebrow"><span class="eyebrow-dot"></span> Rólunk</p>
-            <h2 class="display">Családi vállalkozás, <span class="gold">megbízható kézből</span></h2>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Bemutatkozás</p>
+            <h2 class="display">Több évtizedes tapasztalat, <span class="gold">megbízható kézből</span></h2>
             <p>
-                Placeholder bekezdés a cég bemutatkozásához. Ide kerül majd a történet,
-                az értékek és a „miért minket” üzenet. Nagy képek, kevés szöveg.
+                Cégünk több évtizedes tapasztalattal foglalkozik fa alapú raklapok, ládák és
+                csomagolóanyagok gyártásával, valamint ipari gépek és berendezések szakszerű
+                csomagolásával.
+            </p>
+            <p>
+                Megoldásainkat úgy alakítjuk ki, hogy megfeleljenek a tengeri, közúti és légi
+                szállítás szigorú követelményeinek, így partnereink biztonságban tudhatják
+                termékeiket a világ bármely pontjára történő szállítás során.
             </p>
             <ul class="ticks">
-                <li>Feladatra szabott megoldások</li>
-                <li>Fenntartható alapanyag</li>
-                <li>Saját logisztika</li>
+                <li>Standard és egyedi méretű raklapok, fa ládák</li>
+                <li>Ipari gépek és berendezések csomagolása</li>
+                <li>Export csomagolás a nemzetközi szállításhoz</li>
             </ul>
-            <a href="#kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
+            <a href="/kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="partnerek">
+    <div class="container">
+        <header class="section-head reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Referenciák</p>
+            <h2 class="display">Partnereink</h2>
+            <p class="section-sub">Akiknek dolgozunk – az iparág meghatározó szereplői.</p>
+        </header>
+        <div class="partner-grid reveal">
+            <?php foreach ($partners as $partner): ?>
+                <div class="partner">
+                    <span class="partner-name"><?= View::e((string) $partner['name']) ?></span>
+                    <?php if (!empty($partner['note'])): ?>
+                        <span class="partner-note"><?= View::e((string) $partner['note']) ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
@@ -134,6 +162,6 @@ $stats = [
     <div class="container cta-inner reveal">
         <h2 class="display">Dolgozzunk együtt</h2>
         <p>Mondja el, mire van szüksége — visszajelzünk egy ajánlattal.</p>
-        <a href="#kapcsolat" class="btn btn--gold btn--lg">Ajánlatkérés</a>
+        <a href="/kapcsolat" class="btn btn--gold btn--lg">Ajánlatkérés</a>
     </div>
 </section>

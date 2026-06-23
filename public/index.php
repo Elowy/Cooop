@@ -24,6 +24,7 @@ use App\Core\Csrf;
 use App\Core\Router;
 use App\Core\View;
 use App\Integration\MockAxelGateway;
+use App\Message\MessageStore;
 use App\Order\OrderStore;
 use App\Payment\MockPaymentGateway;
 
@@ -49,8 +50,9 @@ $axel = match ($config['axel']['gateway'] ?? 'mock') {
 // Kategóriafa (config/categories.php).
 $cats = new Categories();
 
-// Rendeléstár és fizetési szolgáltató (utóbbi a config alapján választva).
+// Rendeléstár, üzenettár és fizetési szolgáltató (utóbbi a config alapján választva).
 $orders = new OrderStore($config['shop']['orders_dir']);
+$messages = new MessageStore($config['contact']['messages_dir']);
 $payment = match ($config['shop']['payment'] ?? 'mock') {
     // 'simplepay' => new App\Payment\SimplePayGateway(...),  // éles bekötéskor
     default => new MockPaymentGateway(),
@@ -92,7 +94,60 @@ $router->get('/', static fn (): string => View::render('home', [
     'title' => null,
     'featured' => array_slice($axel->products(), 0, 3),
     'topCats' => $cats->topLevel(),
+    'partners' => require dirname(__DIR__) . '/config/partners.php',
 ]));
+
+$router->get('/kapcsolat', static function (): string {
+    return View::render('contact', [
+        'title' => 'Kapcsolat',
+        'sent' => isset($_GET['elkuldve']),
+        'errors' => [],
+        'old' => [],
+    ]);
+});
+
+$router->post('/kapcsolat', static function () use ($config, $messages, $redirect): string {
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/kapcsolat');
+    }
+    $val = static fn (string $k): string => trim((string) ($_POST[$k] ?? ''));
+    $errors = [];
+    $old = $_POST;
+
+    if ($val('name') === '') {
+        $errors['name'] = 'A név megadása kötelező.';
+    }
+    if ($val('email') === '' || !filter_var($val('email'), FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Érvényes e-mail cím szükséges.';
+    }
+    if ($val('message') === '') {
+        $errors['message'] = 'Az üzenet megadása kötelező.';
+    }
+    if (!isset($_POST['privacy'])) {
+        $errors['privacy'] = 'Az adatkezelési tájékoztató elfogadása kötelező.';
+    }
+
+    if ($errors) {
+        return View::render('contact', ['title' => 'Kapcsolat', 'sent' => false, 'errors' => $errors, 'old' => $old]);
+    }
+
+    $msg = [
+        'created' => date('c'),
+        'name' => $val('name'), 'email' => $val('email'), 'phone' => $val('phone'),
+        'subject' => $val('subject'), 'message' => $val('message'),
+    ];
+    $messages->save($msg);
+
+    // E-mail értesítés (ha a szerver tudja küldeni; az üzenet ettől függetlenül tárolódik).
+    $subject = mb_encode_mimeheader('Új üzenet a weboldalról' . ($msg['subject'] !== '' ? ': ' . $msg['subject'] : ''), 'UTF-8');
+    $body = "Név: {$msg['name']}\nE-mail: {$msg['email']}\nTelefon: {$msg['phone']}\n"
+        . "Tárgy: {$msg['subject']}\n\nÜzenet:\n{$msg['message']}\n";
+    $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
+        . 'From: weboldal@' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\nReply-To: {$msg['email']}";
+    @mail($config['contact']['email'], $subject, $body, $headers);
+
+    return $redirect('/kapcsolat?elkuldve=1');
+});
 
 $router->get('/webshop', static function () use ($axel, $cats): string {
     $activeCat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
@@ -442,6 +497,11 @@ $router->get('/admin/rendeles/{token}', static function (array $params) use ($ad
 $router->get('/admin/integracio', static function () use ($adminView, $guard): string {
     $guard();
     return $adminView('admin/integration', 'integration', ['title' => 'Axel integráció']);
+});
+
+$router->get('/admin/uzenetek', static function () use ($adminView, $guard, $messages): string {
+    $guard();
+    return $adminView('admin/messages', 'messages', ['title' => 'Üzenetek', 'messages' => $messages->all()]);
 });
 
 echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

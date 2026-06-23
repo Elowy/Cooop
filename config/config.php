@@ -20,9 +20,11 @@ $config = [
     ],
 
     'contact' => [
-        'email'   => 'info@net-trade.hu',
-        'phone'   => '+36 20 415 2695',
-        'address' => '2660 Balassagyarmat, Mártírok útja 72.',
+        'email'        => 'info@net-trade.hu',
+        'phone'        => '+36 20 387 1450',
+        'person'       => 'Nagy László (projektvezető)',
+        'address'      => '2660 Balassagyarmat, Mártírok útja 72.',
+        'messages_dir' => getenv('MESSAGES_DIR') ?: dirname(__DIR__) . '/storage/messages',
     ],
 
     // Vezérlőpult belépés. Élesben adj meg erős jelszót (ADMIN_PASSWORD vagy config.local.php)!

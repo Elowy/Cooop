@@ -594,3 +594,42 @@ a.panel-link:hover { color: var(--gold-2); }
 @media (max-width: 520px) {
     .field-row { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   Partnerek, kapcsolat, üzenetek
+   ========================================================================== */
+
+[data-aico="mail"] { --aico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 4h18v12H8l-4 4z'/%3E%3C/svg%3E"); }
+
+.partner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+.partner { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, transform .15s; }
+.partner:hover { border-color: var(--line-gold); transform: translateY(-3px); }
+.partner-name { font-family: var(--serif); font-weight: 600; color: var(--text); }
+.partner-note { color: var(--muted); font-size: .82rem; }
+
+.contact-grid { display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start; }
+.contact-form-col { min-width: 0; }
+.form-card button[type="submit"] { margin-top: 12px; }
+.contact-info { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+.contact-info h2 { font-size: 1.1rem; margin: 0 0 16px; }
+.contact-list { list-style: none; margin: 0 0 16px; padding: 0; }
+.contact-list li { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.contact-list li:last-child { border-bottom: 0; }
+.contact-list span { color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }
+.contact-list a, .contact-list strong { color: var(--text); }
+.contact-list a:hover { color: var(--gold-2); }
+
+.form-success { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 44px 32px; text-align: center; }
+.form-success h2 { margin: 6px 0 8px; }
+.form-success .btn { margin-top: 18px; }
+
+.msg-list { display: flex; flex-direction: column; gap: 14px; }
+.msg { padding: 20px 22px; }
+.msg-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; margin-bottom: 8px; }
+.msg-head a { color: var(--gold-2); }
+.msg-subject { font-weight: 600; margin: 0 0 6px; }
+.msg-body { color: var(--muted); margin: 0; }
+
+@media (max-width: 860px) {
+    .contact-grid { grid-template-columns: 1fr; }
+}

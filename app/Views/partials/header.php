@@ -8,7 +8,7 @@ $nav = [
     '/webshop'     => 'Webshop',
     '/#kategoriak' => 'Kategóriák',
     '/#rolunk'     => 'Rólunk',
-    '/#kapcsolat'  => 'Kapcsolat',
+    '/kapcsolat'   => 'Kapcsolat',
 ];
 $cartCount = Cart::count();
 ?>
