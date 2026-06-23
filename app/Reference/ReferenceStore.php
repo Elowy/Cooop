@@ -2,20 +2,24 @@
 
 namespace App\Reference;
 
+use PDO;
+
 /**
- * Referenciák tára (egy JSON fájl). Első használatkor a korábbi partnerlistából
- * (config/partners.php) tölti fel magát, hogy a meglévő partnerek ne vesszenek el.
+ * Referenciák tára. Telepítés után adatbázis (refs tábla), előtte JSON fájl.
+ * Fájl-módban első használatkor a partnerlistából (config/partners.php) töltődik
+ * fel; DB-módban a telepítő importálja a fájl-adatokat.
  *
- * Egy referencia: id, name, logo (fájlnév a public/uploads/references alatt),
- *                 short, long, created.
+ * Referencia: id, name, logo, short, long, created.
  */
 final class ReferenceStore
 {
+    private ?PDO $pdo;
     private string $file;
     private string $seedFile;
 
-    public function __construct(?string $file = null, ?string $seedFile = null)
+    public function __construct(?PDO $pdo = null, ?string $file = null, ?string $seedFile = null)
     {
+        $this->pdo = $pdo;
         $this->file = $file ?? dirname(__DIR__, 2) . '/storage/references.json';
         $this->seedFile = $seedFile ?? dirname(__DIR__, 2) . '/config/partners.php';
     }
@@ -23,6 +27,17 @@ final class ReferenceStore
     /** @return array<int, array<string, mixed>> */
     public function all(): array
     {
+        if ($this->pdo) {
+            $out = [];
+            $rows = $this->pdo->query('SELECT id, name, logo, short_text, long_text FROM refs ORDER BY id');
+            foreach ($rows as $r) {
+                $out[] = [
+                    'id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'],
+                    'short' => (string) $r['short_text'], 'long' => (string) $r['long_text'],
+                ];
+            }
+            return $out;
+        }
         if (!is_file($this->file)) {
             $seed = $this->seed();
             $this->persist($seed);
@@ -34,6 +49,12 @@ final class ReferenceStore
 
     public function find(int $id): ?array
     {
+        if ($this->pdo) {
+            $stmt = $this->pdo->prepare('SELECT id, name, logo, short_text, long_text FROM refs WHERE id = ?');
+            $stmt->execute([$id]);
+            $r = $stmt->fetch();
+            return $r ? ['id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'], 'short' => (string) $r['short_text'], 'long' => (string) $r['long_text']] : null;
+        }
         foreach ($this->all() as $ref) {
             if ((int) $ref['id'] === $id) {
                 return $ref;
@@ -42,8 +63,32 @@ final class ReferenceStore
         return null;
     }
 
-    /** Létrehoz vagy frissít; visszaadja az azonosítót. */
     public function save(array $ref): int
+    {
+        if ($this->pdo) {
+            if (!empty($ref['id'])) {
+                $this->pdo->prepare('UPDATE refs SET name=?, logo=?, short_text=?, long_text=? WHERE id=?')
+                    ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', (int) $ref['id']]);
+                return (int) $ref['id'];
+            }
+            $this->pdo->prepare('INSERT INTO refs (name, logo, short_text, long_text, created_at) VALUES (?, ?, ?, ?, ?)')
+                ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', date('c')]);
+            return (int) $this->pdo->lastInsertId();
+        }
+        return $this->fileSave($ref);
+    }
+
+    public function delete(int $id): void
+    {
+        if ($this->pdo) {
+            $this->pdo->prepare('DELETE FROM refs WHERE id = ?')->execute([$id]);
+            return;
+        }
+        $refs = array_values(array_filter($this->all(), static fn ($r) => (int) $r['id'] !== $id));
+        $this->persist($refs);
+    }
+
+    private function fileSave(array $ref): int
     {
         $refs = $this->all();
         if (empty($ref['id'])) {
@@ -52,27 +97,16 @@ final class ReferenceStore
             $refs[] = $ref;
         } else {
             $id = (int) $ref['id'];
-            $found = false;
             foreach ($refs as &$existing) {
                 if ((int) $existing['id'] === $id) {
                     $existing = array_merge($existing, $ref);
-                    $found = true;
                     break;
                 }
             }
             unset($existing);
-            if (!$found) {
-                $refs[] = $ref;
-            }
         }
         $this->persist($refs);
         return (int) $ref['id'];
-    }
-
-    public function delete(int $id): void
-    {
-        $refs = array_values(array_filter($this->all(), static fn ($r) => (int) $r['id'] !== $id));
-        $this->persist($refs);
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -82,29 +116,18 @@ final class ReferenceStore
         $out = [];
         $i = 0;
         foreach ($rows as $p) {
-            $out[] = [
-                'id' => ++$i,
-                'name' => (string) ($p['name'] ?? ''),
-                'logo' => '',
-                'short' => (string) ($p['note'] ?? ''),
-                'long' => '',
-                'created' => date('c'),
-            ];
+            $out[] = ['id' => ++$i, 'name' => (string) ($p['name'] ?? ''), 'logo' => '', 'short' => (string) ($p['note'] ?? ''), 'long' => '', 'created' => date('c')];
         }
         return $out;
     }
 
-    /** @param array<int, array<string, mixed>> $refs */
     private function persist(array $refs): void
     {
         $dir = dirname($this->file);
         if (!is_dir($dir)) {
             @mkdir($dir, 0775, true);
         }
-        file_put_contents(
-            $this->file,
-            json_encode(array_values($refs), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-        );
+        file_put_contents($this->file, json_encode(array_values($refs), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 
     private function nextId(array $refs): int

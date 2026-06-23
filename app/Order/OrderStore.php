@@ -2,19 +2,22 @@
 
 namespace App\Order;
 
+use PDO;
+
 /**
- * Egyszerű, fájl-alapú rendeléstár (JSON fájlok). Adatbázis nélkül, Windows
- * alatt is jól működik. Minden rendelés egy {token}.json fájl; a sorszámot
- * egy zárolt számláló adja.
+ * Rendeléstár. Telepítés után adatbázis (orders tábla; a rendelés teljes
+ * szerkezete JSON-ként a data oszlopban), előtte JSON fájlok.
  */
 final class OrderStore
 {
+    private ?PDO $pdo;
     private string $dir;
 
-    public function __construct(string $dir)
+    public function __construct(?PDO $pdo = null, ?string $dir = null)
     {
-        $this->dir = rtrim($dir, '/\\');
-        if (!is_dir($this->dir)) {
+        $this->pdo = $pdo;
+        $this->dir = rtrim($dir ?? dirname(__DIR__, 2) . '/storage/orders', '/\\');
+        if (!$this->pdo && !is_dir($this->dir)) {
             @mkdir($this->dir, 0775, true);
         }
     }
@@ -25,22 +28,38 @@ final class OrderStore
         if (!self::validToken($token)) {
             return;
         }
-        file_put_contents(
-            $this->path($token),
-            json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-        );
+        if ($this->pdo) {
+            $json = json_encode($order, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->pdo->prepare('DELETE FROM orders WHERE token = ?')->execute([$token]);
+            $this->pdo->prepare('INSERT INTO orders (token, created_at, data) VALUES (?, ?, ?)')
+                ->execute([$token, (string) ($order['created'] ?? date('c')), $json]);
+            return;
+        }
+        file_put_contents($this->path($token), json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 
     public function find(string $token): ?array
     {
-        if (!self::validToken($token) || !is_file($this->path($token))) {
+        if (!self::validToken($token)) {
+            return null;
+        }
+        if ($this->pdo) {
+            $stmt = $this->pdo->prepare('SELECT data FROM orders WHERE token = ?');
+            $stmt->execute([$token]);
+            $row = $stmt->fetch();
+            if (!$row) {
+                return null;
+            }
+            $data = json_decode((string) $row['data'], true);
+            return is_array($data) ? $data : null;
+        }
+        if (!is_file($this->path($token))) {
             return null;
         }
         $data = json_decode((string) file_get_contents($this->path($token)), true);
         return is_array($data) ? $data : null;
     }
 
-    /** Mély összefésülés a meglévő rendeléssel. */
     public function update(string $token, array $changes): ?array
     {
         $order = $this->find($token);
@@ -55,6 +74,16 @@ final class OrderStore
     /** @return array<int, array<string, mixed>> Létrehozás szerint csökkenő. */
     public function all(): array
     {
+        if ($this->pdo) {
+            $out = [];
+            foreach ($this->pdo->query('SELECT data FROM orders ORDER BY created_at DESC') as $row) {
+                $data = json_decode((string) $row['data'], true);
+                if (is_array($data)) {
+                    $out[] = $data;
+                }
+            }
+            return $out;
+        }
         $orders = [];
         foreach (glob($this->dir . '/*.json') ?: [] as $file) {
             $data = json_decode((string) file_get_contents($file), true);
@@ -66,9 +95,12 @@ final class OrderStore
         return $orders;
     }
 
-    /** Növekvő sorszám, pl. NT-000042. */
     public function nextNumber(): string
     {
+        if ($this->pdo) {
+            $n = (int) $this->pdo->query('SELECT COUNT(*) AS c FROM orders')->fetch()['c'] + 1;
+            return 'NT-' . str_pad((string) $n, 6, '0', STR_PAD_LEFT);
+        }
         $file = $this->dir . '/_counter';
         $fp = fopen($file, 'c+');
         if ($fp === false) {

@@ -24,6 +24,7 @@ use App\Core\Csrf;
 use App\Core\Router;
 use App\Core\View;
 use App\Db\Database;
+use App\Db\Importer;
 use App\Db\Schema;
 use App\User\UserRepository;
 use App\Integration\MockAxelGateway;
@@ -56,24 +57,23 @@ $axel = match ($config['axel']['gateway'] ?? 'mock') {
 // Kategóriafa (config/categories.php).
 $cats = new Categories();
 
-// Rendeléstár, üzenettár és fizetési szolgáltató (utóbbi a config alapján választva).
-$orders = new OrderStore($config['shop']['orders_dir']);
-$messages = new MessageStore($config['contact']['messages_dir']);
-
-// Oldal-beállítások, referenciák és térkép-pontok.
-$settings = new SettingsStore();
-$references = new ReferenceStore();
-$pois = new PoiStore();
-
-// Adatbázis és felhasználók – csak ha a telepítő már lefutott.
-$users = null;
+// Adatbázis-kapcsolat, ha a telepítő már lefutott (különben minden fájl-alapú).
+$pdo = null;
 if ($config['installed']) {
     try {
-        $users = new UserRepository(Database::instance($config['db']));
+        $pdo = Database::instance($config['db']);
     } catch (\Throwable $e) {
-        $users = null; // DB nem elérhető; a belépés ilyenkor nem működik
+        $pdo = null; // DB nem elérhető
     }
 }
+
+// Adattárak (DB ha telepítve, különben fájl) és felhasználók.
+$orders = new OrderStore($pdo, $config['shop']['orders_dir']);
+$messages = new MessageStore($pdo, $config['contact']['messages_dir']);
+$settings = new SettingsStore($pdo);
+$references = new ReferenceStore($pdo);
+$pois = new PoiStore($pdo);
+$users = $pdo ? new UserRepository($pdo) : null;
 
 // Referencia-logó feltöltése a public/uploads/references mappába.
 $uploadsDir = dirname(__DIR__) . '/public/uploads/references';
@@ -192,6 +192,7 @@ $router->post('/telepito', static function () use ($config, $redirect): string {
         try {
             $pdo = Database::make($dbcfg);
             Schema::create($pdo, $driver);
+            Importer::run($pdo); // meglévő fájl-adatok átemelése a DB-be
             $repo = new UserRepository($pdo);
             if ($repo->findByEmail($adminEmail) === null) {
                 $repo->create($adminName, $adminEmail, password_hash($adminPass, PASSWORD_DEFAULT), 'admin');

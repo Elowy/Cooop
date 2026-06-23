@@ -2,22 +2,33 @@
 
 namespace App\Settings;
 
+use PDO;
+
 /**
- * Egyszerű kulcs-érték beállítástár (JSON fájl), az adminból szerkeszthető
- * oldal-beállításokhoz (pl. kapcsolati csatornák).
+ * Kulcs-érték beállítástár. Telepítés után adatbázis (settings tábla),
+ * előtte JSON fájl.
  */
 final class SettingsStore
 {
+    private ?PDO $pdo;
     private string $file;
 
-    public function __construct(?string $file = null)
+    public function __construct(?PDO $pdo = null, ?string $file = null)
     {
+        $this->pdo = $pdo;
         $this->file = $file ?? dirname(__DIR__, 2) . '/storage/settings.json';
     }
 
     /** @return array<string, mixed> */
     public function all(): array
     {
+        if ($this->pdo) {
+            $out = [];
+            foreach ($this->pdo->query('SELECT skey, svalue FROM settings') as $row) {
+                $out[$row['skey']] = $row['svalue'];
+            }
+            return $out;
+        }
         if (!is_file($this->file)) {
             return [];
         }
@@ -38,6 +49,15 @@ final class SettingsStore
     /** @param array<string, mixed> $values */
     public function saveMany(array $values): void
     {
+        if ($this->pdo) {
+            $del = $this->pdo->prepare('DELETE FROM settings WHERE skey = ?');
+            $ins = $this->pdo->prepare('INSERT INTO settings (skey, svalue) VALUES (?, ?)');
+            foreach ($values as $key => $value) {
+                $del->execute([$key]);
+                $ins->execute([$key, (string) $value]);
+            }
+            return;
+        }
         $data = array_merge($this->all(), $values);
         $dir = dirname($this->file);
         if (!is_dir($dir)) {

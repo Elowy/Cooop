@@ -5,7 +5,15 @@ use App\Settings\SettingsStore;
 
 /** @var array<string, mixed> $config */
 
-$s = (new SettingsStore())->all();
+$widgetPdo = null;
+if (!empty($config['installed'])) {
+    try {
+        $widgetPdo = \App\Db\Database::instance($config['db']);
+    } catch (\Throwable $e) {
+        $widgetPdo = null;
+    }
+}
+$s = (new SettingsStore($widgetPdo))->all();
 $cfg = $config['contact'];
 
 // Nincs beállítva még → config alapérték; üres string → szándékosan elrejtve.
