@@ -43,6 +43,38 @@
         });
     }
 
+    // Referencia modal (doboz külön oldal helyett)
+    var refModal = document.querySelector('#reference-modal');
+    if (refModal && Array.isArray(window.NT_REFS)) {
+        var refs = {};
+        window.NT_REFS.forEach(function (r) { refs[r.id] = r; });
+        var rEsc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+        var openRef = function (r) {
+            var logo = refModal.querySelector('[data-ref-logo]');
+            logo.innerHTML = r.logo
+                ? '<img src="/uploads/references/' + rEsc(r.logo) + '" alt="">'
+                : '<span class="reference-monogram reference-monogram--sm">' + rEsc((r.name || '?').charAt(0).toUpperCase()) + '</span>';
+            refModal.querySelector('[data-ref-name]').textContent = r.name || '';
+            var shortEl = refModal.querySelector('[data-ref-short]');
+            shortEl.textContent = r.short || '';
+            shortEl.style.display = r.short ? '' : 'none';
+            var longEl = refModal.querySelector('[data-ref-long]');
+            longEl.innerHTML = r.long ? rEsc(r.long).replace(/\n/g, '<br>') : (r.short ? '' : 'Ehhez a referenciához még nincs bővebb leírás.');
+            refModal.hidden = false;
+            document.body.classList.add('modal-open');
+        };
+        var closeRef = function () { refModal.hidden = true; document.body.classList.remove('modal-open'); };
+        document.querySelectorAll('[data-ref-open]').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                var r = refs[el.getAttribute('data-ref-open')];
+                if (r) { openRef(r); }
+            });
+        });
+        refModal.querySelectorAll('[data-modal-close]').forEach(function (b) { b.addEventListener('click', closeRef); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !refModal.hidden) { closeRef(); } });
+    }
+
     // Pénztár: szállítási mezők ki/be
     var shipToggle = document.querySelector('[data-ship-toggle]');
     var shipFields = document.querySelector('[data-ship-fields]');

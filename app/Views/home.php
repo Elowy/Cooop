@@ -148,7 +148,7 @@ $stats = [
         </header>
         <div class="reference-grid">
             <?php foreach ($references as $ref): ?>
-                <a class="reference-card reveal" href="/referencia/<?= (int) $ref['id'] ?>">
+                <a class="reference-card reveal" href="/referencia/<?= (int) $ref['id'] ?>" data-ref-open="<?= (int) $ref['id'] ?>">
                     <span class="reference-logo">
                         <?php if (!empty($ref['logo'])): ?>
                             <img src="/uploads/references/<?= View::e((string) $ref['logo']) ?>" alt="<?= View::e((string) $ref['name']) ?>" loading="lazy">
@@ -164,6 +164,25 @@ $stats = [
             <?php endforeach; ?>
         </div>
     </div>
+
+    <div class="modal" id="reference-modal" data-modal hidden>
+        <div class="modal-backdrop" data-modal-close></div>
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="ref-modal-title">
+            <button class="modal-close" data-modal-close aria-label="Bezárás">&times;</button>
+            <div class="modal-head">
+                <div class="modal-logo" data-ref-logo></div>
+                <h3 id="ref-modal-title" class="display" data-ref-name></h3>
+            </div>
+            <p class="modal-short muted" data-ref-short></p>
+            <div class="modal-body" data-ref-long></div>
+        </div>
+    </div>
+    <script>
+    window.NT_REFS = <?= json_encode(array_map(static fn ($r) => [
+        'id' => (int) $r['id'], 'name' => (string) $r['name'], 'logo' => (string) ($r['logo'] ?? ''),
+        'short' => (string) ($r['short'] ?? ''), 'long' => (string) ($r['long'] ?? ''),
+    ], $references), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+    </script>
 </section>
 <?php endif; ?>
 

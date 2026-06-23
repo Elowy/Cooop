@@ -24,6 +24,7 @@ use App\Core\Csrf;
 use App\Core\Router;
 use App\Core\View;
 use App\Integration\MockAxelGateway;
+use App\Map\PoiStore;
 use App\Message\MessageStore;
 use App\Order\OrderStore;
 use App\Payment\MockPaymentGateway;
@@ -56,9 +57,10 @@ $cats = new Categories();
 $orders = new OrderStore($config['shop']['orders_dir']);
 $messages = new MessageStore($config['contact']['messages_dir']);
 
-// Oldal-beállítások és referenciák.
+// Oldal-beállítások, referenciák és térkép-pontok.
 $settings = new SettingsStore();
 $references = new ReferenceStore();
+$pois = new PoiStore();
 
 // Referencia-logó feltöltése a public/uploads/references mappába.
 $uploadsDir = dirname(__DIR__) . '/public/uploads/references';
@@ -132,6 +134,10 @@ $router->get('/referencia/{id}', static function (array $params) use ($reference
         return View::render('errors/404', ['title' => 'A referencia nem található']);
     }
     return View::render('reference', ['title' => (string) $ref['name'], 'ref' => $ref]);
+});
+
+$router->get('/terkep', static function () use ($pois): string {
+    return View::render('map', ['title' => 'Térkép', 'pois' => $pois->all()]);
 });
 
 $router->get('/kapcsolat', static function (): string {
@@ -618,6 +624,48 @@ $router->post('/admin/referenciak/torles', static function () use ($guard, $refe
         $references->delete((int) ($_POST['id'] ?? 0));
     }
     return $redirect('/admin/referenciak');
+});
+
+$router->get('/admin/terkep', static function () use ($adminView, $guard, $pois): string {
+    $guard();
+    $id = (int) ($_GET['id'] ?? 0);
+    return $adminView('admin/map', 'map', [
+        'title' => 'Térkép',
+        'pois' => $pois->all(),
+        'edit' => $id > 0 ? $pois->find($id) : null,
+    ]);
+});
+
+$router->post('/admin/terkep/mentes', static function () use ($guard, $pois, $redirect): string {
+    $guard();
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/terkep');
+    }
+    $title = trim((string) ($_POST['title'] ?? ''));
+    $lat = (float) ($_POST['lat'] ?? 0);
+    $lng = (float) ($_POST['lng'] ?? 0);
+    if ($title !== '' && $lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180 && ($lat !== 0.0 || $lng !== 0.0)) {
+        $poi = [
+            'title' => $title,
+            'lat' => $lat,
+            'lng' => $lng,
+            'description' => trim((string) ($_POST['description'] ?? '')),
+            'link' => trim((string) ($_POST['link'] ?? '')),
+        ];
+        if (!empty($_POST['id'])) {
+            $poi['id'] = (int) $_POST['id'];
+        }
+        $pois->save($poi);
+    }
+    return $redirect('/admin/terkep');
+});
+
+$router->post('/admin/terkep/torles', static function () use ($guard, $pois, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $pois->delete((int) ($_POST['id'] ?? 0));
+    }
+    return $redirect('/admin/terkep');
 });
 
 echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

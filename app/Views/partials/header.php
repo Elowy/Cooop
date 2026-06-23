@@ -7,6 +7,7 @@ use App\Core\View;
 $nav = [
     '/webshop'     => 'Webshop',
     '/#kategoriak' => 'Kategóriák',
+    '/terkep'      => 'Térkép',
     '/#rolunk'     => 'Rólunk',
     '/kapcsolat'   => 'Kapcsolat',
 ];
