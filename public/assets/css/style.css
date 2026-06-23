@@ -686,6 +686,44 @@ a.panel-link:hover { color: var(--gold-2); }
 .to-top.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 .to-top:hover { border-color: var(--gold); }
 
+/* ==========================================================================
+   Jogi oldalak, cookie soft wall (erdei faültetés)
+   ========================================================================== */
+.legal-doc { color: var(--muted); line-height: 1.8; }
+.legal-doc h2 { font-family: var(--serif); color: var(--text); font-size: 1.5rem; margin: 1.6em 0 .5em; }
+.legal-doc h3 { color: var(--gold-2); font-size: 1.15rem; margin: 1.4em 0 .4em; }
+.legal-doc h4, .legal-doc h5, .legal-doc h6 { color: var(--text); font-size: 1rem; margin: 1.2em 0 .3em; }
+.legal-doc p { margin: 0 0 1em; }
+.legal-doc strong { color: var(--text); }
+.legal-doc a { color: var(--gold-2); word-break: break-word; }
+.legal-doc ul { margin: 0 0 1em; padding-left: 20px; }
+.legal-doc li { margin: .3em 0; }
+.legal-doc hr { border: 0; border-top: 1px solid var(--line); margin: 1.8em 0; }
+
+.footer-legal { display: flex; gap: 18px; flex-wrap: wrap; }
+.footer-legal a { color: var(--muted); font-size: .82rem; }
+.footer-legal a:hover { color: var(--gold-2); }
+
+.cookie-wall { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(8, 8, 6, .55); backdrop-filter: blur(3px); transition: opacity .3s ease; }
+.cookie-wall.is-hidden { opacity: 0; pointer-events: none; }
+.cookie-card { width: 100%; max-width: 460px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, .55); }
+.cookie-scene { line-height: 0; }
+.cookie-scene svg { width: 100%; height: 140px; display: block; }
+.cookie-body { padding: 22px 24px 24px; }
+.cookie-body h3 { margin: 0 0 8px; font-size: 1.2rem; }
+.cookie-body p { color: var(--muted); font-size: .92rem; margin: 0 0 16px; }
+.cookie-body a { color: var(--gold-2); }
+.cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.cw-sapling { transform-box: fill-box; transform-origin: 50% 100%; animation: cwGrow 3.4s ease-in-out infinite; }
+.cw-planter { transform-box: fill-box; transform-origin: 50% 100%; animation: cwBob 1.6s ease-in-out infinite alternate; }
+.cw-tree { transform-box: fill-box; transform-origin: 50% 100%; animation: cwSway 4s ease-in-out infinite alternate; }
+.cw-tree-b { animation-duration: 5.2s; }
+@keyframes cwGrow { 0% { transform: scale(0); opacity: 0; } 14% { opacity: 1; } 70% { transform: scale(1); opacity: 1; } 88% { transform: scale(1); opacity: 1; } 100% { transform: scale(.12); opacity: 0; } }
+@keyframes cwBob { from { transform: rotate(-3deg); } to { transform: rotate(5deg); } }
+@keyframes cwSway { from { transform: rotate(-1.5deg); } to { transform: rotate(1.5deg); } }
+@media (prefers-reduced-motion: reduce) { .cw-sapling, .cw-planter, .cw-tree { animation: none; } }
+
 /* Referenciák */
 .reference-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
 .reference-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; color: var(--text); transition: border-color .15s, transform .15s; }

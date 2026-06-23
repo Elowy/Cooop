@@ -29,6 +29,9 @@ $metaDesc = trim((string) ($meta['description'] ?? '')) ?: (trim((string) ($seo[
 $metaKeywords = trim((string) ($meta['keywords'] ?? '')) ?: trim((string) ($seo['seo_keywords'] ?? ''));
 $ogImage = trim((string) ($meta['og_image'] ?? '')) ?: trim((string) ($seo['seo_og_image'] ?? ''));
 $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?? '/');
+
+$gaId = trim((string) ($seo['ga_id'] ?? ''));
+$cookieConsent = $_COOKIE['nt_consent'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="hu">
@@ -51,6 +54,11 @@ $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?
     <meta name="twitter:card" content="<?= $ogImage !== '' ? 'summary_large_image' : 'summary' ?>">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+    <?php if ($gaId !== '' && $cookieConsent === 'all'): ?>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= View::e($gaId) ?>"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','<?= View::e($gaId) ?>');</script>
+    <?php endif; ?>
+    <?php if ($gaId !== ''): ?><script>window.NT_GA=<?= json_encode($gaId) ?>;</script><?php endif; ?>
 </head>
 <body>
 <?php include dirname(__DIR__) . '/partials/header.php'; ?>
@@ -62,6 +70,7 @@ $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?
 <button class="to-top" data-to-top aria-label="Vissza a tetejére">↑ Vissza a tetejére</button>
 
 <?php include dirname(__DIR__) . '/partials/contact-widget.php'; ?>
+<?php if ($cookieConsent === ''): include dirname(__DIR__) . '/partials/cookie-wall.php'; endif; ?>
 <?php include dirname(__DIR__) . '/partials/footer.php'; ?>
 
 <script src="/assets/js/main.js" defer></script>

@@ -1,0 +1,828 @@
+# ÁLTALÁNOS SZERZŐDÉSI FELTÉTELEK - Net-Trade Hungary Kft.
+
+## www.net-trade.hu
+
+**Hatályba lépés ideje: 2023.04.17.**
+
+---
+
+### Bevezetés
+
+Legyen kedves gondosan elolvasni Általános szerződési feltételeinket, hiszen Ön rendelése leadásával elfogadja Cégünk Általános szerződési feltételeit!
+
+Amennyiben webshopunk használatával, a vásárlás folyamatával, az általunk értékesített árukkal vagy Általános szerződési feltételeinkkel kapcsolatos kérdése van, felveheti Cégünkkel a kapcsolatot az alábbi elérhetőségeken:
+
+---
+
+### Cégünk adatai
+
+**Cég neve:** Net-Trade Hungary Kft.
+
+**Székhelye:** 2660 Balassagyarmat, Mártírok útja 72.
+
+**Postacíme:** 2660 Balassagyarmat, Mártírok útja 72.
+
+**Adószáma:** 12453292-2-12
+
+**Cégjegyzékszáma:** 12-09-006698
+
+**Nyilvántartásba vevő hatóság neve:** Balassagyarmati Törvényszék Cégbírósága
+
+**Cég bankszámlaszáma:** 10300002-10587008-49020013
+
+**Képviselő neve:** Nagy Lászlóné
+
+**Honlap címe:** www.net-trade.hu
+
+**E-mail cím:** info@net-trade.hu
+
+**Telefonszám:** +36 20 3871 450
+
+**Tárhelyszolgáltató adatai:** Websupport Magyarország Kft.
+
+**Székhely:** 1132 Budapest, Victor Hugo utca 18-22.
+
+**Adószám:** 25138205-2-41
+
+**Telefon:** +36 1 700 2323
+
+**Email:** info@mhosting.hu
+
+---
+
+### Fogalmak
+
+**Felek:** Eladó és Fogyasztó/Vállalkozás együttesen
+
+**Fogyasztó:** gazdasági tevékenysége, illetve szakmája körén kívül eljáró nagykorú, 18. életévét betöltött természetes személy
+
+**Fogyasztói szerződés:** szerződés, melynek egyik alanya Fogyasztónak minősül
+
+**Jótállás:** a Fogyasztói szerződés esetében a Polgári Törvénykönyv szerint
+- jogszabályi kötelezettségen túlmutató, illetve önként, a szerződés megfelelő teljesítéséért vállalt jótállás
+- kötelező jótállás, mely jogszabályon alapul
+
+**Szerződés:** Eladó és Fogyasztó/Vállalkozás között a webshop és e-mail felhasználásával történő adásvételi szerződés megkötése
+
+**Távollévők között kötött szerződés:** olyan fogyasztói szerződés, amelyet a szerződés szerinti áru vagy szolgáltatás nyújtására szervezett távértékesítési rendszer keretében a felek egyidejű fizikai jelenléte nélkül úgy kötnek meg, hogy a szerződés megkötése érdekében a szerződő felek kizárólag távollévők közötti kommunikációt lehetővé tévő eszközt alkalmaznak
+
+**Áru:** webshopunk kínálatában lévő, eladásra szánt, birtokba vehető:
+- ingó dolog, ideértve a tartályban, palackban vagy egyéb módon korlátozott mennyiségben vagy meghatározott űrtartalommal kiszerelt víz, gáz és villamos energia, valamint
+- ingó dolog, amely digitális tartalmat vagy digitális szolgáltatást foglal magában vagy azzal össze van kapcsolva, olyan módon, hogy az érintett digitális tartalom vagy digitális szolgáltatás hiányában az áru nem tudná betölteni funkcióit
+
+**Vételár:** az áruért, valamint a digitális tartalom szolgáltatásáért vagy a digitális szolgáltatás nyújtásáért fizetendő ellenszolgáltatás
+
+**Digitális elemeket tartalmazó áru:** ingó dolog, amely digitális tartalmat vagy digitális szolgáltatást foglal magában vagy azzal össze van kapcsolva, olyan módon, hogy az érintett digitális tartalom vagy digitális szolgáltatás hiányában az áru nem tudná betölteni funkcióit
+
+**Kompatibilitás:** a digitális elemeket tartalmazó áru, a digitális tartalom vagy a digitális szolgáltatás azon képessége, hogy – átalakítás szükségessége nélkül – együtt tudjon működni olyan hardverrel vagy szoftverrel, amellyel az azonos típusú árukat, digitális tartalmat vagy digitális szolgáltatásokat általában együtt használják
+
+**Interoperabilitás:** a digitális elemeket tartalmazó áru, a digitális tartalom vagy a digitális szolgáltatás azon képessége, hogy együtt tudjon működni olyan hardverrel és szoftverrel, amely eltér attól, amellyel az azonos típusú árukat, digitális tartalmat vagy digitális szolgáltatásokat általában együtt használják
+
+**Funkcionalitás:** a digitális elemeket tartalmazó áru, a digitális tartalom vagy a digitális szolgáltatás azon képessége, hogy a céljának megfelelő funkciókat betöltse
+
+**Gyártó:** az árú előállítója, importált áru esetén az Európai Unió területére behozó importőr, illetve bármilyen olyan személy, aki az árun nevének, védjegyének, vagy egyéb megkülönböztető jelzésének feltüntetésével önmagát gyártónak tünteti fel
+
+**Tartós adathordozó:** bármely olyan eszköz, amely lehetővé teszi a fogyasztó vagy a vállalkozás számára a személyesen neki címzett adatoknak a jövőben is hozzáférhető módon és az adat céljának megfelelő ideig történő tárolását, valamint a tárolt adatok változatlan formában történő megjelenítését
+
+**Távollévők közötti kommunikációt lehetővé tévő eszköz:** olyan eszköz, amely alkalmas a felek távollétében – szerződés megkötése érdekében – szerződési nyilatkozat megtételére. Ilyen eszköz különösen a címzett vagy a címzés nélküli nyomtatvány, a szabványlevél, a sajtótermékben közzétett hirdetés megrendelőlappal, a katalógus, a telefon, a telefax és az internetes hozzáférést biztosító eszköz
+
+**Vállalkozás:** gazdasági tevékenysége, illetve szakmája körében eljáró személy
+
+**Webshop:** webshopunk, melyen a szerződéskötés megvalósul
+
+---
+
+### Vonatkozó jogszabályok
+
+- évi CLV. törvény a Fogyasztóvédelemről
+- évi LXXVI. törvény a szerzői jogról
+- évi CVIII. törvény az elektronikus kereskedelmi szolgáltatások, valamint az információs társadalommal összefüggő szolgáltatások egyes kérdéseiről
+- 151/2003. (IX.22.) kormányrendelet a tartós fogyasztási cikkekre vonatkozó kötelező jótállásról
+- évi CXX. törvény az információs önrendelkezési jogról és az információszabadságról
+- évi V. törvény a Polgári Törvénykönyvről
+- 19/2014. (IV.29.) NGM rendelet a Fogyasztó és vállalkozás közötti szerződés keretében eladott dolgokra vonatkozó szavatossági és jótállási igények intézésének eljárási szabályairól
+- 45/2014. (II.26.) kormányrendelet a Fogyasztó és a vállalkozás közötti szerződések részletes szabályairól
+- Az Európai Parlament és Tanács (EU) 2016/679. rendelete (2016.04.27.) a természetes személyek személyes adatainak kezeléséről és védelméről, továbbá ezen adatok szabad áramlásáról, valamint a 95/46/EK rendelet, azaz az általános adatvédelmi rendelet hatályon kívül helyezéséről
+- Az Európai Parlament és Tanács (EU) 2018/302. rendelete (2018.02.28.) a belső piacon belül a Fogyasztó állampolgársága, lakó/letelepedési helye alapján való indokolatlan területi alapú tartalomkorlátozással és a megkülönböztetés egyéb formáival szembeni fellépésről, valamint a 2006/2004/EK és az (EU) 2017/2394. rendelete, továbbá a 2009/22/EK irányelv módosításáról
+- A fogyasztó és vállalkozás közötti, az áruk adásvételére, valamint a digitális tartalom szolgáltatására és digitális szolgáltatások nyújtására irányuló szerződések részletes szabályairól szóló 373/2021. (VI. 30.) Korm. rendelet
+
+---
+
+### ÁSZF hatálya és elfogadása
+
+A vonatkozó jogszabályok mellett a megkötésre kerülő szerződés tartalmát Általános szerződési feltételeink is szabályozzák. Ennek keretein belül összefoglaljuk az Önt és minket megillető jogokat, kötelezettségeket, a szerződéskötés feltételeit, a fizetési, illetve szállítási feltételeket, a határidőket, a felelősséggel kapcsolatos szabályokat, továbbá az elállási jog gyakorlásának feltételeit.
+
+Ön rendelése leadásával elfogadja Cégünk Általános szerződési feltételeit, mely a megkötésre kerülő szerződéshez tartozik.
+
+---
+
+### Szerződés nyelve és formája
+
+A szerződés nyelve magyar.
+
+A szerződés a megrendelés leadásával jön létre, Általános szerződési feltételeink elfogadásával.
+
+---
+
+### Árak
+
+Az árak forintban értendők. Cégünk ÁFA körbe tartozik, áraink bruttó árak, melyek az ÁFÁt tartalmazzák. Fenntartjuk az árváltoztatás jogát.
+
+---
+
+### Panaszügyintézés és jogérvényesítési lehetőségek
+
+A Fogyasztó az Árukat, illetőleg Cégünk tevékenységét illető kifogásait a következő elérhetőségeinken juttathatja el hozzánk:
+
+- E-mail cím: info@net-trade.hu
+- Telefonszám: +36 20 3871 450
+
+A Fogyasztó **elsősorban írásban, egyes esetekben azonban szóban is közölheti Cégünkkel panaszát**. A panasz vonatkozhat a Cégünk részéről eljáró személy viselkedésére, munkájára, esetleg mulasztására, mely az áru forgalmazásával, értékesítésével közvetlen kapcsolatban áll.
+
+**A szóbeli panaszt Cégünk haladéktalanul kivizsgálja és lehetőség szerint megoldja**. Amennyiben a Fogyasztó nem ért egyet a panasz kezelésével vagy a panasz haladéktalan kivizsgálása nem lehetséges, Cégünk a panaszról és azzal kapcsolatos álláspontjáról jegyzőkönyvet vesz fel, melynek másolati példányát eljuttatja a Fogyasztó részére (személyes jelenlét esetén helyben átadja). E-mailen érkezett panasz esetében 30 napon belül a válasszal együtt megküldi a Fogyasztó részére. **Az írásbeli panaszt Cégünk a beérkezéstől számított 30 napon belül írásban megválaszolja**. A panasz elutasítása esetén Cégünk álláspontját köteles megindokolni. Cégünk köteles a panaszt egyedi azonosítószámmal ellátni – telefonon, illetve egyéb elektronikus hírközlési szolgáltatás útján közölt szóbeli panasz esetén.
+
+Tartalmaznia kell a panaszról felvett jegyzőkönyvnek:
+
+- Panasz eljuttatásának helyét, módját, idejét
+- Fogyasztó nevét, lakcímét, elérhetőségét
+- Fogyasztói panasz részletes leírását, továbbá a dokumentumok, iratok, bizonyítékok jegyzékét
+- Cégünk nyilatkozatát a Fogyasztói panaszt érintő álláspontjáról, ha annak haladéktalan kivizsgálása megoldható
+- Jegyzőkönyv felvételének helyét és idejét
+- Jegyzőkönyvet felvevő személy- és a Fogyasztó aláírását – ez utóbbit abban az esetben, amennyiben személyes jelenléttel történik a szóbeli panasz közlése
+- A panasz egyedi azonosítószámát – telefonon, illetve egyéb elektronikus hírközlési szolgáltatás útján közölt szóbeli panasz esetén
+
+Cégünk a panaszról felvett jegyzőkönyvet és válasszunk másolati példányát 5 évig megőrzi, ellenőrző hatóság kérésére bemutatja.
+
+Cégünk a Fogyasztót írásban tájékoztatja, amennyiben a panaszt elutasítja, hogy panaszával mely hatóság vagy Békéltető Testület eljárását kezdeményezheti. Tartalmazza a tájékoztatás az illetékes hatóság és a Fogyasztó lakóhelye/tartózkodási helye szerinti Békéltető Testület székhelyét, levelezési címét, elérhetőségeit (weboldal, e-mail, telefonszám), valamint Cégünk Fogyasztói jogvita rendezése céljából történő Békéltető Testületi eljárás igénybevételével kapcsolatos álláspontját.
+
+Abban az esetben, ha Cégünk és a Fogyasztó közötti jogvita tárgyalások útján sem rendeződik, további jogérvényesítési lehetőségekkel élhet a Fogyasztó:
+
+#### Fogyasztóvédelmi Hatósági eljárás
+
+A Fogyasztói jogok megsértése esetén a Fogyasztó jogosult panaszt tenni a lakóhelye szerint illetékes Fogyasztóvédelmi Hatóságnál. A hatóság dönt a Fogyasztóvédelmi eljárás lefolytatásáról a panasz elbírálását követően. Az elsőfokú hatósági feladatokat a járási hivatalok látják el. Elérhetőségük: http://jarasinfo.gov.hu/jarasok-lista
+
+#### Bírósági eljárás
+
+A Fogyasztó polgári eljárás keretein belül jogosult a jogvitából származó követelésének bíróság előtti érvényesítésére a Polgári Törvénykönyvről szóló 2013. évi V. törvény, valamint a Polgári Perrendtartásról szóló 2016. évi CXXX. törvény rendelkezései szerint.
+
+#### Békéltető Testületi eljárás
+
+Jogosult a lakóhelye/tartózkodási helye szerint illetékes Békéltető Testülethez fordulni, ha Fogyasztói panaszát elutasítjuk. Az eljárás megindításának feltétele, hogy a Fogyasztó Cégünkkel közvetlenül megkísérelje a vitás ügy rendezését.
+
+A Békéltető Testületi eljárásban Cégünket együttműködési kötelezettség terheli. Ez alapján Cégünk köteles a Békéltető Testület felhívására **válasziratot megküldeni**, valamint a Békéltető Testület előtti meghallgatáson **megjelenni** és egyezség létrehozatalára feljogosított személy részvételét biztosítani.
+
+Ha Cégünk székhelye/telephelye a területileg illetékes Békéltető Testületet működtető kamara szerinti megyén kívül található, Cégünk együttműködési kötelezettsége a Fogyasztói igény megfelelő írásbeli egyezségkötés lehetőségének felajánlására terjed ki.
+
+Amennyiben fenti együttműködési kötelezettségünknek nem teszünk eleget, a Fogyasztóvédelmi Hatóság hatáskörébe kerül az ügy, mely szerint a cégek jogsértő magatartásakor **kötelező bírság kiszabása** van érvényben, ettől eltekinteni nem lehet.
+
+A bírság összege kis- és középvállalkozás számára 15.000 – 500.000 Ft-ig, 100 millió Ft feletti éves nettó árbevétellel rendelkező nagyvállalat számára pedig 15.000 Ft-tól a vállalat éves nettó árbevételének 5%-áig, legfeljebb 500 millió Ft-ig terjedhet.
+
+A Fogyasztó kérelmezheti a Békéltető Testületi eljárás megindítását. A kérelmet írásban (levél, fax, távirat útján, illetve a Békéltető Testület weboldalán, elektronikus formában), a Békéltető Testület elnökéhez szükséges eljuttatni.
+
+Tartalmaznia kell a kérelemnek:
+
+- Fogyasztó nevét, lakóhelyét/tartózkodási helyét, elérhetőségét
+- Fogyasztói jogvitával érintett cég nevét, székhelyét/telephelyét
+- Fogyasztó álláspontját és az azzal kapcsolatos bizonyítékokat, tényeket
+- Fogyasztó nyilatkozatát, hogy megkísérelte a vitás ügy rendezését közvetlenül az érintett vállalkozással
+- Fogyasztó nyilatkozatát, hogy más Békéltető Testületi eljárást nem kezdeményezett az ügyben, nem indított közvetítői eljárást, keresetlevelet nem adott be, fizetési meghagyás kibocsátására irányuló kérelmet nem terjesztett elő
+- Testület döntésére irányuló indítványt
+- Fogyasztó aláírását
+- Amennyiben a Fogyasztó az illetékes Békéltető Testület helyett más testületi illetékességet kérelmezett, annak megjelölését
+
+Mindenképpen csatolni szükséges a kérelemhez azon okiratot vagy másolatát, mely tartalmára bizonyítékként hivatkozik a Fogyasztó (a cég panaszt elutasító írásbeli nyilatkozatát, ha ez nem áll rendelkezésre, akkor a Fogyasztó által birtokolt írásos bizonyítékokat az egyeztetés megkísérléséről).
+
+Amennyiben meghatalmazott jár el a panasz ügyében, a kérelemhez mellékelni szükséges a Fogyasztó által kiadott meghatalmazást.
+
+További információ a Békéltető Testületekről: http://www.bekeltetes.hu
+
+További információ a területileg illetékes Békéltető Testületekről: https://bekeltetes.hu/index.php?id=testuletek
+
+#### A területileg illetékes Békéltető Testületek elérhetőségei
+
+**Baranya Megyei Békéltető Testület**
+- Cím: 7625 Pécs, Majorossy I. u. 36.
+- Telefonszám: 06-72 507-154
+- Fax: 06-72 507-152
+- E-mail cím: abeck@pbkik.hu, mbonyar@pbkik.hu
+
+**Bács-Kiskun Megyei Békéltető Testület**
+- Cím: 6000 Kecskemét, Árpád krt. 4.
+- Telefonszám: 06-76 501-500, 06-76 501-525, 06-76 501-523
+- Fax: 06-76 501-538
+- E-mail cím: bekeltetes@bacsbekeltetes.hu, mariann.matyus@bkmkik.hu
+- Honlap: www.bacsbekeltetes.hu
+
+**Békés Megyei Békéltető Testület**
+- Cím: 5600 Békéscsaba, Penza ltp. 5.
+- Telefonszám: 06-66 324-976
+- Fax: 06-66 324-976
+- E-mail cím: eva.toth@bmkik.hu
+
+**Borsod-Abaúj-Zemplén Megyei Békéltető Testület**
+- Cím: 3525 Miskolc, Szentpáli u. 1.
+- Telefonszám: 06-46 501-091, 06-46 501-870
+- Fax: 06-46 501-099
+- E-mail cím: kalna.zsuzsa@bokik.hu
+
+**Budapesti Békéltető Testület**
+- Cím: 1016 Budapest, Krisztina krt. 99. III. em. 310.
+- Telefonszám: 06-1 488-2131
+- Fax: 06-1 488-2186
+- E-mail cím: bekelteto.testulet@bkik.hu
+
+**Csongrád Megyei Békéltető Testület**
+- Cím: 6721 Szeged, Párizsi krt. 8-12.
+- Telefonszám: 06-62 554-250/118
+- Fax: 06-62 426-149
+- E-mail cím: bekelteto.testulet@csmkik.hu
+
+**Fejér Megyei Békéltető Testület**
+- Cím: 8000 Székesfehérvár, Hosszúsétatér 4-6.
+- Telefonszám: 06-22 510-310
+- Fax: 06-22 510-312
+- E-mail cím: fmkik@fmkik.hu
+
+**Győr-Moson-Sopron Megyei Békéltető Testület**
+- Cím: 9021 Győr, Szent István út 10/a.
+- Telefonszám: 06-96 520-217
+- Fax: 06-96 520-218
+- E-mail cím: bekeltetotestulet@gymskik.hu
+
+**Hajdú-Bihar Megyei Békéltető Testület**
+- Cím: 4025 Debrecen, Vörösmarty u. 13-15.
+- Telefonszám: 06-52 500-710
+- Fax: 06-52 500-720
+- E-mail cím: korosi.vanda@hbkik.hu
+
+**Heves Megyei Békéltető Testület**
+- Cím: 3300 Eger, Faiskola út 15.
+- Telefonszám: 06-36 429-612
+- Fax: 06-36 323-615
+- E-mail cím: hkik@hkik.hu
+
+**Jász-Nagykun-Szolnok Megyei Békéltető Testület**
+- Cím: 5000 Szolnok, Verseghy park 8. III. emelet 305-306.
+- Telefonszám: 06-56 510-621, 06-20 373-2570
+- Fax: 06-56 510-628
+- E-mail cím: bekeltetotestulet@jnszmkik.hu
+
+**Komárom-Esztergom Megyei Békéltető Testület**
+- Cím: 2800 Tatabánya, Fő tér 36.
+- Telefonszám: 06-34 513-027
+- Fax: 06-34 316-259
+- E-mail cím: szilvi@kemkik.hu
+
+**Nógrád Megyei Békéltető Testület**
+- Cím: 3100 Salgótarján, Alkotmány út 9/A.
+- Telefonszám: 06-32 520-860
+- Fax: 06-32 520-862
+- E-mail cím: nkik@nkik.hu
+
+**Pest Megyei Békéltető Testület**
+- Cím: 1119 Budapest, Etele út 59-61. II. emelet 240.
+- Levelezési cím: 1364 Budapest, Pf.: 81.
+- Telefonszám: 06-1 269-0703
+- Fax: 06-1 474-7921
+- E-mail cím: pmbekelteto@pmkik.hu
+
+**Somogy Megyei Békéltető Testület**
+- Cím: 7400 Kaposvár, Anna u. 6.
+- Telefonszám: 06-82 501-026
+- Fax: 06-82 501-046
+- E-mail cím: skik@skik.hu
+
+**Szabolcs-Szatmár-Bereg Megyei Békéltető Testület**
+- Cím: 4400 Nyíregyháza, Széchenyi u. 2.
+- Telefonszám: 06-42 311-544
+- Fax: 06-42 311-750
+- E-mail cím: bekelteto@szabkam.hu
+
+**Tolna Megyei Békéltető Testület**
+- Cím: 7100 Szekszárd, Arany J. u. 23-25. III. emelet
+- Telefonszám: 06-74 411-661
+- Fax: 06-74 411-456
+- E-mail cím: kamara@tmkik.hu
+
+**Vas Megyei Békéltető Testület**
+- Cím: 9700 Szombathely, Honvéd tér 2.
+- Telefonszám: 06-94 312-356
+- Fax: 06-94 316-936
+- E-mail cím: vmkik@vmkik.hu
+
+**Veszprém Megyei Békéltető Testület**
+- Cím: 8200 Veszprém, Radnóti tér 1. földszint 116.
+- Telefonszám: 06-88 429-008
+- Fax: 06-88 412-150
+- E-mail cím: bekelteto@veszpremikamara.hu
+
+**Zala Megyei Békéltető Testület**
+- Cím: 8900 Zalaegerszeg, Petőfi u. 24.
+- Telefonszám: 06-92 550-513
+- Fax: 06-92 550-525
+- E-mail cím: zmbekelteto@zmkik.hu
+
+#### Online vitarendezési platform
+
+Az Európai Bizottság által létrehozott weboldalon, Fogyasztói regisztrációt követően, az oldalon található kérelem kitöltésével a Fogyasztó rendezheti az online vásárlással kapcsolatos jogvitáit bírósági eljárás indítása nélkül. Ez is egy módja a távolsági korlátok nélküli Fogyasztói jogérvényesítésnek.
+
+Ön panaszt tehet az online vásárolt áruval/szolgáltatással kapcsolatban. Önnek és az Ön által bepanaszolt cégnek lehetősége van ezen az online vitarendezési platformon együtt kiválasztani, hogy mely vitarendezési testületet bízzák meg a panasz kezelésével.
+
+Az online vitarendezési platform a következő weboldalon érhető el: https://webgate.ec.europa.eu/odr/main/?event=main.home.show&lng=HU
+
+---
+
+### Szerzői jogok
+
+Weboldalunk szerzői műnek minősül a szerzői jogról szóló 1999. évi LXXVI. törvény 1. § (1) bekezdése értelmében, szerzői jogi védelem alatt áll minden egyes része. Tilos a weboldalunkon található képek, szövegek, szoftveres, illetve grafikai programok engedély nélküli használata, továbbá a weboldalunkat módosító, kártékony alkalmazások használata, ugyanezen törvény 16. § (1) bekezdése szerint. Felhívjuk figyelmét, hogy weboldalunkról, valamint adatbázisunkból történő anyagok, képek, videók, szövegek átvételére kizárólag a jogtulajdonos Net-Trade Hungary Kft. írásos hozzájárulása esetén van lehetőség, forrásmegjelölés feltüntetése mellett.
+
+---
+
+### Részleges érvénytelenség és magatartási kódex
+
+Abban az esetben, ha az Általános szerződési feltételeink egy pontja jogilag hiányos/hatálytalan lenne, arra a részre a vonatkozó jogszabályok rendelkezései az irányadóak. A szerződés többi része továbbra is érvényes.
+
+Cégünknek a Fogyasztókkal szembeni tisztességtelen kereskedelmi gyakorlat tilalmáról szóló törvény szerinti magatartási kódexe nincsen.
+
+---
+
+### Műszaki védelmi intézkedések és digitális adattartalom működése
+
+A szerverek, melyek a weboldalunkon megjelenő adatokat biztosítják, 99,9%/év feletti elérhetőséggel rendelkeznek. A teljes adattartalmat folyamatosan mentjük, rendszeres időközönként, ha gond adódna, úgy az eredeti adatok visszaállíthatók. Az adatok, melyek weboldalunkon megjelennek, MySQL, illetve MSSQL adatbázisban kerülnek tárolásra. Ezen adatokat érzékeny mivoltukból adódóan megfelelő erősségű titkosítással tároljuk, kódolásukhoz pedig hardveres támogatást használunk, mely processzorba van építve.
+
+---
+
+### Áruk tulajdonságai
+
+Weboldalunkon az értékesítésre szánt áruk tulajdonságairól az adott áru oldalán található leírás szolgáltat információt.
+
+---
+
+### Adatbeviteli hibák javítása és felelősség az adatok valóságáért
+
+A megrendelés folyamata során, a rendelés megerősítése előtt adott a lehetőség az Ön által megadott adatok módosítására, javítására. Az Ön által megadott adatok pontosságáért Ön felelős. Ezen adatok alapján állítjuk ki a számlát, a szállítási címként megjelölt címre kézbesítjük az áru(kat). Rendelése leadásával Ön tudomásul veszi, hogy Cégünk jogosult az Ön által hibásan megadott adatokból eredő károk, költségek Ön részére történő áthárítására. Cégünk a hibás adatbevitel miatt való teljesítésért kizárja felelősségét. Az elírt e-mail cím vagy postafiókja telítettsége következtében a visszaigazolás kézbesíthetetlennek minősül, ezáltal a szerződés megvalósulását (meg)akadályozhatja.
+
+---
+
+### Eljárás Hibás ár esetén
+
+Cégünk kizárja felelősségét a minden gondossága ellenére, továbbá az informatikai rendszer meghibásodásából eredő, nyilvánvalóan hibásan feltüntetett árért.
+
+Nyilvánvalóan hibásan feltüntetett árnak minősül:
+
+- 0 Ft
+- Kedvezményt helytelenül feltüntető ár (pl.: Áru eredeti ára: 3.000 Ft, kedvezmény: 20%, kedvezményes ár: 500 Ft, hiszen ebben az esetben a helyes árnak 2.400 Ft-nak kellene lennie helyesen)
+
+Amennyiben hibás ár került feltüntetésre, Cégünk tájékoztatja Önt az esetről és felkínálja az áru helyes áron való megvételének lehetőségét, így az Ön döntése értelmében vagy megrendeli a helyes áron az árut vagy következmények nélkül elállhat a vásárlástól.
+
+---
+
+### Webshopunk használata
+
+Webshopunk a Felhasználó részére biztosítja az áruk bemutatását (áruk képpel, leírással, árral a weboldalon) és az online megrendelés opcióját. Weboldalunkon Ön menürendszerben böngészhet. Az árukat kategóriánként rendszerezve találja. Egy-egy kategória nevére kattintva megjelennek az abban szereplő áruk. A listaoldalról az áru részletes leírását az áru nevére kattintva találja. Webshopunkban kulcsszó alapján történő keresésre is van lehetőség. Akciós áruknál feltüntetésre kerül az akció kezdete és lejárata, illetve a „készlet erejéig" jelzés.
+
+Ha szeretne megvásárolni egy árut, azt (amennyiben több darabot szeretne, a darabszám beállításával, ezt követően) a kosár gombra történő kattintással teheti meg. A kosárban lévő árukat a Kosár megtekintése segítségével nézheti meg és ellenőrizheti. Itt lehetősége van módosítani a mennyiségeken vagy törölni árukat. A Kosár kiürítésére kattintva a kosár teljes tartalma törlődik.
+
+Ha kiválasztotta, mely árukat szeretné megrendelni, a Megrendelés gombra történő kattintással, az oldalra belépve, amennyiben nincsen még regisztrációja, abban az esetben a regisztráció létrehozásával van lehetősége rendelése leadására. Regisztrációkor a következő adatok megadása szükséges: név, cím, számlázási cím, szállítási cím, e-mail cím, telefonszám, jelszó. A regisztráció sikerességéről e-mailben küldünk megerősítést.
+
+A belépési adatok biztonsága a Felhasználó felelőssége, ő felelős adatai frissítéséért, köteles Cégünknek tudomására hozni, ha adataival harmadik fél visszaélt. Ha elfelejtette a jelszót, kattintson az „Elfelejtett jelszó" lehetőségre, ezt követően küldünk egy hivatkozást a Felhasználó regisztrált e-mail címére, melyre kattintva új jelszó hozható létre.
+
+A megrendelés folyamata során a Felhasználónak szükséges kiválasztani az általa preferált fizetési és szállítási módot. Közvetlenül a rendelés jóváhagyása előtt a Felhasználó a Megrendelés összesítése oldalon ellenőrizheti az adatok helyességét, a megrendelni kívánt árukat és mennyiségüket. Ha javítani szeretné az adatokat, a ceruza ikonra kattintva van mód rá.
+
+---
+
+### Rendelés véglegesítése
+
+Ha mindent rendben talál, a „Megrendelés elküldése" gombra kattintva véglegesítheti rendelését, melyről weboldalunkon és e-mailben is visszaigazolást kap. Abban az esetben, ha a visszaigazoló e-mailben veszi észre, hogy hibás adatot adott meg, kérjük, haladéktalanul, 24 órán belül jelezze felénk.
+
+A weboldalunkon található tájékoztatás nem minősül Cégünk részéről történő szerződéskötési ajánlatnak. Az ajánlattevő Ön.
+
+Ön a „Megrendelés elküldése" gombra kattintva tudomásul veszi, hogy ajánlata megtettnek minősül és nyilatkozata fizetési kötelezettséggel jár. Ha ajánlatát Általános szerződési feltételeink szerinti 48 órán belül nem igazoljuk vissza, Ön mentesül ajánlati kötöttsége alól.
+
+---
+
+### Rendelés feldolgozása és a szerződés megkötése
+
+Webshopunkon Ön bármikor leadhatja rendelését. Rendeléséről automatikus visszaigazolást kap, mely rendelése beérkezését jelenti, azonban ez a visszaigazolás nem minősül az Ön által tett ajánlat elfogadásának. Ha rendelésétől számítva 24 órán belül nem kap automatikus visszaigazolást e-mailben, kérjük, jelezze felénk, hiszen előfordulhat technikai probléma, elképzelhető, hogy emiatt nem érkezett meg rendszerünkbe rendelése.
+
+Cégünk egy második e-mailben igazolja vissza az Ön ajánlatát, ekkor jön létre a szerződés.
+
+---
+
+### Fizetési módok
+
+#### Banki átutalás
+
+A fizetés történhet banki átutalással. A megrendelés feldolgozását követően kollégánk elküldi Önnek az átutaláshoz szükséges adatokat. Miután utalása beérkezett, átadjuk csomagját a futárszolgálatnak kiszállítás céljából.
+
+#### Utánvét
+
+A fizetés történhet készpénzben közvetlenül a csomag átvételekor, melyet a csomag kézbesítését végző futárnak szükséges átadni. Ebben az esetben megrendelés után átadjuk a futárszolgálat részére a küldeményt, amit az Ön által megadott címre kiszállítanak.
+
+#### Bankkártyás fizetés (Barion)
+
+Az online bankkártyás fizetések a Barion rendszerén keresztül valósulnak meg. A bankkártya adatok a kereskedőhöz nem jutnak el. A szolgáltatást nyújtó Barion Payment Zrt. a Magyar Nemzeti Bank felügyelete alatt álló intézmény, engedélyének száma: H-EN-I-1064/2013.
+
+A fizetés történhet biztonságosan online, bankkártyával a rendelés véglegesítése során.
+
+---
+
+### Átvételi módok
+
+#### GLS
+
+A GLS kiszállítással kapcsolatban érdeklődjön ügyfélszolgálatunkon, vagy tájékozódjon az alábbi linken.
+
+További információ: https://gls-group.com/HU
+
+#### Személyes átvétel
+
+Lehetőség van a személyes átvételre is telephelyünkön, 2660 Balassagyarmat, Mártírok útja 76.
+
+---
+
+### Teljesítési határidő
+
+A megrendelés teljesítésére vonatkozó általános határidő a rendelés visszaigazolását követő legfeljebb 30 napon belül esedékes. Abban az esetben, ha Cégünk nem teljesíti a rendelést megszabott időn belül, úgy Ön jogosult póthatáridőt adni Cégünk részére. Ha Cégünk a póthatáridőn belül sem teljesít, úgy Ön jogosult a szerződéstől elállni.
+
+**Átlagos teljesítési határidő:** 3-5 munkanap.
+
+---
+
+### Jogfenntartás és kikötés
+
+Ha Ön korábban rendelt tőlünk árut, de azt kiszállításkor nem vette át (kivéve azon esetet, melyben elállási jogával élt), illetve a csomag „Nem kereste" jelzéssel visszajött hozzánk, Cégünk abban az esetben vállalja a megrendelés teljesítését, amennyiben a vételár és szállítási költség előre megfizetésre kerül.
+
+Cégünk visszatarthatja a csomag átadását, amíg meggyőződünk az áru vételárának sikeres kifizetésének megtörténtéről online fizetés esetén. Ha az áru árát nem egyenlítette ki teljes mértékben, Cégünk felhívja a Fogyasztó figyelmét a vételár kiegészítésére.
+
+---
+
+### Külföldi értékesítés
+
+Cégünk elsősorban Magyarország területén belül biztosítja a megrendelt áruk kiszállítását/átvételét.
+
+A Magyarországon kívüli vásárlásra szintén Általános szerződési feltételeink irányadóak. Fogyasztó ebben az esetben valamely tagállam nagykorú állampolgára vagy ott lakóhellyel rendelkező, gazdasági tevékenysége, illetve szakmája körén kívül eljáró természetes személy. Vállalkozás pedig valamely tagállamban letelepedési hellyel rendelkező, az Európai Unión belül árut vásárló vagy szolgáltatást igénybe vevő, gazdasági tevékenysége, illetve szakmája körében eljáró személy.
+
+A kommunikáció és vásárlás elsődleges nyelve magyar. Cégünk nem köteles a Fogyasztó tagállamának megfelelő nyelven kommunikálni.
+
+Cégünk nem köteles megfelelni a külföldi Fogyasztók/Vállalkozások tagállama szerinti nemzeti jogban az érintett árukkal összefüggésben meghatározott szerződésen kívüli követelményeknek.
+
+A külföldi Fogyasztók/Vállalkozások az Általános szerződési feltételeink szerint élhetnek jogérvényesítési lehetőségükkel.
+
+Online fizetés esetén a fizetés a Cégünk által meghatározott pénznemben történik. Cégünk visszatarthatja az áru átadását, amíg meggyőződik a vételár és szállítási díj sikeres kifizetésről. Ha a vételár nem került teljes mértékben kifizetésre, Cégünk felhívja a Fogyasztó/Vállalkozás figyelmét a vételár kiegészítésére.
+
+Cégünk a magyar vásárlókat megillető átadási lehetőségeket biztosítja a nem magyarországi vásárlóknak is, amennyiben rendelkezésre áll az adott országban az adott szállítási mód. A Fogyasztó/Vállalkozás kérheti az áru külföldre történő szállítását, a külföldre vonatkozó szállítási díj megfizetése mellett.
+
+---
+
+### Fogyasztói tájékoztató a 45/2014. (II. 26.) Korm. rendelet alapján
+
+#### Tájékoztatás a Fogyasztót megillető elállási jogról
+
+Fogyasztónak a Ptk. 8:1. § 1. bekezdés 3. pontja alapján kizárólag a szakmája, önálló foglalkozása, üzleti tevékenysége körén kívül eljáró természetes személy minősül, ennek értelmében **jogi személyek nem élhetnek az indokolás nélküli elállás jogával!**
+
+A Fogyasztót a 45/2014. (II. 26.) Korm. rendelet 20. § alapján indokolás nélküli elállási jog illet meg. A Fogyasztó gyakorolhatja elállási jogát az áru adásvételére irányuló szerződés esetén az áru átvételének napjától számított 14 napos határidőn belül.
+
+A Fogyasztó elállási jogát gyakorolhatja a szerződés megkötésének és az áru átvételének napja közti időszakban is.
+
+Amennyiben a szerződés megkötésére a Fogyasztó tett ajánlatot, megilleti őt a szerződés megkötése előtt az ajánlat visszavonásának joga, mely megszünteti a szerződés megkötésére irányuló ajánlati kötöttséget.
+
+#### Elállási nyilatkozat, Fogyasztó elállási és felmondási joga
+
+A 45/2014. (II. 26.) Korm. rendelet 20. §-ban biztosított jogát a Fogyasztó az erre vonatkozó nyilatkozata útján gyakorolhatja.
+
+#### Fogyasztói elállási nyilatkozat érvényessége
+
+Határidőben érvényesítettnek tekintjük az elállási jogot, amennyiben a Fogyasztó nyilatkozatát határidőn (14 napon) belül elküldi részünkre.
+
+A Fogyasztót terheli a bizonyítás, miszerint elállási jogát e rendelkezéssel összhangban gyakorolta.
+
+Cégünk a Fogyasztó elállási nyilatkozatának beérkezése után elektronikusan visszaigazolja a Fogyasztó számára az elállási jog gyakorlásának tényét, illetve tudomásul vételét.
+
+#### Cégünk kötelezettsége a Fogyasztó elállása esetén
+
+##### Cégünk visszatérítési kötelezettsége
+
+Ha a Fogyasztó a 45/2014. (II. 26.) Korm. rendelet 22. § alapján eláll a szerződéstől, Cégünk az elállásról történő tudomásszerzéstől számított 14 napon belül visszatéríti a Fogyasztó által megfizetett teljes összeget, a teljesítéssel összefüggő költségeket is beleértve, mint a szállítási díj. Kérjük, vegye figyelembe, hogy ezen rendelkezés nem vonatkozik a szokásos, kevésbé költséges szállítási módtól eltérő szállítási mód választásával okozott többletköltségekre.
+
+##### Cégünk visszatérítési kötelezettségének módja
+
+A 45/2014. (II. 26.) Korm. rendelet 22. § alapján történő elállás/felmondás esetén Cégünk a Fogyasztónak visszajáró összeget a Fogyasztó által igénybe vett fizetési móddal megegyezően téríti vissza. A Fogyasztó jóváhagyása esetén Cégünk a visszatérítésre más fizetési módot is alkalmazhat, azonban a Fogyasztót ebből adódó többletdíj nem terhelheti. A Fogyasztó által hibásan megadott bankszámlaszám vagy postacím miatti késedelem folytán Cégünket nem terheli felelősség.
+
+##### Többletköltségek
+
+Ha a Fogyasztó a szokásos, kevésbé költséges szállítási módtól eltérő szállítási módot választ, Cégünk nem köteles visszatéríteni az ebből eredő többletköltséget. Ilyenkor visszatérítési kötelezettségünk a feltüntetett általános szállítási díjtételek erejéig áll fenn.
+
+##### Visszatartási jog
+
+Cégünk visszatarthatja a Fogyasztónak visszajáró összeget, amíg a Fogyasztó vissza nem küldte az árut vagy egyértelműen nem igazolta, hogy visszaküldte. Utánvéttel, illetve portósan feladott csomagokat nem fogadunk el.
+
+#### Fogyasztó kötelezettségei elállása/felmondása esetén
+
+##### Áru visszaszolgáltatása
+
+Ha a Fogyasztó a 45/2014. (II. 26.) Korm. rendelet 22. § alapján eláll a szerződéstől, az árut haladéktalanul, legkésőbb az elállás közlésétől számított 14 napon belül köteles visszaküldeni vagy Cégünk által az áru átvételére jogosult személynek átadni. Határidőben teljesítettnek minősül a visszaküldés, ha a Fogyasztó az árut a határidő lejárta előtt elküldi.
+
+##### Áru visszaszolgáltatásával kapcsolatos költségek viselése
+
+Az áru visszaküldésének költsége a Fogyasztót terheli. Az árut Cégünk címére szükséges visszaküldeni. Ha a Fogyasztó a szerződést a teljesítés megkezdése után mondja fel, a felmondás vállalkozással való közlése időpontjáig teljesített szolgáltatással arányos díjat köteles Cégünk számára megfizetni. A Fogyasztó által arányosan fizetendő összeget a szerződésben megállapított ellenszolgáltatás adóval növelt teljes összege alapján kell megállapítani. Ha a Fogyasztó bizonyítja, hogy az így megállapított összeg túl magas, az arányos összeget a szerződés megszűnésének időpontjáig teljesített szolgáltatások piaci értéke alapján kell kiszámítani. Utánvéttel, illetve portósan feladott csomagokat nem fogadunk el.
+
+##### Fogyasztó felelőssége az értékcsökkenésért
+
+A Fogyasztó felel az áru jellegének, tulajdonságának, működésének megállapításához szükséges használatot meghaladó használatból eredő értékcsökkenésért.
+
+#### Elállási jog a következő esetekben nem gyakorolható
+
+Felhívjuk figyelmét, hogy Ön nem gyakorolhatja elállási jogát a 45/2014 (II.26.) Korm. Rendelet 29. §. (1) bekezdésében foglalt esetekben:
+
+- Alkoholtartalmú ital esetén, melynek valós értéke Cégünk által nem befolyásolhatóan, piaci áringadozásoktól függ és amely áráról a felek az adásvételi szerződés megkötésekor megállapodtak, de a szerződés teljesítésére csak a megkötéstől számított 30. napot követően kerül sor
+- Cégünk által nem befolyásolható, az elállási jog gyakorlására meghatározott határidő alatt is lehetséges pénzpiaci áringadozástól függő áru vagy szolgáltatás esetén
+- Hírlap, folyóirat, időszaki lap esetén, az előfizetéses szerződések kivételével
+- Jellegénél fogva átadás után elválaszthatatlanul más áruval vegyülő áru esetén
+- Lakáscélú szolgáltatás kivételével, szállásnyújtásra irányuló szerződés, személygépjármű-kölcsönzés, fuvarozás, étkeztetés, szabadidős tevékenységhez kötődő szolgáltatásra irányuló szerződés esetén, ha a szerződésben meghatározott teljesítési határnapot/határidőt szabtak meg
+- Lezárt csomagolású hang- vagy képfelvétel, számítógépes szoftver adásvétele esetén, ha az átadás után a Fogyasztó a csomagolást felbontotta
+- Nem előre gyártott áru esetén, amit a Fogyasztó utasítása alapján vagy kérésére gyártottak, illetve olyan áru esetén, amit a Fogyasztó személyére szabtak
+- Nem tárgyi adathordozón nyújtott digitális adattartalom esetén, ha Cégünk a Fogyasztó kifejezett, előzetes beleegyezésével kezdte meg a teljesítést és a Fogyasztó a beleegyezésével egyidejűleg nyilatkozott, hogy tudomásul veszi, hogy a teljesítés megkezdését követően elveszíti elállási jogát
+- Nyilvános árverésen megkötött szerződések esetén
+- Romlandó vagy minőségét rövid ideig megőrző áru esetén
+- Szolgáltatás nyújtására irányuló szerződés esetén a szolgáltatás egészének teljesítése után, ha Cégünk a teljesítést a Fogyasztó kifejezett, előzetes beleegyezésével kezdte meg és a Fogyasztó tudomásul vette, hogy a szolgáltatás egészének teljesítése után felmondási jogát elveszíti
+- Vállalkozási szerződés esetén, melyben Cégünk a Fogyasztó kifejezett kérésére keresi fel a Fogyasztót sürgős javítási/karbantartási munkák elvégzése céljából
+- Zárt csomagolású áru esetén, mely egészségvédelmi vagy higiéniai okok miatt az átadást követő felbontás után nem küldhető vissza
+
+---
+
+### Kellékszavatosság, termékszavatosság, jótállás tájékoztatás fogyasztói szerződésekre vonatkozóan
+
+A Fogyasztói tájékoztató ezen pontja a 45/2014 (II.26.) Korm. rendelet 9. § (3) bekezdése felhatalmazása alapján a 45/2014 (II.26.) Korm. rendelet 3. számú melléklete alkalmazásával készült.
+
+Ezen tájékoztató kizárólag fogyasztónak minősülő vásárlóra vonatkozik, a fogyasztónak nem minősülő vásárlóra vonatkozó szabályok külön fejezetben kerülnek meghatározásra.
+
+#### A teljesítés szerződésszerűségének általános követelményei fogyasztói szerződés esetén
+
+Az árunak a teljesítés időpontjában meg kell felelnie az 373/2021. (VI.30.) Korm. rendeletben foglalt követelményeknek.
+
+Ahhoz, hogy a teljesítés szerződésszerűnek minősüljön a szerződés tárgyát képező árunak
+
+- meg kell felelnie a szerződésben foglalt leírásnak, mennyiségnek, minőségnek, típusnak, valamint rendelkeznie kell a szerződésben meghatározott funkcionalitással, kompatibilitással, interoperabilitással és egyéb, a szerződés szerinti jellemzőkkel
+- alkalmasnak kell lennie a fogyasztó által meghatározott bármely célra, amelyet a fogyasztó legkésőbb a szerződés megkötésekor a vállalkozás tudomására hozott, és amelyet a vállalkozás elfogadott
+- rendelkeznie kell a szerződésben meghatározott valamennyi tartozékkal, használati útmutatóval – ideértve az üzembe helyezésre vonatkozó utasítást, a telepítési utasítást, valamint az ügyfélszolgálati támogatást
+- biztosítania kell a szerződésben meghatározott frissítéseket
+
+Ahhoz, hogy a teljesítés szerződésszerűnek minősüljön – továbbá – a szerződés tárgyát képező árunak
+
+- alkalmasnak kell lennie azokra a célokra, amelyeket azonos típusú szolgáltatás esetén jogszabály, műszaki szabvány vagy műszaki szabvány hiányában az irányadó magatartási kódex előír
+- rendelkeznie kell a fogyasztó által észszerűen elvárható azon mennyiséggel, minőséggel, teljesítmény- és egyéb jellemzőkkel – különösen a funkcionalitás, a kompatibilitás, a hozzáférhetőség, a folyamatosság és a biztonságosság tekintetében -, amely azonos típusú áru esetén szokásos, figyelembe véve a vállalkozás, annak képviselője vagy az értékesítési láncban részt vevő más személy a szolgáltatás konkrét tulajdonságaira vonatkozó nyilvános – különösen hirdetésben vagy címkén tett – kijelentését
+- rendelkeznie kell a fogyasztó által észszerűen elvárható tartozékokkal és útmutatókkal – ideértve a csomagolást, illetve az üzembe helyezésre vonatkozó utasítást
+- meg kell felelnie a vállalkozás által a szerződéskötést megelőzően mintaként, modellként bemutatott vagy próbaverzióként elérhetővé tett szolgáltatás tulajdonságainak, leírásának
+
+Az árunak abban az esetben nem kell megfelelnie a fenti nyilvános kijelentésnek, amennyiben Cégünk bizonyítani tudja, hogy
+
+- a nyilvános kijelentést nem ismerte, és azt nem is kellett ismernie
+- a nyilvános kijelentést a szerződéskötés időpontjáig már megfelelő módon helyesbítették
+- a nyilvános kijelentés a jogosult szerződéskötési elhatározását nem befolyásolhatta
+
+#### A teljesítés szerződésszerűségének egyedi követelményei digitális elemeket tartalmazó áru esetén
+
+Digitális elemeket tartalmazó áru esetében Cégünknek biztosítania kell, hogy a fogyasztó értesítést kapjon az áru digitális tartalmának vagy az azzal kapcsolatos digitális szolgáltatás olyan frissítéseiről – ideértve a biztonsági frissítéseket is -, amelyek az áru szerződésszerűségének fenntartásához szükségesek, valamint biztosítania kell, hogy a fogyasztó meg is kapja azokat.
+
+Cégünknek a frissítés elérhetővé tételét, ha az adásvételi szerződés
+
+- a digitális tartalom vagy a digitális szolgáltatás egyszeri szolgáltatásáról rendelkezik, akkor az áru és a digitális elemek típusa és célja, valamint az egyedi körülmények és a szerződés jellege alapján a fogyasztó által észszerűen elvárható; **vagy**
+- a digitális tartalom meghatározott időszakon keresztül történő folyamatos szolgáltatásáról rendelkezik, akkor két évet meg nem haladó időtartamú folyamatos szolgáltatás esetén az áru teljesítésétől számított két éven keresztül biztosítania kell.
+
+Ha a fogyasztó nem telepíti észszerű határidőn belül a fent meghatározott módon rendelkezésre bocsátott frissítéseket, a vállalkozás nem felel az áru hibájáért, ha az kizárólag a vonatkozó frissítés alkalmazásának hiányából fakad, feltéve, hogy
+
+- a vállalkozás tájékoztatta a fogyasztót a frissítés elérhetőségéről és a telepítés fogyasztó általi elmulasztásának következményeiről; és
+- a frissítés fogyasztó általi telepítésének elmulasztása vagy a frissítés fogyasztó általi helytelen telepítése nem a vállalkozás által biztosított telepítési útmutató hiányosságának tudható be
+
+Nem állapítható meg hibás teljesítés, ha a szerződés megkötésekor a fogyasztó külön tájékoztatást kapott arról, hogy az áru valamely konkrét tulajdonsága eltér a fentiekben meghatározott követelményektől, és az adásvételi szerződés megkötésekor a fogyasztó ezt az eltérést külön, kifejezetten elfogadta.
+
+#### A teljesítés szerződésszerűségének egyedi követelményei áru esetén
+
+Cégünk hibásan teljesít, ha az áru hibája a szakszerűtlen üzembe helyezéséből fakad, feltéve, hogy
+
+- az üzembe helyezés az adásvételi szerződés részét képezi, és azt Cégünk végezte el, vagy Cégünk felelősségvállalása mellett végezték el; **vagy**
+- az üzembe helyezést a fogyasztónak kellett elvégeznie, és a szakszerűtlen üzembe helyezés Cégünk által – illetve digitális elemeket tartalmazó áruk esetében a digitális tartalom vagy digitális szolgáltatás szolgáltatója által – rendelkezésre bocsátott üzembe helyezési utasítások hiányosságainak következménye
+
+Ha az adásvételi szerződés szerint az árut Cégünk helyezi üzembe, vagy az üzembe helyezés Cégünk felelősségvállalása mellett történik, a teljesítést akkor kell Cégünk által befejezettnek tekinteni, amikor az üzembe helyezés befejeződött.
+
+Ha a digitális elemeket tartalmazó áru esetében az adásvételi szerződés a digitális tartalom vagy digitális szolgáltatás meghatározott időtartamon keresztül történő folyamatos szolgáltatásáról rendelkezik, Cégünk felel az áru digitális tartalommal vagy digitális szolgáltatással kapcsolatos hibájáért, amennyiben a hiba
+
+- két évet meg nem haladó időtartamú folyamatos szolgáltatás esetén az áru teljesítésétől számított két éven belül; vagy
+- két évet meghaladó időtartamú folyamatos szolgáltatás esetén a folyamatos szolgáltatás teljes időtartama alatt következik be vagy válik felismerhetővé.
+
+#### Kellékszavatosság
+
+##### Milyen esetben élhet Ön kellékszavatossági jogával?
+
+Ön Cégünk hibás teljesítése esetén Cégünkkel szemben kellékszavatossági igényét érvényesítheti a Polgári Törvénykönyv, illetve a fogyasztói szerződés esetén a 373/2021 (VI.30.) Korm. rendelet vonatkozó szabályai szerint.
+
+##### Milyen jogok illetik meg Önt kellékszavatossági igénye alapján?
+
+Ön a következő kellékszavatossági igényekkel élhet:
+
+Kérhet kijavítást vagy kicserélést, kivéve, ha az Ön által választott lehetőség teljesítése lehetetlen vagy Cégünk számára aránytalan többletköltséggel járna. Ha kijavítást vagy kicserélést nem kért vagy nem kérhette, abban az esetben igényelheti az ellenszolgáltatás arányos leszállítását vagy a hibát Cégünk költségére Ön is kijavíthatja, illetve mással kijavíttathatja vagy végső esetben elállhat a szerződéstől.
+
+Választott kellékszavatossági jogáról áttérhet egy másikra, az áttérés költségét azonban Ön viseli, kivéve, ha az indokolt volt vagy arra Cégünk adott okot.
+
+Fogyasztói szerződés esetében feltételezni kell ellenkező bizonyításig, hogy az áru és a digitális elemeket tartalmazó áru teljesítésének időpontjától számított egy éven belül felismert hiba már a teljesítésnek időpontjában fennállt – ez alól kivételt képez, ha ezen feltételezés az áru természetével vagy a hiba jellegével összeegyeztethetetlen.
+
+Használt áru esetében eltérőek a szavatossági, jótállási jogok az általános szabályoktól. Használt áruknál is előfordulhat hibás teljesítés, azonban figyelembe kell venni azon körülményeket, amelyek alapján a vásárló bizonyos hibák előfordulására számíthatott. A használt áru esetében, a használat során egyes hibák jelentkezésére nagyobb az esély, a használat idejével együttesen gyakoribbá válhatnak, ezért nem feltételezhető az, hogy egy használt áru ugyanolyan minőséggel rendelkezik, mint egy újonnan vásárolt áru. Ezen indok alapján a vásárló csak olyan hiányosság/hiba esetén érvényesítheti a szavatossági jogait, amelyek a használtságból eredő hibáktól függetlenül jelentkeznek. Amennyiben a használt áru valamilyen hibával rendelkezik és erről a fogyasztó tájékoztatást kapott, úgy az ismert hiba vonatkozásában Cégünknek nincs felelőssége.
+
+Cégünk megtagadhatja az áru szerződésszerűvé tételét, ha a kijavítás, illetve a kicserélés lehetetlen, vagy ha az aránytalan többletköltséget eredményezne a vállalkozásnak, figyelembe véve valamennyi körülményt, ideértve a szolgáltatás hibátlan állapotban képviselt értékét, valamint a szerződésszegés súlyát.
+
+A fogyasztó akkor is jogosult – a szerződésszegés súlyához igazodva – az ellenszolgáltatás arányos leszállítását igényelni, vagy az adásvételi szerződést megszüntetni, ha
+
+- Cégünk nem végezte el a kijavítást vagy kicserélést, vagy elvégezte azt, de részben vagy egészben nem teljesítette a következő feltételeket:
+  - Cégünknek a saját költségére kell biztosítania a kicserélt áru visszavételét
+  - Ha a kijavítás vagy kicserélés olyan áru eltávolítását teszi szükségessé, amelyet az áru jellegének és céljának megfelelően – a hiba felismerhetővé válása előtt – üzembe helyeztek, akkor a kijavításra vagy kicserélésre vonatkozó kötelezettség magában foglalja a nem megfelelő áru eltávolítását és a csereként szállított vagy kijavított áru üzembe helyezését vagy az eltávolítás, illetve üzembe helyezés költségeinek viselését
+- megtagadta az áru szerződésszerűvé tételét
+- ismételt teljesítési hiba merült fel, annak ellenére, hogy cégünk megkísérelte az áru szerződésszerűvé tételét
+- a teljesítés hibája olyan súlyú, hogy azonnali árleszállítást vagy az adásvételi szerződés azonnali megszüntetését teszi indokolttá; **vagy**
+- Cégünk nem vállalta az áru szerződésszerűvé tételét, vagy a körülményekből nyilvánvaló, hogy Cégünk észszerű határidőn belül vagy a fogyasztónak okozott jelentős érdeksérelem nélkül nem fogja az árut szerződésszerűvé tenni
+
+Ha a fogyasztó hibás teljesítésre hivatkozva kívánja megszüntetni az adásvételi szerződést, Cégünket terheli annak bizonyítása, hogy a hiba jelentéktelen.
+
+A fogyasztó jogosult a vételár még fennmaradó részét – a szerződésszegés súlyához igazodva – részben vagy egészben visszatartani mindaddig, amíg Cégünk nem tesz eleget a teljesítés szerződésszerűségével és a hibás teljesítéssel kapcsolatos kötelezettségeinek.
+
+##### Általános érvényesülő szabályok
+
+- Cégünknek saját költségére kell biztosítania a kicserélt áru visszavételét
+- Ha a kijavítás vagy kicserélés olyan áru eltávolítását teszi szükségessé, amelyet az áru jellegének és céljának megfelelően – a hiba felismerhetővé válása előtt – üzembe helyeztek, akkor a kijavításra vagy kicserélésre vonatkozó kötelezettség magában foglalja a nem megfelelő áru eltávolítását és a csereként szállított vagy kijavított áru üzembe helyezését vagy az eltávolítás, illetve üzembe helyezés költségeinek viselését
+
+Az áru kijavításának vagy kicserélésének elvégzésére nyitva álló észszerű határidőt attól az időponttól kell számítani, amikor a fogyasztó közölte a hibát Cégünkkel.
+
+A fogyasztónak az árut a kijavítás vagy kicserélés teljesítése érdekében Cégünk rendelkezésére kell bocsátania.
+
+Az ellenszolgáltatás leszállítása akkor arányos, ha annak összege megegyezik a fogyasztónak szerződésszerű teljesítés esetén járó, valamint a fogyasztó által ténylegesen megkapott áru értékének különbözetével.
+
+A fogyasztó adásvételi szerződés megszüntetésére vonatkozó kellékszavatossági joga Cégünknek címzett, a megszüntetésre vonatkozó döntést kifejező jognyilatkozattal gyakorolható.
+
+Ha a hibás teljesítés az adásvételi szerződés alapján szolgáltatott árunak csak meghatározott részét érinti, és azok tekintetében a szerződés megszüntetésére vonatkozó jog gyakorlásának feltételei fennállnak, a fogyasztó az adásvételi szerződést csak a hibás áru tekintetében szüntetheti meg, de az azokkal együtt szerzett bármely egyéb áru vonatkozásában is megszüntetheti, ha a fogyasztótól nem várható el észszerűen, hogy csak a szerződésnek megfelelő árukat tartsa meg.
+
+Ha a fogyasztó az adásvételi szerződést teljes egészében vagy – a (2) bekezdés szerint – az adásvételi szerződés alapján szolgáltatott áruk egy része tekintetében szünteti meg, úgy
+
+- a fogyasztónak Cégünk költségére vissza kell küldenie Cégünknek az érintett árut; **és**
+- Cégünknek haladéktalanul vissza kell térítenie a fogyasztó részére az érintett áru vonatkozásában teljesített vételárat, amint az árut vagy az áru visszaküldését alátámasztó igazolást átvette.
+
+##### Milyen határidőben érvényesítheti Ön kellékszavatossági igényét?
+
+Az Ön kötelessége a hibát annak felfedezését követően haladéktalanul, legkésőbb 2 hónapon belül jelezni. A szerződés teljesítésétől számított 2 éves elévülési határidőn túl kellékszavatossági jogait nem érvényesítheti.
+
+Az elévülési határidőbe nem számít bele az áru javításának igénybe vett ideje, ami alatt a vásárló nem tudta rendeltetésszerűen használatba venni az árut.
+
+Amennyiben az árunak egy része cserére vagy javításra kerül, úgy az érintett részre a kellékszavatossági igény elévülése újra kezdődik. Ezen szabály érvényes arra az esetre is, ha a javítás következtében új hiba képződik.
+
+Ha a Fogyasztó és Cégünk közti szerződés tárgya használt dolog, a felek rövidebb elévülési időben is megállapodhatnak, de 1 évnél rövidebb elévülési határidő nem köthető ki.
+
+##### Kivel szemben érvényesítheti kellékszavatossági igényét?
+
+Ön Cégünkkel szemben érvényesítheti kellékszavatossági igényét.
+
+##### Milyen egyéb feltétele van kellékszavatossági jogai érvényesítésének?
+
+A teljesítéstől számított 1 éven belül kellékszavatossági igénye érvényesítésének a hiba közlésén túl nincs egyéb feltétele, ha Ön igazolja, hogy az árut, illetve a szolgáltatást Cégünk nyújtotta. A teljesítéstől számított 1 év leteltét követően viszont Önnek kell bizonyítani, hogy a hiba már a teljesítés időpontjában is megvolt.
+
+#### Termékszavatosság
+
+##### Milyen esetben élhet Ön termékszavatossági jogával?
+
+Ingó dolog/áru hibája esetén választása szerint Ön kellékszavatossági vagy termékszavatossági igényét érvényesítheti.
+
+##### Milyen jogok illetik meg Önt termékszavatossági igénye alapján?
+
+Termékszavatossági igényként Ön kizárólag a hibás áru kijavítását vagy kicserélését kérheti.
+
+##### Milyen esetben minősül az áru hibásnak?
+
+Az áru hibás, ha a forgalomba hozatalakor hatályos minőségi követelményeknek nem felel meg vagy ha nem rendelkezik a gyártó által adott leírásban szereplő tulajdonságokkal.
+
+##### Milyen határidőben érvényesítheti Ön termékszavatossági igényét?
+
+Ön termékszavatossági igényét az áru gyártó általi forgalomba hozatalától számított 2 éven belül érvényesítheti. E határidő elteltével e jogosultságát elveszti.
+
+##### Kivel szemben és milyen egyéb feltétellel érvényesítheti termékszavatossági igényét?
+
+Termékszavatossági igényét csakis az ingó dolog gyártójával/forgalmazójával szemben gyakorolhatja. Önnek kell bizonyítania az áru hibáját termékszavatossági igény érvényesítése esetén.
+
+##### Milyen esetben mentesül a gyártó/forgalmazó termékszavatossági kötelezettsége alól?
+
+A gyártó/forgalmazó kizárólag akkor mentesül termékszavatossági kötelezettsége alól, ha bizonyítani tudja, hogy:
+
+- A hiba a tudomány és technika állása szerint a forgalomba hozatal időpontjában nem volt felismerhető
+- Az áru hibája jogszabály vagy kötelező hatósági előírás alkalmazásából ered
+- Az árut nem üzleti tevékenysége körében gyártotta, illetve hozta forgalomba
+
+A gyártónak/forgalmazónak a mentesüléshez elegendő 1 okot bizonyítania.
+
+Kérjük, vegye figyelembe, hogy ugyanazon hiba miatt kellékszavatossági és termékszavatossági igényt egyszerre, párhuzamosan nem érvényesíthet. Termékszavatossági igény eredményes érvényesítése esetén azonban a kicserélt árura/kijavított részre vonatkozóan érvényesítheti kellékszavatossági igényét a gyártóval szemben.
+
+#### Jótállás
+
+##### Milyen esetben élhet Ön jótállási jogával?
+
+Hibás teljesítés fennállása esetén a tartós fogyasztási cikkekre vonatkozó kötelező jótállásról szóló 151/2003. (IX. 22.) Korm. rendelet alapján Cégünk jótállásra köteles a rendelet 1. számú mellékletében felsorolt új tartós fogyasztási cikkek, valamit az ott meghatározott körben azok tartozékai és alkotórészei eladása esetén.
+
+Jogszabály írja elő a jótállás biztosítását a tartós fogyasztási cikkek, mint a műszaki cikkek, gépek, szerszámok esetén, melyek vételára meghaladja a 10.000 Ft-ot.
+
+Cégünk önként jótállást vállalhat fogyasztónak minősülő vásárló részére, melyhez jótállási nyilatkozatot kell átadnia.
+
+A jótállási nyilatkozatot tartós adathordozón kell a fogyasztó rendelkezésére bocsátani, legkésőbb az áru teljesítésének időpontjában.
+
+A jótállási nyilatkozatban a következőket kötelező feltüntetni:
+
+- az arra vonatkozó egyértelmű nyilatkozatot, hogy az áru hibás teljesítése esetén a fogyasztót a jogszabály szerinti kellékszavatossági jogok gyakorlása térítésmentesen megilleti, e jogait a jótállás nem érinti;
+- a jótállásra kötelezett nevét és címét;
+- a fogyasztó által a jótállás érvényesítése érdekében követendő eljárást;
+- azon áru megjelölését, amelyre a jótállás vonatkozik és
+- a jótállás feltételeit.
+
+A jótállási nyilatkozatot magyar nyelven is a fogyasztó rendelkezésére kell bocsátani.
+
+##### Milyen jogok és milyen határidőn belül illetik meg Önt a jótállás alapján?
+
+Jótállás keretében a vásárló javítást vagy cserét igényelhet, jogszabályban meghatározott esetekben árleszállítást kérhet, végső esetben pedig elállhat a szerződéstől, ha a jótállásra kötelezett a javítást vagy cserét nem vállalta határidőn belül, a jogosult érdekeit kímélve nem tud eleget tenni, vagy ha a jogosultnak a javításhoz vagy cseréhez való érdeke megszűnt.
+
+A fogyasztó a kijavítás iránti igényét választása szerint Cégünk székhelyén, bármely telephelyén, fióktelepén és a vállalkozás által a jótállási jegyen feltüntetett javítószolgálatnál közvetlenül is érvényesítheti.
+
+**Jótállási igényét a jótállás időtartama alatt érvényesítheti**, amelyet a 151/2003. (IX.22.) Korm. rendelet meghatározott az alábbiak szerint:
+
+- 10 000 forintot elérő, de 100 000 forintot meg nem haladó eladási ár esetén egy év
+- 100 000 forintot meghaladó, de 250 000 forintot meg nem haladó eladási ár esetén két év
+- 250 000 forint eladási ár felett három év
+
+Kérjük, vegye figyelembe, hogy e határidők elmulasztása jogvesztéssel jár.
+
+A fogyasztási cikk kijavítása esetén a jótállás időtartama meghosszabbodik a javításra átadás napjától kezdve azzal az idővel, amely alatt a fogyasztó a fogyasztási cikket a hiba miatt rendeltetésszerűen nem használhatta.
+
+A jótállási határidő a fogyasztási cikk fogyasztó részére történő átadása, vagy ha az üzembe helyezést Cégünk vagy annak megbízottja végzi, az üzembe helyezés napjával kezdődik.
+
+Ha a fogyasztó a fogyasztási cikket az átadástól számított hat hónapon túl helyezteti üzembe, akkor a jótállási határidő kezdő időpontja a fogyasztási cikk átadásának napja.
+
+##### Jótállásra vonatkozó eljárási rendelkezések
+
+Cégünknek törekednie kell arra, hogy a jótállás keretében kért javítást 15 napon belül elvégezze. A 15 napos határidő a fogyasztási cikk átvételének napján indul.
+
+Amennyiben a javítás vagy a csere időtartama meghaladja a 15 napot, úgy Cégünknek tájékoztatnia kell a vásárlót a javítás vagy csere várható időtartamáról.
+
+A rögzített bekötésű, illetve a 10 kg-nál súlyosabb, vagy tömegközlekedési eszközön kézi csomagként nem szállítható fogyasztási cikket – a járművek kivételével – az üzemeltetés helyén kell megjavítani. Ha a kijavítás az üzemeltetés helyén nem végezhető el, a le- és felszerelésről, valamint az el- és visszaszállításról Cégünk, vagy – a javítószolgálatnál közvetlenül érvényesített kijavítás iránti igény esetén – a javítószolgálat gondoskodik.
+
+Ha a meghatározott jótállási időtartam alatt a fogyasztási cikk első alkalommal történő javítása során Cégünk részéről megállapítást nyer, hogy a fogyasztási cikk nem javítható, a fogyasztó eltérő rendelkezése hiányában a vállalkozás köteles a fogyasztási cikket nyolc napon belül kicserélni. Ha a fogyasztási cikk cseréjére nincs lehetőség, Cégünk köteles a fogyasztó által bemutatott, a fogyasztási cikk ellenértékének megfizetését igazoló bizonylaton – az általános forgalmi adóról szóló törvény alapján kibocsátott számlán vagy nyugtán – feltüntetett vételárat nyolc napon belül a fogyasztó részére visszatéríteni.
+
+Az Általános szerződési feltételek dokumentum elfogadásával a vásárló hozzájárul, hogy a vásárló részére a tájékoztatás elektronikus úton megvalósulhasson.
+
+**Abban az esetben, ha Cégünk nem képes a fogyasztási cikket 30 napon belül kijavítani**
+
+- úgy ha a vásárló ehhez hozzájárulását adta, a javítás későbbi határidőben is elvégezhető, vagy
+- ha a vásárló nem járul hozzá a későbbi javítás elvégzéséhez, vagy ezzel kapcsolatban nyilatkozatot nem tett, úgy a fogyasztási cikket a 30 napos határidő eredménytelen elteltét követően 8 napon belül Cégünknek ki kell cserélni, vagy
+- ha a vásárló nem járul hozzá a későbbi javítás elvégzéséhez, vagy ezzel kapcsolatban nyilatkozatot nem tett, de a fogyasztási cikk cseréjére nincs lehetőség, úgy Cégünk köteles a vásárló által bemutatott, a fogyasztási cikk ellenértékének megfizetését igazoló bizonylaton – az általános forgalmi adóról szóló törvény alapján kibocsátott számlán vagy nyugtán – feltüntetett vételárat nyolc napon belül a vásárló részére visszatéríteni.
+
+**Abban az esetben, ha a fogyasztási cikk a 3. javítást követően meghibásodik, – a vásárló eltérő rendelkezése hiányában – a vásárló jogosult**
+
+- javítási igénnyel fordulni Cégünk felé, vagy
+- a Polgári Törvénykönyvről szóló 2013. évi V. törvény 6:159. § (2) bekezdés b) pontja alapján a vételár arányos leszállítását kérni Cégünktől, vagy
+- a Polgári Törvénykönyvről szóló 2013. évi V. törvény 6:159. § (2) bekezdés b) pontja alapján a fogyasztási cikket Cégünk költségére kijavítani vagy mással kijavíttatni, vagy
+- ha a vásárló ezen jogokkal nem él, vagy erről nem nyilatkozott, a fogyasztási cikket 8 napon belül ki kell cserélni, amennyiben erre nincs lehetőség, úgy Cégünk köteles a vásárló által bemutatott, a fogyasztási cikk ellenértékének megfizetését igazoló bizonylaton – az általános forgalmi adóról szóló törvény alapján kibocsátott számlán vagy nyugtán – a feltüntetett vételárat nyolc napon belül a vásárló számára visszatéríteni.
+
+##### Mi a jótállás és más szavatossági jogok viszonya?
+
+A jótállás a szavatossági jogok (termék, illetve kellékszavatosság) mellett érvényesül. A szavatossági jogok és a jótállás közti különbség, hogy jótállás esetén kedvezőbb a Fogyasztó számára a bizonyítási teher.
+
+Cégünk önkéntes jótállási vállalása a kötelező jótállás időtartamán belül nem tartalmazhat a Fogyasztóra nézve hátrányosabb feltételeket, mint amit a kötelező jótállás szabályai biztosítanak. Ennek lejárta után az önkéntes jótállás feltételei szabadon megszabhatók, viszont a jótállás ilyenkor sem érintheti hátrányosan a Fogyasztó jogszabályból eredő (kellékszavatosságon alapuló) jogainak fennállását.
+
+##### Három munkanapon belüli csereigény
+
+Webáruházunkban történt vásárlás esetén megilleti Önt a 3 munkanapon belüli árucsere joga. 3 munkanapon belüli csereigényt a 151/2003. (IX. 22.) Korm. rendelet hatálya alá tartozó tartós fogyasztási cikkek esetén érvényesíthet, mely szerint, ha 3 munkanapon belül érvényesíti csereigényét, Cégünknek úgy kell értelmeznie, hogy az áru eladáskor már hibás volt és minden további nélkül az árut ki kell cserélnünk.
+
+##### Mikor mentesül Cégünk jótállási kötelezettsége alól?
+
+Cégünk jótállási kötelezettsége alól mentesül, ha bizonyítja, hogy a hiba oka a teljesítés után keletkezett.
+
+Felhívjuk figyelmét, hogy a „Jótállásra vonatkozó eljárási rendelkezések" pont alatt írt rendelkezések nem vonatkoznak a következő fogyasztási cikkekre: elektromos kerékpár, elektromos roller, quad, motorkerékpár, segédmotoros kerékpár, személygépkocsi, lakóautó, lakókocsi, utánfutós lakókocsi, utánfutó, motoros vízi jármű. Ettől függetlenül, ezen fogyasztási cikkek esetén is Cégünk köteles törekedni arra, hogy a javítási igényt 15 napon belül teljesítse. Amennyiben a javítás vagy csere időtartama meghaladja a 15 napot, úgy Cégünk köteles a vásárlót tájékoztatni a javítás vagy csere várható időtartamáról.
+
+Kérjük, vegye figyelembe, hogy ugyanazon hiba miatt kellékszavatossági és jótállási igényt, illetve termékszavatossági és jótállási igényt egyszerre, párhuzamosan nem érvényesíthet. A jótállásból fakadó jogok a szavatossági jogosultságoktól függetlenül megilletik Önt.
+
+---
+
+### Kellékszavatosság, termékszavatosság, jótállás tájékoztatás fogyasztónak nem minősülő vásárlói szerződésekre vonatkozóan
+
+#### Kellékszavatosság
+
+A fogyasztónak nem minősülő vásárló a következő kellékszavatossági igényekkel élhet:
+
+- Kérhet javítást vagy cserét, kivéve, ha ezek közül a fogyasztónak nem minősülő vásárló által választott igény teljesítése nem kivitelezhető vagy az a Cégünk számára más igény kivitelezéséhez képest aránytalan többletköltséggel járna.
+- Ha a javítást vagy cserét nem kéri, vagy nem kérhette, úgy igényelheti az ellenszolgáltatás arányos leszállítását vagy a hibát Cégünk költségére is kijavíthatja, illetve mással kijavíttathatja, vagy végső esetben a szerződéstől is elállhat.
+
+A választott kellékszavatossági jogról egy másikra is áttérhet, azonban az áttérés költségét a fogyasztónak nem minősülő vásárló téríti, kivéve, ha az indokolt volt, vagy arra Cégünk adott okot.
+
+Fogyasztónak nem minősülő vásárlók esetében a kellékszavatossági jog érvényesítési határideje 1 év, amely a teljesítés napján indul.
+
+Használt áru esetében eltérőek a szavatossági, jótállási jogok az általános szabályoktól. Használt áruknál is előfordulhat hibás teljesítés, azonban figyelembe kell venni azon körülményeket, amelyek alapján a vásárló bizonyos hibák előfordulására számíthatott. A használt áru esetében, a használat során egyes hibák jelentkezésére nagyobb az esély, a használat idejével együttesen gyakoribbá válhatnak, ezért nem feltételezhető az, hogy egy használt áru ugyanolyan minőséggel rendelkezik, mint egy újonnan vásárolt áru. Ezen indok alapján a vásárló csak olyan hiányosság/hiba esetén érvényesítheti a szavatossági jogait, amelyek a használtságból eredő hibáktól függetlenül jelentkeznek. Amennyiben a használt áru valamilyen hibával rendelkezik és erről a fogyasztó tájékoztatást kapott, úgy az ismert hiba vonatkozásában Cégünknek nincs felelőssége.
+
+#### Termékszavatosság és jótállás
+
+A fogyasztónak nem minősülő vásárlókat a jótállás, illetve a termékszavatosság nem illeti meg.
+
+Abban az esetben, ha Cégünk egy adott áruhoz önként jótállást biztosít, úgy azt az áru megvásárlása során feltünteti.
+
+Ha egy áru gyártója a fogyasztónak nem minősülő vásárlókra is kiterjedő jótállást biztosít, úgy az közvetlenül a gyártónál érvényesíthető.

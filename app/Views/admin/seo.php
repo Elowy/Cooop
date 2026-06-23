@@ -27,6 +27,11 @@ use App\Core\View;
             <label>Megosztási kép URL (Open Graph, ajánlott 1200×630)</label>
             <input name="seo_og_image" value="<?= View::e($values['seo_og_image']) ?>" placeholder="https://a-domained.hu/assets/img/hero.svg">
         </div>
+        <div class="field">
+            <label>Google Analytics azonosító (Measurement ID)</label>
+            <input name="ga_id" value="<?= View::e($values['ga_id']) ?>" placeholder="G-XXXXXXXXXX">
+            <p class="note" style="margin-top:6px">Csak akkor töltődik be, ha a látogató elfogadta a sütiket.</p>
+        </div>
         <button type="submit" class="btn btn--gold">Mentés</button>
     </form>
 </section>

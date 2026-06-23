@@ -36,6 +36,9 @@ $contact = $config['contact'];
 
     <div class="container footer-bottom">
         <small>&copy; <?= date('Y') ?> <?= View::e($config['app']['name']) ?> Kft. — Minden jog fenntartva.</small>
-        <small class="footer-note">Az ügyfél sikere a mi sikerünk!</small>
+        <nav class="footer-legal">
+            <a href="/aszf">ÁSZF</a>
+            <a href="/adatkezeles">Adatkezelési tájékoztató</a>
+        </nav>
     </div>
 </footer>

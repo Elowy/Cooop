@@ -247,6 +247,13 @@ $router->get('/terkep', static function () use ($redirect): string {
     return $redirect('/#terkep');
 });
 
+$router->get('/aszf', static fn (): string => View::render('legal', [
+    'title' => 'ÁSZF', 'heading' => 'Általános Szerződési Feltételek', 'mdFile' => 'aszf.txt',
+]));
+$router->get('/adatkezeles', static fn (): string => View::render('legal', [
+    'title' => 'Adatkezelési tájékoztató', 'heading' => 'Adatkezelési tájékoztató', 'mdFile' => 'adatkezeles.txt',
+]));
+
 $router->get('/kapcsolat', static function () use ($redirect): string {
     return $redirect('/#kapcsolat');
 });
@@ -787,6 +794,7 @@ $router->get('/admin/seo', static function () use ($adminView, $guard, $settings
             'seo_description' => array_key_exists('seo_description', $s) ? (string) $s['seo_description'] : 'Net-Trade Hungary Kft. – egyedi raklapgyártás, ipari csomagolás, nemzetközi árufuvarozás és fűrészáru-nagykereskedelem.',
             'seo_keywords' => (string) ($s['seo_keywords'] ?? ''),
             'seo_og_image' => (string) ($s['seo_og_image'] ?? ''),
+            'ga_id' => (string) ($s['ga_id'] ?? ''),
         ],
     ]);
 });
@@ -799,6 +807,7 @@ $router->post('/admin/seo', static function () use ($guard, $settings, $redirect
             'seo_description' => trim((string) ($_POST['seo_description'] ?? '')),
             'seo_keywords' => trim((string) ($_POST['seo_keywords'] ?? '')),
             'seo_og_image' => trim((string) ($_POST['seo_og_image'] ?? '')),
+            'ga_id' => trim((string) ($_POST['ga_id'] ?? '')),
         ]);
         $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'SEO beállítások mentve.'];
     }

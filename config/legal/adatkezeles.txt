@@ -1,0 +1,94 @@
+# Adatkezelési Tájékoztató - Net-Trade Hungary Kft.
+
+## Az Adatkezelő adatai
+
+**Net-Trade Hungary Tanácsadó és Szolgáltató Kft.**
+
+- **Postai cím:** 2660 Balassagyarmat, Bíró János u. 14.
+- **E-mail:** info@net-trade.hu
+- **Telefon:** +36203871450
+
+## Az adatkezelés alapelvei
+
+A vállalat elkötelezett a weboldal látogatóinak és vásárlóinak személyes adatainak védelme iránt. Az adatokat bizalmasan kezelik, valamint biztonsági és szervezeti intézkedéseket alkalmaznak az adatok védelme érdekében.
+
+## Alkalmazott jogszabályok
+
+Az adatkezelés az alábbi előírások szerint történik:
+
+- EU általános adatvédelmi rendelet (GDPR)
+- 2011. évi CXII. törvény (Infotv.)
+
+## Panaszkezelés és jogérvényesítés
+
+Jogsértés esetén a Nemzeti Adatvédelmi és Információszabadság Hatósághoz fordulhat:
+
+- **Postai cím:** 1363 Budapest, Pf. 9.
+- **Telefon:** +3613911400
+- **E-mail:** ugyfelszolgalat@naih.hu
+- **Weboldal:** www.naih.hu
+
+## Sütik (Cookie) kezelése
+
+Weboldalunkon funkcionális sütik kerülnek alkalmazásra, melyek támogatják az oldal működését. Ezek munkamenet-sütik, amelyek érvényessége lejár az oldal bezárásakor. Bármely böngészőben letilthatók vagy törölhetők.
+
+## Google Analytics
+
+Az oldal teljesítményének mérésére Google Analytics szolgáltatást használnak statisztikai adatok gyűjtésére. Az adatok nem tartalmaznak személyes információkat, csak munkameneteket azonosítanak.
+
+## Megrendelés során kezelt adatok
+
+**Célja:** megrendelés teljesítése, jogszabályi követelmények teljesítése
+
+**Kezelt adatok:** név, cím, e-mail, telefonszám
+
+**Időtartam:** 8 év (számviteli előírások szerint)
+
+**Továbbítás:** Adóhatóság, kiszállító partnerek (GLS, MPL)
+
+## Hírlevél feliratkozás
+
+**Célja:** feliratkozók tájékoztatása
+
+**Kezelt adatok:** név, e-mail cím
+
+**Jogalapja:** önkéntes hozzájárulás
+
+**Leiratkozás:** bármikor lehetséges korlátozás nélkül
+
+**Szolgáltató:** MailChimp
+
+## Panaszkezelés során kezelt adatok
+
+**Célja:** vásárlói panaszok kivizsgálása
+
+**Kezelt adatok:** név, e-mail, telefonszám, cím
+
+**Megőrzési idő:** 3 év
+
+## Érdeklődés, kapcsolatfelvétel során kezelt adatok
+
+**Célja:** érdeklődők tájékoztatása
+
+**Kezelt adatok:** név, cégnév, e-mail, üzenet
+
+**Jogalapja:** önkéntes hozzájárulás
+
+**Megőrzési idő:** tájékoztatás után, vagy indokolt igény esetén legfeljebb 5 év
+
+## Adatfeldolgozók
+
+- **Szállítás:** GLS, MPL
+- **Hírlevél:** The Rocket Science Group LLC (MailChimp)
+
+## Az adatkezelés biztonsága
+
+Technikai és szervezeti intézkedéseket alkalmaznak az adatok jogosulatlan hozzáféréséből, módosításából, törlésből vagy nyilvánosságra hozatalából való védelme érdekében.
+
+## Az adatok továbbítása
+
+Személyes adatok harmadik feleknek csak jogszabály által kötelezően előírt hatósági megkeresés alapján továbbíthatók.
+
+## A tájékoztató felülvizsgálata
+
+A vállalat fenntartja a jogot a tájékoztató módosítására. Önkéntes hozzájárulás alapján kezelt adatok esetén módosításról előzetesen értesítik az érintetteket.

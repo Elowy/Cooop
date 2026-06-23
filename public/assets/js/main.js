@@ -52,6 +52,30 @@
         });
     }
 
+    // Cookie hozzájárulás (soft wall)
+    var cookieWall = document.querySelector('[data-cookie-wall]');
+    if (cookieWall) {
+        cookieWall.querySelectorAll('[data-cookie-accept]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var v = btn.getAttribute('data-cookie-accept');
+                document.cookie = 'nt_consent=' + v + ';path=/;max-age=' + (60 * 60 * 24 * 180) + ';samesite=lax';
+                cookieWall.classList.add('is-hidden');
+                setTimeout(function () { if (cookieWall.parentNode) { cookieWall.parentNode.removeChild(cookieWall); } }, 300);
+                if (v === 'all' && window.NT_GA && !window.__ntGa) {
+                    window.__ntGa = true;
+                    var s = document.createElement('script');
+                    s.async = true;
+                    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.NT_GA;
+                    document.head.appendChild(s);
+                    window.dataLayer = window.dataLayer || [];
+                    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+                    window.gtag('js', new Date());
+                    window.gtag('config', window.NT_GA);
+                }
+            });
+        });
+    }
+
     // Lebegő kapcsolati gomb
     var fab = document.querySelector('[data-fab]');
     var fabToggle = document.querySelector('[data-fab-toggle]');
