@@ -766,6 +766,34 @@ $router->post('/admin/beallitasok', static function () use ($guard, $settings, $
     return $redirect('/admin/beallitasok?mentve=1');
 });
 
+$router->get('/admin/seo', static function () use ($adminView, $guard, $settings, $config): string {
+    $guard();
+    $s = $settings->all();
+    return $adminView('admin/seo', 'seo', [
+        'title' => 'SEO',
+        'values' => [
+            'seo_title' => array_key_exists('seo_title', $s) ? (string) $s['seo_title'] : ($config['app']['name'] . ' — ' . $config['app']['tagline']),
+            'seo_description' => array_key_exists('seo_description', $s) ? (string) $s['seo_description'] : 'Net-Trade Hungary Kft. – egyedi raklapgyártás, ipari csomagolás, nemzetközi árufuvarozás és fűrészáru-nagykereskedelem.',
+            'seo_keywords' => (string) ($s['seo_keywords'] ?? ''),
+            'seo_og_image' => (string) ($s['seo_og_image'] ?? ''),
+        ],
+    ]);
+});
+
+$router->post('/admin/seo', static function () use ($guard, $settings, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $settings->saveMany([
+            'seo_title' => trim((string) ($_POST['seo_title'] ?? '')),
+            'seo_description' => trim((string) ($_POST['seo_description'] ?? '')),
+            'seo_keywords' => trim((string) ($_POST['seo_keywords'] ?? '')),
+            'seo_og_image' => trim((string) ($_POST['seo_og_image'] ?? '')),
+        ]);
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'SEO beállítások mentve.'];
+    }
+    return $redirect('/admin/seo');
+});
+
 $router->get('/admin/referenciak', static function () use ($adminView, $guard, $references): string {
     $guard();
     return $adminView('admin/references', 'references', ['title' => 'Referenciák', 'references' => $references->all()]);

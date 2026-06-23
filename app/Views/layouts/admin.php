@@ -22,6 +22,7 @@ $nav = [
     'integration' => ['/admin/integracio', 'Axel integráció', 'plug'],
     'users'       => ['/admin/felhasznalok', 'Felhasználók', 'users'],
     'settings'    => ['/admin/beallitasok', 'Beállítások', 'gear'],
+    'seo'         => ['/admin/seo', 'SEO', 'search'],
 ];
 ?>
 <!DOCTYPE html>
