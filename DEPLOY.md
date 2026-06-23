@@ -165,3 +165,39 @@ Ha nem akarsz IIS-sel bajlódni, a **Caddy** (https://caddyserver.com/) Windowso
 is fut, és **automatikus HTTPS**-t ad egyetlen `Caddyfile`-lal; a PHP-t
 `php_fastcgi`-val a `C:\php\php-cgi.exe`-hez kötve szolgálja ki. IIS mellett ez
 csak alternatíva — egyszerre az egyiket használd.
+
+---
+
+## Automatikus FTP deploy (GitHub Actions)
+
+A `.github/workflows/deploy.yml` minden **`main` ágra való push** után FTP-vel
+kitelepíti a weboldalt a tárhelyre (cPanel). Kézzel is indítható az Actions fülön.
+
+### 1. FTP titkok beállítása
+GitHub → a repó **Settings → Secrets and variables → Actions → New repository secret**,
+és vedd fel ezeket:
+
+| Titok neve        | Érték                                                        |
+|-------------------|-------------------------------------------------------------|
+| `FTP_SERVER`      | az FTP szerver címe (pl. `ftp.a-domained.hu`)               |
+| `FTP_USERNAME`    | az FTP felhasználónév (cPanelben hozhatsz létre FTP-fiókot) |
+| `FTP_PASSWORD`    | az FTP jelszó                                                |
+| `FTP_REMOTE_DIR`  | *(opcionális)* célmappa, pl. `/public_html/` vagy `/nettrade/` (alapért.: `./`) |
+
+> Amíg a három kötelező titok nincs beállítva, a workflow **lefut, de a deployt
+> kihagyja** (csak figyelmeztet) — nem lesz piros hiba.
+
+### 2. Célmappa (`FTP_REMOTE_DIR`)
+- Ha a domain **document rootja a projekt `public/` mappája**, akkor a teljes
+  projektet egy szülőmappába töltsd (pl. `/nettrade/`), és a docrootot oda állítsd.
+- Ha a tárhely **fix `public_html`** és oda kell a projekt gyökere, akkor
+  `FTP_REMOTE_DIR=/public_html/` — a gyökér `.htaccess` viszi a `public/` alá.
+
+### 3. Amit a deploy NEM bánt
+A workflow kihagyja (sosem törli/írja felül a szerveren): `config/config.local.php`
+(titkok), `storage/**` (rendelések, üzenetek), `.github/`, `.git*`, `*.md`.
+Csak a megváltozott fájlokat tölti fel (inkrementális szinkron).
+
+### 4. FTPS vs FTP
+A workflow alapból **`ftps`** (titkosított). Ha a tárhely csak sima FTP-t tud
+vagy TLS-hibát ad, a `deploy.yml`-ben írd át a `protocol`-t `ftp`-re.
