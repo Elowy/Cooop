@@ -10,8 +10,11 @@ config/config.local.php
 *.log
 /tmp/
 
-# Helyi adat (rendelések, Axel-csere)
+# Helyi adat (rendelések, üzenetek, beállítások, Axel-csere)
 /storage/
+
+# Feltöltött fájlok (referencia-logók stb.)
+/public/uploads/
 
 # Szerkesztő / OS
 .DS_Store

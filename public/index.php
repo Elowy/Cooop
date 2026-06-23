@@ -27,6 +27,8 @@ use App\Integration\MockAxelGateway;
 use App\Message\MessageStore;
 use App\Order\OrderStore;
 use App\Payment\MockPaymentGateway;
+use App\Reference\ReferenceStore;
+use App\Settings\SettingsStore;
 
 $config = require dirname(__DIR__) . '/config/config.php';
 
@@ -53,6 +55,32 @@ $cats = new Categories();
 // Rendeléstár, üzenettár és fizetési szolgáltató (utóbbi a config alapján választva).
 $orders = new OrderStore($config['shop']['orders_dir']);
 $messages = new MessageStore($config['contact']['messages_dir']);
+
+// Oldal-beállítások és referenciák.
+$settings = new SettingsStore();
+$references = new ReferenceStore();
+
+// Referencia-logó feltöltése a public/uploads/references mappába.
+$uploadsDir = dirname(__DIR__) . '/public/uploads/references';
+$uploadLogo = static function (array $file) use ($uploadsDir): ?string {
+    if (($file['error'] ?? 1) !== UPLOAD_ERR_OK || empty($file['tmp_name'])) {
+        return null;
+    }
+    if (($file['size'] ?? 0) > 3 * 1024 * 1024) {
+        return null; // max 3 MB
+    }
+    $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    $info = @getimagesize($file['tmp_name']);
+    $mime = $info['mime'] ?? '';
+    if (!isset($allowed[$mime])) {
+        return null;
+    }
+    if (!is_dir($uploadsDir)) {
+        @mkdir($uploadsDir, 0775, true);
+    }
+    $name = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
+    return move_uploaded_file($file['tmp_name'], $uploadsDir . '/' . $name) ? $name : null;
+};
 $payment = match ($config['shop']['payment'] ?? 'mock') {
     // 'simplepay' => new App\Payment\SimplePayGateway(...),  // éles bekötéskor
     default => new MockPaymentGateway(),
@@ -94,8 +122,17 @@ $router->get('/', static fn (): string => View::render('home', [
     'title' => null,
     'featured' => array_slice($axel->products(), 0, 3),
     'topCats' => $cats->topLevel(),
-    'partners' => require dirname(__DIR__) . '/config/partners.php',
+    'references' => $references->all(),
 ]));
+
+$router->get('/referencia/{id}', static function (array $params) use ($references): string {
+    $ref = $references->find((int) ($params['id'] ?? 0));
+    if ($ref === null) {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'A referencia nem található']);
+    }
+    return View::render('reference', ['title' => (string) $ref['name'], 'ref' => $ref]);
+});
 
 $router->get('/kapcsolat', static function (): string {
     return View::render('contact', [
@@ -502,6 +539,85 @@ $router->get('/admin/integracio', static function () use ($adminView, $guard): s
 $router->get('/admin/uzenetek', static function () use ($adminView, $guard, $messages): string {
     $guard();
     return $adminView('admin/messages', 'messages', ['title' => 'Üzenetek', 'messages' => $messages->all()]);
+});
+
+$router->get('/admin/beallitasok', static function () use ($adminView, $guard, $settings, $config): string {
+    $guard();
+    $s = $settings->all();
+    return $adminView('admin/settings', 'settings', [
+        'title' => 'Beállítások',
+        'saved' => isset($_GET['mentve']),
+        'values' => [
+            'contact_messenger' => $s['contact_messenger'] ?? '',
+            'contact_viber' => $s['contact_viber'] ?? '',
+            'contact_email' => array_key_exists('contact_email', $s) ? $s['contact_email'] : $config['contact']['email'],
+            'contact_phone' => array_key_exists('contact_phone', $s) ? $s['contact_phone'] : $config['contact']['phone'],
+        ],
+    ]);
+});
+
+$router->post('/admin/beallitasok', static function () use ($guard, $settings, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $settings->saveMany([
+            'contact_messenger' => trim((string) ($_POST['contact_messenger'] ?? '')),
+            'contact_viber' => trim((string) ($_POST['contact_viber'] ?? '')),
+            'contact_email' => trim((string) ($_POST['contact_email'] ?? '')),
+            'contact_phone' => trim((string) ($_POST['contact_phone'] ?? '')),
+        ]);
+    }
+    return $redirect('/admin/beallitasok?mentve=1');
+});
+
+$router->get('/admin/referenciak', static function () use ($adminView, $guard, $references): string {
+    $guard();
+    return $adminView('admin/references', 'references', ['title' => 'Referenciák', 'references' => $references->all()]);
+});
+
+$router->get('/admin/referenciak/szerkesztes', static function () use ($adminView, $guard, $references): string {
+    $guard();
+    $id = (int) ($_GET['id'] ?? 0);
+    $ref = $id > 0 ? $references->find($id) : null;
+    return $adminView('admin/reference-edit', 'references', [
+        'title' => $ref ? 'Referencia szerkesztése' : 'Új referencia',
+        'ref' => $ref,
+    ]);
+});
+
+$router->post('/admin/referenciak/mentes', static function () use ($guard, $references, $uploadLogo, $redirect): string {
+    $guard();
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/referenciak');
+    }
+    $id = (int) ($_POST['id'] ?? 0);
+    $existing = $id > 0 ? $references->find($id) : null;
+    $ref = [
+        'name' => trim((string) ($_POST['name'] ?? '')),
+        'short' => trim((string) ($_POST['short'] ?? '')),
+        'long' => trim((string) ($_POST['long'] ?? '')),
+        'logo' => $existing['logo'] ?? '',
+    ];
+    if ($id > 0) {
+        $ref['id'] = $id;
+    }
+    if (isset($_FILES['logo']) && ($_FILES['logo']['error'] ?? 4) === UPLOAD_ERR_OK) {
+        $uploaded = $uploadLogo($_FILES['logo']);
+        if ($uploaded !== null) {
+            $ref['logo'] = $uploaded;
+        }
+    }
+    if ($ref['name'] !== '') {
+        $references->save($ref);
+    }
+    return $redirect('/admin/referenciak');
+});
+
+$router->post('/admin/referenciak/torles', static function () use ($guard, $references, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $references->delete((int) ($_POST['id'] ?? 0));
+    }
+    return $redirect('/admin/referenciak');
 });
 
 echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

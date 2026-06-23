@@ -15,7 +15,9 @@ $nav = [
     'categories'  => ['/admin/kategoriak', 'Kategóriák', 'tree'],
     'orders'      => ['/admin/rendelesek', 'Rendelések', 'cart'],
     'messages'    => ['/admin/uzenetek', 'Üzenetek', 'mail'],
+    'references'  => ['/admin/referenciak', 'Referenciák', 'star'],
     'integration' => ['/admin/integracio', 'Axel integráció', 'plug'],
+    'settings'    => ['/admin/beallitasok', 'Beállítások', 'gear'],
 ];
 ?>
 <!DOCTYPE html>

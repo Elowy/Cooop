@@ -633,3 +633,58 @@ a.panel-link:hover { color: var(--gold-2); }
 @media (max-width: 860px) {
     .contact-grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   Lebegő kapcsolati gomb, referenciák, admin kiegészítések
+   ========================================================================== */
+
+/* admin nav ikonok */
+[data-aico="star"] { --aico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l2.9 6.3 6.9.6-5.2 4.5 1.6 6.7L12 17l-6.2 3.1 1.6-6.7L2.2 8.9l6.9-.6z'/%3E%3C/svg%3E"); }
+[data-aico="gear"] { --aico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 6.2h18v1.6H3z M14 4.5h3v5h-3z M3 11.2h18v1.6H3z M6 9.5h3v5H6z M3 16.2h18v1.6H3z M11 14.5h3v5h-3z'/%3E%3C/svg%3E"); }
+
+/* Lebegő kapcsolati gomb (FAB) */
+.contact-fab { position: fixed; right: 22px; bottom: 22px; z-index: 70; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.fab-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; opacity: 0; transform: translateY(12px) scale(.96); transform-origin: bottom right; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+.contact-fab.is-open .fab-menu { opacity: 1; transform: none; pointer-events: auto; }
+.fab-item { display: inline-flex; align-items: center; gap: 12px; padding: 7px 14px 7px 7px; background: rgba(20, 21, 15, .96); border: 1px solid var(--line); border-radius: 999px; color: var(--text); font-weight: 600; font-size: .9rem; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); }
+.fab-item:hover { border-color: var(--line-gold); color: var(--text); }
+.fab-ico { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; }
+.fab-ico::before { content: ""; width: 19px; height: 19px; background: #fff; -webkit-mask: center/contain no-repeat; mask: center/contain no-repeat; -webkit-mask-image: var(--ch); mask-image: var(--ch); }
+.fab-ico[data-ch="messenger"] { background: #0084ff; --ch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.13 2 11.2c0 2.88 1.44 5.45 3.7 7.14V22l3.38-1.85c.9.25 1.86.39 2.92.39 5.52 0 10-4.13 10-9.2C22 6.13 17.52 2 12 2z'/%3E%3C/svg%3E"); }
+.fab-ico[data-ch="viber"] { background: #7360f2; --ch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E"); }
+.fab-ico[data-ch="email"] { background: linear-gradient(135deg, var(--gold-2), var(--gold)); --ch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5z'/%3E%3C/svg%3E"); }
+.fab-ico[data-ch="phone"] { background: #22a06b; --ch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E"); }
+.fab-toggle { width: 60px; height: 60px; border-radius: 50%; border: 0; cursor: pointer; background: linear-gradient(135deg, var(--gold-2), var(--gold)); box-shadow: 0 10px 28px rgba(203, 161, 78, .4); display: grid; place-items: center; transition: transform .15s ease; }
+.fab-toggle:hover { transform: translateY(-2px); }
+.fab-ico-main, .fab-ico-close { width: 26px; height: 26px; background: #1c1709; -webkit-mask: center/contain no-repeat; mask: center/contain no-repeat; }
+.fab-ico-main { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 4h16v12H8l-4 4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 4h16v12H8l-4 4z'/%3E%3C/svg%3E"); }
+.fab-ico-close { display: none; -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 6.4L6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 6.4L6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12z'/%3E%3C/svg%3E"); }
+.contact-fab.is-open .fab-ico-main { display: none; }
+.contact-fab.is-open .fab-ico-close { display: block; }
+
+/* Referenciák */
+.reference-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+.reference-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; color: var(--text); transition: border-color .15s, transform .15s; }
+.reference-card:hover { border-color: var(--line-gold); transform: translateY(-4px); color: var(--text); }
+.reference-logo { width: 84px; height: 84px; border-radius: 12px; background: #fff; display: grid; place-items: center; overflow: hidden; }
+.reference-logo img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 8px; }
+.reference-monogram { width: 84px; height: 84px; border-radius: 12px; display: grid; place-items: center; font-family: var(--serif); font-weight: 600; font-size: 2rem; color: #1c1709; background: linear-gradient(135deg, var(--gold-2), var(--gold)); }
+.reference-monogram--sm { width: 40px; height: 40px; border-radius: 9px; font-size: 1.1rem; }
+.reference-monogram--lg { width: 120px; height: 120px; border-radius: 16px; font-size: 3rem; }
+.reference-name { font-family: var(--serif); font-weight: 600; }
+.reference-note { color: var(--muted); font-size: .85rem; }
+
+.reference-detail { display: flex; gap: 24px; align-items: center; margin-bottom: 24px; }
+.reference-detail-logo { width: 120px; height: 120px; border-radius: 16px; background: #fff; display: grid; place-items: center; overflow: hidden; flex: 0 0 auto; }
+.reference-detail-logo img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 10px; }
+.reference-detail-short { color: var(--muted); margin: 6px 0 0; }
+.reference-detail-body { color: var(--text); line-height: 1.8; margin-bottom: 28px; }
+
+/* admin referenciák */
+.admin-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+.ref-thumb { width: 48px; height: 48px; border-radius: 8px; background: #fff; object-fit: contain; padding: 3px; vertical-align: middle; }
+
+@media (max-width: 520px) {
+    .reference-detail { flex-direction: column; text-align: center; }
+    .contact-fab { right: 16px; bottom: 16px; }
+}

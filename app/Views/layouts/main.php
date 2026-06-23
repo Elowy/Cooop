@@ -28,6 +28,7 @@ $pageTitle = isset($title) && $title ? "{$title} â€” {$appName}" : "{$appName} â
     <?= $content ?>
 </main>
 
+<?php include dirname(__DIR__) . '/partials/contact-widget.php'; ?>
 <?php include dirname(__DIR__) . '/partials/footer.php'; ?>
 
 <script src="/assets/js/main.js" defer></script>

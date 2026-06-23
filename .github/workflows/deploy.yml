@@ -50,3 +50,4 @@ jobs:
             **/*.md
             config/config.local.php
             storage/**
+            public/uploads/**

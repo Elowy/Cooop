@@ -6,7 +6,7 @@ use App\Integration\Product;
 /** @var array<string, mixed> $config */
 /** @var Product[] $featured */
 /** @var array<int, array<string, mixed>> $topCats */
-/** @var array<int, array<string, mixed>> $partners */
+/** @var array<int, array<string, mixed>> $references */
 
 // Megjelenítési adatok a fő kategóriákhoz (ikon + rövid leírás).
 $catMeta = [
@@ -18,7 +18,7 @@ $catMeta = [
 
 $stats = [
     ['n' => '30+', 'l' => 'év tapasztalat'],
-    ['n' => (string) count($partners), 'l' => 'partnercég'],
+    ['n' => (string) count($references), 'l' => 'referencia'],
     ['n' => '5', 'l' => 'fő tevékenység'],
     ['n' => '3', 'l' => 'szállítási mód'],
 ];
@@ -138,25 +138,34 @@ $stats = [
     </div>
 </section>
 
-<section class="section" id="partnerek">
+<?php if (!empty($references)): ?>
+<section class="section" id="referenciak">
     <div class="container">
         <header class="section-head reveal">
             <p class="eyebrow"><span class="eyebrow-dot"></span> Referenciák</p>
-            <h2 class="display">Partnereink</h2>
-            <p class="section-sub">Akiknek dolgozunk – az iparág meghatározó szereplői.</p>
+            <h2 class="display">Akiknek dolgozunk</h2>
+            <p class="section-sub">Válogatás partnereink és referenciáink közül – kattints a részletekért.</p>
         </header>
-        <div class="partner-grid reveal">
-            <?php foreach ($partners as $partner): ?>
-                <div class="partner">
-                    <span class="partner-name"><?= View::e((string) $partner['name']) ?></span>
-                    <?php if (!empty($partner['note'])): ?>
-                        <span class="partner-note"><?= View::e((string) $partner['note']) ?></span>
+        <div class="reference-grid">
+            <?php foreach ($references as $ref): ?>
+                <a class="reference-card reveal" href="/referencia/<?= (int) $ref['id'] ?>">
+                    <span class="reference-logo">
+                        <?php if (!empty($ref['logo'])): ?>
+                            <img src="/uploads/references/<?= View::e((string) $ref['logo']) ?>" alt="<?= View::e((string) $ref['name']) ?>" loading="lazy">
+                        <?php else: ?>
+                            <span class="reference-monogram"><?= View::e(mb_strtoupper(mb_substr((string) $ref['name'], 0, 1))) ?></span>
+                        <?php endif; ?>
+                    </span>
+                    <span class="reference-name"><?= View::e((string) $ref['name']) ?></span>
+                    <?php if (!empty($ref['short'])): ?>
+                        <span class="reference-note"><?= View::e((string) $ref['short']) ?></span>
                     <?php endif; ?>
-                </div>
+                </a>
             <?php endforeach; ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <section class="cta">
     <div class="container cta-inner reveal">

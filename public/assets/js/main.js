@@ -26,6 +26,23 @@
         window.addEventListener('scroll', onScroll, { passive: true });
     }
 
+    // Lebegő kapcsolati gomb
+    var fab = document.querySelector('[data-fab]');
+    var fabToggle = document.querySelector('[data-fab-toggle]');
+    if (fab && fabToggle) {
+        fabToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = fab.classList.toggle('is-open');
+            fabToggle.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', function (e) {
+            if (!fab.contains(e.target)) {
+                fab.classList.remove('is-open');
+                fabToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     // Pénztár: szállítási mezők ki/be
     var shipToggle = document.querySelector('[data-ship-toggle]');
     var shipFields = document.querySelector('[data-ship-fields]');
