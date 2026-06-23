@@ -134,16 +134,48 @@
         });
     }
 
-    // Belépő animációk
+    // Szám-számláló (statisztika)
+    var animateCount = function (el) {
+        if (el.dataset.counted) { return; }
+        var m = (el.textContent || '').trim().match(/^(\d+)(.*)$/);
+        if (!m) { return; }
+        el.dataset.counted = '1';
+        var target = parseInt(m[1], 10), suffix = m[2] || '';
+        if (reduceMotion || target === 0) { el.textContent = target + suffix; return; }
+        var start = performance.now(), dur = 1100;
+        var step = function (now) {
+            var p = Math.min((now - start) / dur, 1);
+            var val = Math.round(target * (0.5 - Math.cos(p * Math.PI) / 2));
+            el.textContent = val + suffix;
+            if (p < 1) { window.requestAnimationFrame(step); }
+        };
+        window.requestAnimationFrame(step);
+    };
+
+    // Belépő animációk (lépcsőzetes)
+    ['.card-grid', '.reference-grid', '.team-grid', '.kpi-grid'].forEach(function (sel) {
+        document.querySelectorAll(sel).forEach(function (grid) {
+            grid.querySelectorAll('.reveal').forEach(function (el, i) {
+                el.style.transitionDelay = Math.min(i * 70, 420) + 'ms';
+            });
+        });
+    });
+
     var reveals = document.querySelectorAll('.reveal');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || !('IntersectionObserver' in window)) {
-        reveals.forEach(function (el) { el.classList.add('is-visible'); });
+        reveals.forEach(function (el) {
+            el.classList.add('is-visible');
+            el.querySelectorAll('.stat-n').forEach(animateCount);
+        });
     } else {
         var io = new IntersectionObserver(function (entries, obs) {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
+                    entry.target.querySelectorAll('.stat-n').forEach(animateCount);
+                    var t = entry.target;
+                    setTimeout(function () { t.style.transitionDelay = ''; }, 700);
                     obs.unobserve(entry.target);
                 }
             });

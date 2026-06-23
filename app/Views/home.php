@@ -180,7 +180,7 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
         m.bindPopup(html);
         group.push(m);
     });
-    if (group.length) { map.fitBounds(L.featureGroup(group).getBounds().pad(0.3)); }
+    if (group.length) { map.fitBounds(L.featureGroup(group).getBounds(), { padding: [36, 36], maxZoom: 6 }); }
 })();
 </script>
 <?php endif; ?>
@@ -304,7 +304,7 @@ $teamDir = dirname(__DIR__, 2) . '/public/uploads/team/';
             <div class="team-grid">
                 <?php foreach ($leaders as $p):
                     $hasPhoto = !empty($p['photo']) && is_file($teamDir . $p['photo']); ?>
-                    <article class="team-card">
+                    <article class="team-card reveal">
                         <div class="team-photo">
                             <?php if ($hasPhoto): ?>
                                 <img src="/uploads/team/<?= View::e((string) $p['photo']) ?>" alt="<?= View::e((string) $p['name']) ?>" loading="lazy">

@@ -682,9 +682,33 @@ $router->get('/admin/rendeles/{token}', static function (array $params) use ($ad
     return $adminView('admin/order', 'orders', ['title' => 'Rendelés · ' . ($order['number'] ?? ''), 'order' => $order]);
 });
 
-$router->get('/admin/integracio', static function () use ($adminView, $guard): string {
+$router->get('/admin/integracio', static function () use ($adminView, $guard, $settings, $config): string {
     $guard();
-    return $adminView('admin/integration', 'integration', ['title' => 'Axel integráció']);
+    $s = $settings->all();
+    return $adminView('admin/integration', 'integration', [
+        'title' => 'Axel integráció',
+        'values' => [
+            'gateway' => (string) ($s['axel_gateway'] ?? ($config['axel']['gateway'] ?? 'mock')),
+            'exchange_dir' => (string) ($s['axel_exchange_dir'] ?? ($config['axel']['exchange_dir'] ?? '')),
+            'api_url' => (string) ($s['axel_api_url'] ?? ''),
+            'api_key' => (string) ($s['axel_api_key'] ?? ''),
+        ],
+    ]);
+});
+
+$router->post('/admin/integracio', static function () use ($guard, $settings, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $gateway = in_array($_POST['gateway'] ?? 'mock', ['mock', 'xml', 'rest'], true) ? (string) $_POST['gateway'] : 'mock';
+        $settings->saveMany([
+            'axel_gateway' => $gateway,
+            'axel_exchange_dir' => trim((string) ($_POST['exchange_dir'] ?? '')),
+            'axel_api_url' => trim((string) ($_POST['api_url'] ?? '')),
+            'axel_api_key' => trim((string) ($_POST['api_key'] ?? '')),
+        ]);
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Axel beállítások mentve.'];
+    }
+    return $redirect('/admin/integracio');
 });
 
 $router->get('/admin/uzenetek', static function () use ($adminView, $guard, $messages): string {
