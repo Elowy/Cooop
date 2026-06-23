@@ -63,8 +63,16 @@ $pdo = null;
 if ($config['installed']) {
     try {
         $pdo = Database::instance($config['db']);
+        // Hiányzó táblák pótlása (pl. új funkció utáni deploy után), idempotens.
+        Schema::create($pdo, (string) ($config['db']['driver'] ?? 'mysql'));
+        // Az újonnan létrejött táblák egyszeri feltöltése a meglévő tartalomból.
+        $boot = new SettingsStore($pdo);
+        if (!$boot->has('seed_done')) {
+            Importer::run($pdo);
+            $boot->saveMany(['seed_done' => '1']);
+        }
     } catch (\Throwable $e) {
-        $pdo = null; // DB nem elérhető
+        $pdo = null; // DB nem elérhető vagy nincs jog – fájl-módra esünk vissza
     }
 }
 
