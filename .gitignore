@@ -1,9 +1,10 @@
 # Függőségek
 /vendor/
 
-# Környezeti változók
+# Környezeti változók / helyi konfiguráció
 .env
 .env.local
+config/config.local.php
 
 # Logok és ideiglenes fájlok
 *.log

@@ -30,12 +30,19 @@ $config = require dirname(__DIR__) . '/config/config.php';
 if ($config['app']['debug']) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
+} else {
+    ini_set('display_errors', '0');
+    ini_set('log_errors', '1');
 }
 
 session_start();
 
-// Az Axel-kapu egyetlen példánya. Éles bekötéskor itt cseréljük a megvalósítást.
-$axel = new MockAxelGateway();
+// Az Axel-kapu. A config 'gateway' alapján választunk megvalósítást; éles
+// bekötéskor az 'xml' (helyi mappás) vagy 'rest' adapter kerül a mock helyére.
+$axel = match ($config['axel']['gateway'] ?? 'mock') {
+    // 'xml' => new App\Integration\XmlAxelGateway($config['axel']['exchange_dir']),
+    default => new MockAxelGateway(),
+};
 
 // Kategóriafa (config/categories.php).
 $cats = new Categories();

@@ -1,40 +1,58 @@
-# Net-Trade Hungary – weboldal
+# Net-Trade Hungary – webáruház
 
-A [net-trade.hu](https://net-trade.hu) cég profiljára épülő, saját fejlesztésű
-PHP weboldal. **Teljes újraírás alatt** – jelenleg a **sötét, prémium dizájnú
-főoldal** készült el (1. kör). A tartalom egyelőre vázlat / placeholder.
+Saját fejlesztésű PHP webáruház (keretrendszer nélkül), **sötét, prémium**
+dizájnnal. A készlet és a számlázás később az **Axel Pro** ügyviteli programhoz
+kapcsolódik (egy adapter-interfészen át). A tartalom egyelőre vázlat / placeholder.
 
 ## Felépítés
 
 ```
 app/
-  Core/        Router, View
-  Views/       layouts/, partials/, home.php, errors/
-config/        config.php
-public/        webgyökér (index.php, .htaccess, assets/)
-.htaccess      tartalék átirányítás, ha a webgyökér a projekt gyökere
+  Core/         Router, View, Cart, Csrf, Auth
+  Catalog/      Categories (kategóriafa)
+  Integration/  AxelGateway (interfész) + Product, InvoiceResult, MockAxelGateway
+  Views/        layouts/, partials/, home, shop/, cart/, admin/, errors/
+config/         config.php, categories.php, catalog.php, config.local.php(.example)
+public/         webgyökér (index.php, .htaccess, web.config, assets/)
+DEPLOY.md       telepítés Windows Server VPS-re (IIS + PHP + HTTPS + Axel)
 ```
 
-A webszerver gyökerét a **`public/`** mappára kell állítani (vagy használd a
-gyökér `.htaccess`-t, ami a `public/` alá irányít).
+A webszerver gyökerét a **`public/`** mappára kell állítani.
 
-## Futtatás
+## Futtatás (helyi fejlesztés)
 
 ```bash
 php -S localhost:8000 -t public
 ```
+- Webáruház: http://localhost:8000/webshop
+- Vezérlőpult: http://localhost:8000/admin (alapértelmezett jelszó: `admin`)
+- Hibakijelzéshez: `APP_DEBUG=true php -S localhost:8000 -t public`
 
-Majd nyisd meg: http://localhost:8000
+## Konfiguráció
 
-## Dizájn
+A `config/config.php` az alapértékeket adja; ezeket felülírhatod
+- környezeti változókkal (`APP_URL`, `APP_DEBUG`, `ADMIN_PASSWORD`, `AXEL_DIR`…), vagy
+- egy `config/config.local.php` fájllal (másold a `.example`-ből). Ez nem kerül
+  verziókövetésbe, és Windows/IIS alatt kényelmesebb a titkok/útvonalak megadására.
 
-- Sötét, prémium megjelenés, **arany/amber** kiemelésekkel
-- Display címsorok szerif betűtípussal, törzsszöveg rendszer-sans-szal
-- Nagy hero, finom belépő animációk (`prefers-reduced-motion` figyelve)
-- Reszponzív, mobil menüvel; külső kép-/betűtípus-függőség nélkül (egyedi SVG-k)
+## Funkciók (eddig)
+
+- **Főoldal**: hero, fő kategóriák, „Rólunk", CTA – egyedi SVG-kkel, animációkkal.
+- **Webáruház**: hierarchikus kategóriafa (oldalsáv + morzsamenü), termékoldal,
+  munkamenet-kosár (CSRF-fel).
+- **Vezérlőpult** (`/admin`): belépés, készlet/termék áttekintés, kategóriák,
+  rendelések (placeholder), Axel-integráció állapot.
+- **Axel adapter**: a shop egyetlen interfészen (`App\Integration\AxelGateway`)
+  beszél az Axellel; jelenleg `MockAxelGateway`, később `xml`/`rest` adapter.
+
+## Telepítés
+
+Lásd **[DEPLOY.md](DEPLOY.md)** – teljes Windows Server (IIS + PHP) telepítés,
+domain + Let's Encrypt HTTPS, és az Axel Pro helyi mappás integrációja
+(ugyanazon a VPS-en futó Axelhez).
 
 ## Következő körök (terv)
 
-- Aloldalak (Tevékenységek, Rólunk, Kapcsolat) külön oldalakon
-- Végleges szövegek és képek
-- Igény szerint: termékkatalógus, többnyelvűség, admin, adatbázis
+- Pénztár: online fizetés + rendelés-megerősítés, rendelések a vezérlőpulton.
+- Éles Axel-bekötés: `XmlAxelGateway` (helyi mappás) – rendelés → számla + NAV.
+- Készlet-szinkron ütemezve; valódi termékadatok betöltése.

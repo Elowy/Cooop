@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * PÉLDA helyi konfiguráció.
+ *
+ * Telepítéskor másold át "config.local.php" néven (ugyanebbe a mappába),
+ * és töltsd ki a saját értékeiddel. Ez a fájl felülírja a config.php-ban
+ * megadott alapértékeket, és NEM kerül a verziókövetésbe.
+ *
+ *   copy config\config.local.php.example config\config.local.php   (Windows)
+ */
+
+return [
+    'app' => [
+        'url'   => 'https://a-te-domained.hu',
+        'debug' => false, // élesben mindig false
+    ],
+
+    'admin' => [
+        // Erős, egyedi jelszó a vezérlőpulthoz!
+        'password' => 'ide-egy-eros-jelszo',
+    ],
+
+    'axel' => [
+        'gateway'      => 'mock',              // később: 'xml'
+        'exchange_dir' => 'C:\\axel-exchange', // az Axellel közös helyi mappa
+    ],
+];
