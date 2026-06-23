@@ -28,6 +28,7 @@ use App\Db\Importer;
 use App\Db\Schema;
 use App\User\UserRepository;
 use App\Integration\MockAxelGateway;
+use App\Leader\LeaderStore;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
 use App\Order\OrderStore;
@@ -73,11 +74,11 @@ $messages = new MessageStore($pdo, $config['contact']['messages_dir']);
 $settings = new SettingsStore($pdo);
 $references = new ReferenceStore($pdo);
 $pois = new PoiStore($pdo);
+$leaders = new LeaderStore($pdo);
 $users = $pdo ? new UserRepository($pdo) : null;
 
-// Referencia-logó feltöltése a public/uploads/references mappába.
-$uploadsDir = dirname(__DIR__) . '/public/uploads/references';
-$uploadLogo = static function (array $file) use ($uploadsDir): ?string {
+// Általános képfeltöltő (referencia-logó, vezető-fotó) a megadott mappába.
+$uploadImage = static function (array $file, string $dir): ?string {
     if (($file['error'] ?? 1) !== UPLOAD_ERR_OK || empty($file['tmp_name'])) {
         return null;
     }
@@ -90,11 +91,11 @@ $uploadLogo = static function (array $file) use ($uploadsDir): ?string {
     if (!isset($allowed[$mime])) {
         return null;
     }
-    if (!is_dir($uploadsDir)) {
-        @mkdir($uploadsDir, 0775, true);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
     }
     $name = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
-    return move_uploaded_file($file['tmp_name'], $uploadsDir . '/' . $name) ? $name : null;
+    return move_uploaded_file($file['tmp_name'], $dir . '/' . $name) ? $name : null;
 };
 $payment = match ($config['shop']['payment'] ?? 'mock') {
     // 'simplepay' => new App\Payment\SimplePayGateway(...),  // éles bekötéskor
@@ -133,7 +134,7 @@ $redirect = static function (string $to): string {
 
 $router = new Router();
 
-$router->get('/', static function () use ($axel, $cats, $references): string {
+$router->get('/', static function () use ($axel, $cats, $references, $leaders): string {
     $flash = $_SESSION['_flash_contact'] ?? [];
     unset($_SESSION['_flash_contact']);
     return View::render('home', [
@@ -141,7 +142,7 @@ $router->get('/', static function () use ($axel, $cats, $references): string {
         'featured' => array_slice($axel->products(), 0, 3),
         'topCats' => $cats->topLevel(),
         'references' => $references->all(),
-        'leaders' => require dirname(__DIR__) . '/config/leaders.php',
+        'leaders' => $leaders->all(),
         'contactSent' => !empty($flash['sent']),
         'contactErrors' => $flash['errors'] ?? [],
         'contactOld' => $flash['old'] ?? [],
@@ -772,7 +773,7 @@ $router->get('/admin/referenciak/szerkesztes', static function () use ($adminVie
     ]);
 });
 
-$router->post('/admin/referenciak/mentes', static function () use ($guard, $references, $uploadLogo, $redirect): string {
+$router->post('/admin/referenciak/mentes', static function () use ($guard, $references, $uploadImage, $redirect): string {
     $guard();
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/referenciak');
@@ -789,7 +790,7 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
         $ref['id'] = $id;
     }
     if (isset($_FILES['logo']) && ($_FILES['logo']['error'] ?? 4) === UPLOAD_ERR_OK) {
-        $uploaded = $uploadLogo($_FILES['logo']);
+        $uploaded = $uploadImage($_FILES['logo'], dirname(__DIR__) . '/public/uploads/references');
         if ($uploaded !== null) {
             $ref['logo'] = $uploaded;
         }
@@ -798,6 +799,58 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
         $references->save($ref);
     }
     return $redirect('/admin/referenciak');
+});
+
+$router->get('/admin/vezetok', static function () use ($adminView, $guard, $leaders): string {
+    $guard();
+    return $adminView('admin/leaders', 'leaders', ['title' => 'Vezetők', 'leaders' => $leaders->all()]);
+});
+
+$router->get('/admin/vezetok/szerkesztes', static function () use ($adminView, $guard, $leaders): string {
+    $guard();
+    $id = (int) ($_GET['id'] ?? 0);
+    $leader = $id > 0 ? $leaders->find($id) : null;
+    return $adminView('admin/leader-edit', 'leaders', [
+        'title' => $leader ? 'Vezető szerkesztése' : 'Új vezető',
+        'leader' => $leader,
+    ]);
+});
+
+$router->post('/admin/vezetok/mentes', static function () use ($guard, $leaders, $uploadImage, $redirect): string {
+    $guard();
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/vezetok');
+    }
+    $id = (int) ($_POST['id'] ?? 0);
+    $existing = $id > 0 ? $leaders->find($id) : null;
+    $leader = [
+        'name' => trim((string) ($_POST['name'] ?? '')),
+        'role' => trim((string) ($_POST['role'] ?? '')),
+        'phone' => trim((string) ($_POST['phone'] ?? '')),
+        'email' => trim((string) ($_POST['email'] ?? '')),
+        'photo' => $existing['photo'] ?? '',
+    ];
+    if ($id > 0) {
+        $leader['id'] = $id;
+    }
+    if (isset($_FILES['photo']) && ($_FILES['photo']['error'] ?? 4) === UPLOAD_ERR_OK) {
+        $uploaded = $uploadImage($_FILES['photo'], dirname(__DIR__) . '/public/uploads/team');
+        if ($uploaded !== null) {
+            $leader['photo'] = $uploaded;
+        }
+    }
+    if ($leader['name'] !== '') {
+        $leaders->save($leader);
+    }
+    return $redirect('/admin/vezetok');
+});
+
+$router->post('/admin/vezetok/torles', static function () use ($guard, $leaders, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $leaders->delete((int) ($_POST['id'] ?? 0));
+    }
+    return $redirect('/admin/vezetok');
 });
 
 $router->post('/admin/referenciak/torles', static function () use ($guard, $references, $redirect): string {

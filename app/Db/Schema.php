@@ -67,6 +67,16 @@ final class Schema
                 created_at VARCHAR(40) NOT NULL,
                 data $txt NOT NULL
             )$suffix",
+
+            "CREATE TABLE IF NOT EXISTS leaders (
+                id $id,
+                name VARCHAR(190) NOT NULL,
+                role VARCHAR(190) NOT NULL DEFAULT '',
+                phone VARCHAR(100) NOT NULL DEFAULT '',
+                email VARCHAR(190) NOT NULL DEFAULT '',
+                photo VARCHAR(255) NOT NULL DEFAULT '',
+                created_at VARCHAR(40) NOT NULL
+            )$suffix",
         ];
 
         foreach ($tables as $sql) {

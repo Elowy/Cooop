@@ -26,6 +26,7 @@ $config = [
         'person'       => 'Nagy László (projektvezető)',
         'address'      => '2660 Balassagyarmat, Mártírok útja 72.',
         'hours'        => 'Hétfő–Péntek 8:00–16:00 · Hétvégén zárva',
+        'map_url'      => 'https://maps.app.goo.gl/PWurE6mJVF2DUGP29',
         'messages_dir' => getenv('MESSAGES_DIR') ?: dirname(__DIR__) . '/storage/messages',
     ],
 

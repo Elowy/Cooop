@@ -17,6 +17,7 @@ $nav = [
     'orders'      => ['/admin/rendelesek', 'Rendelések', 'cart'],
     'messages'    => ['/admin/uzenetek', 'Üzenetek', 'mail'],
     'references'  => ['/admin/referenciak', 'Referenciák', 'star'],
+    'leaders'     => ['/admin/vezetok', 'Vezetők', 'person'],
     'map'         => ['/admin/terkep', 'Térkép', 'pin'],
     'integration' => ['/admin/integracio', 'Axel integráció', 'plug'],
     'users'       => ['/admin/felhasznalok', 'Felhasználók', 'users'],

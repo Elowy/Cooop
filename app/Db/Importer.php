@@ -2,6 +2,7 @@
 
 namespace App\Db;
 
+use App\Leader\LeaderStore;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
 use App\Order\OrderStore;
@@ -43,6 +44,17 @@ final class Importer
                 foreach ((new PoiStore())->all() as $poi) {
                     unset($poi['id']);
                     $db->save($poi);
+                }
+            }
+        });
+
+        // Vezetők (fájl-módban a config/leaders.php-ból töltődnek fel)
+        self::guard(static function () use ($pdo): void {
+            $db = new LeaderStore($pdo);
+            if (count($db->all()) === 0) {
+                foreach ((new LeaderStore())->all() as $leader) {
+                    unset($leader['id']);
+                    $db->save($leader);
                 }
             }
         });

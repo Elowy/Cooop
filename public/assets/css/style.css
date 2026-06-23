@@ -695,6 +695,7 @@ a.panel-link:hover { color: var(--gold-2); }
 
 [data-aico="pin"] { --aico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z'/%3E%3C/svg%3E"); }
 [data-aico="users"] { --aico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1.6c-2.7 0-5 1.4-5 3.6V18h10v-1.8c0-2.2-2.3-3.6-5-3.6zm6.5-1.6a3 3 0 0 0 0-6c-.4 0-.8.1-1.2.2a4.5 4.5 0 0 1 0 5.6c.4.1.8.2 1.2.2zm.5 1.6c-.5 0-1 .1-1.5.2 1.2.8 2 1.9 2 3.4V18H22v-1.8c0-2.2-2.3-3.8-6-3.8z'/%3E%3C/svg%3E"); }
+[data-aico="person"] { --aico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z'/%3E%3C/svg%3E"); }
 
 .world-map { height: 480px; width: 100%; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; z-index: 0; background: #14150f; }
 .world-map--admin { height: 360px; }
@@ -727,6 +728,9 @@ body.modal-open { overflow: hidden; }
    ========================================================================== */
 .contact-info h3 { font-size: 1.1rem; margin: 0 0 16px; }
 .form-success h3 { margin: 6px 0 8px; }
+.contact-map { margin-top: 32px; text-align: center; }
+.contact-map-frame { width: 100%; height: 360px; border: 1px solid var(--line); border-radius: var(--radius); display: block; }
+.contact-map .btn { margin-top: 16px; }
 .team { margin-top: 56px; }
 .team-title { text-align: center; font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 2rem); margin: 0 0 32px; }
 .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 22px; }

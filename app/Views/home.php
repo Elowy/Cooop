@@ -196,7 +196,7 @@ $cfg = $config['contact'];
 $cv = static fn (string $k): string => View::e((string) ($contactOld[$k] ?? ''));
 $cerr = static fn (string $k): string => isset($contactErrors[$k])
     ? '<p class="field-err">' . View::e($contactErrors[$k]) . '</p>' : '';
-$teamDir = dirname(__DIR__, 2) . '/public/assets/img/team/';
+$teamDir = dirname(__DIR__, 2) . '/public/uploads/team/';
 ?>
 <section class="section section--alt" id="kapcsolat">
     <div class="container">
@@ -247,6 +247,15 @@ $teamDir = dirname(__DIR__, 2) . '/public/assets/img/team/';
             </aside>
         </div>
 
+        <div class="contact-map reveal">
+            <iframe class="contact-map-frame" title="Térkép – telephely" loading="lazy" allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="https://maps.google.com/maps?q=<?= urlencode($cfg['address']) ?>&amp;z=15&amp;output=embed"></iframe>
+            <?php if (!empty($cfg['map_url'])): ?>
+                <a href="<?= View::e($cfg['map_url']) ?>" class="btn btn--outline" target="_blank" rel="noopener">Útvonalterv a telephelyre →</a>
+            <?php endif; ?>
+        </div>
+
         <?php if (!empty($leaders)): ?>
         <div class="team reveal">
             <h3 class="team-title">Akikkel személyesen is találkozhatsz</h3>
@@ -256,7 +265,7 @@ $teamDir = dirname(__DIR__, 2) . '/public/assets/img/team/';
                     <article class="team-card">
                         <div class="team-photo">
                             <?php if ($hasPhoto): ?>
-                                <img src="/assets/img/team/<?= View::e((string) $p['photo']) ?>" alt="<?= View::e((string) $p['name']) ?>" loading="lazy">
+                                <img src="/uploads/team/<?= View::e((string) $p['photo']) ?>" alt="<?= View::e((string) $p['name']) ?>" loading="lazy">
                             <?php else: ?>
                                 <span class="team-monogram"><?= View::e(mb_strtoupper(mb_substr((string) $p['name'], 0, 1))) ?></span>
                             <?php endif; ?>
