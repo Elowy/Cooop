@@ -41,6 +41,17 @@
         }, { passive: true });
     }
 
+    // Vissza a tetejére gomb
+    var toTop = document.querySelector('[data-to-top]');
+    if (toTop) {
+        var onToTop = function () { toTop.classList.toggle('is-visible', (window.scrollY || 0) > 400); };
+        onToTop();
+        window.addEventListener('scroll', onToTop, { passive: true });
+        toTop.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        });
+    }
+
     // Lebegő kapcsolati gomb
     var fab = document.querySelector('[data-fab]');
     var fabToggle = document.querySelector('[data-fab-toggle]');

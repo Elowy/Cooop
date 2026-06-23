@@ -144,7 +144,7 @@ $redirect = static function (string $to): string {
 
 $router = new Router();
 
-$router->get('/', static function () use ($axel, $cats, $references, $leaders): string {
+$router->get('/', static function () use ($axel, $cats, $references, $leaders, $pois): string {
     $flash = $_SESSION['_flash_contact'] ?? [];
     unset($_SESSION['_flash_contact']);
     return View::render('home', [
@@ -153,6 +153,7 @@ $router->get('/', static function () use ($axel, $cats, $references, $leaders): 
         'topCats' => $cats->topLevel(),
         'references' => $references->all(),
         'leaders' => $leaders->all(),
+        'pois' => $pois->all(),
         'contactSent' => !empty($flash['sent']),
         'contactErrors' => $flash['errors'] ?? [],
         'contactOld' => $flash['old'] ?? [],
@@ -242,8 +243,8 @@ $router->get('/referencia/{id}', static function (array $params) use ($reference
     return View::render('reference', ['title' => (string) $ref['name'], 'ref' => $ref]);
 });
 
-$router->get('/terkep', static function () use ($pois): string {
-    return View::render('map', ['title' => 'Térkép', 'pois' => $pois->all()]);
+$router->get('/terkep', static function () use ($redirect): string {
+    return $redirect('/#terkep');
 });
 
 $router->get('/kapcsolat', static function () use ($redirect): string {

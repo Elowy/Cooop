@@ -59,6 +59,8 @@ $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?
     <?= $content ?>
 </main>
 
+<button class="to-top" data-to-top aria-label="Vissza a tetejére">↑ Vissza a tetejére</button>
+
 <?php include dirname(__DIR__) . '/partials/contact-widget.php'; ?>
 <?php include dirname(__DIR__) . '/partials/footer.php'; ?>
 

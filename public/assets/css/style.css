@@ -665,8 +665,26 @@ a.panel-link:hover { color: var(--gold-2); }
 .fab-ico-main, .fab-ico-close { width: 26px; height: 26px; background: #1c1709; -webkit-mask: center/contain no-repeat; mask: center/contain no-repeat; }
 .fab-ico-main { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 4h16v12H8l-4 4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 4h16v12H8l-4 4z'/%3E%3C/svg%3E"); }
 .fab-ico-close { display: none; -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 6.4L6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 6.4L6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12z'/%3E%3C/svg%3E"); }
-.contact-fab.is-open .fab-ico-main { display: none; }
+.contact-fab.is-open .fab-saw { display: none; }
 .contact-fab.is-open .fab-ico-close { display: block; }
+
+/* Fűrészelő farönk a kapcsolati gombon */
+.fab-saw { width: 52px; height: 52px; display: block; }
+.fab-saw svg { width: 100%; height: 100%; display: block; }
+.saw-tool { animation: sawSlide 1s ease-in-out infinite alternate; }
+.saw-fig--l { transform-origin: 10px 50px; animation: sawLeanL 1s ease-in-out infinite alternate; }
+.saw-fig--r { transform-origin: 54px 50px; animation: sawLeanR 1s ease-in-out infinite alternate; }
+@keyframes sawSlide { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
+@keyframes sawLeanL { from { transform: rotate(6deg); } to { transform: rotate(-4deg); } }
+@keyframes sawLeanR { from { transform: rotate(-6deg); } to { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .saw-tool, .saw-fig--l, .saw-fig--r { animation: none; }
+}
+
+/* Vissza a tetejére gomb (görgetésre, középen alul) */
+.to-top { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 16px); z-index: 65; padding: 11px 20px; border-radius: 999px; border: 1px solid var(--line-gold); background: rgba(20, 21, 15, .92); color: var(--gold-2); font-weight: 600; font-size: .88rem; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease, border-color .15s; }
+.to-top.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.to-top:hover { border-color: var(--gold); }
 
 /* Referenciák */
 .reference-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
