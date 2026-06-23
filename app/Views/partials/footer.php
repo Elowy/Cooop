@@ -8,11 +8,8 @@ $contact = $config['contact'];
 <footer class="site-footer">
     <div class="container footer-grid">
         <div class="footer-brand">
-            <span class="brand-mark"><?= View::e($config['app']['short']) ?></span>
-            <div>
-                <strong><?= View::e($config['app']['name']) ?> Kft.</strong>
-                <p><?= View::e($config['app']['tagline']) ?></p>
-            </div>
+            <img class="brand-logo" src="/assets/img/logo.svg" alt="<?= View::e($config['app']['name']) ?> Kft." width="232" height="64">
+            <p><?= View::e($config['app']['tagline']) ?></p>
         </div>
 
         <div class="footer-col">

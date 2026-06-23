@@ -16,11 +16,7 @@ $cartCount = Cart::count();
 <header class="site-header" data-header>
     <div class="container header-inner">
         <a href="/" class="brand" aria-label="<?= View::e($config['app']['name']) ?>">
-            <span class="brand-mark"><?= View::e($config['app']['short']) ?></span>
-            <span class="brand-text">
-                <strong><?= View::e($config['app']['name']) ?></strong>
-                <small><?= View::e($config['app']['tagline']) ?></small>
-            </span>
+            <img class="brand-logo" src="/assets/img/logo.svg" alt="<?= View::e($config['app']['name']) ?> Kft." width="232" height="64">
         </a>
 
         <button class="nav-toggle" data-nav-toggle aria-label="Menü" aria-expanded="false">

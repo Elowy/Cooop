@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 64" role="img" aria-label="Net-Trade Hungary Kft.">
+  <defs>
+    <linearGradient id="ntgold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ecd29a"/>
+      <stop offset="1" stop-color="#c39a45"/>
+    </linearGradient>
+  </defs>
+
+  <!-- embléma -->
+  <rect x="2" y="8" width="48" height="48" rx="13" fill="url(#ntgold)"/>
+  <text x="26" y="41" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="25" font-weight="700"
+        fill="#17150d">NT</text>
+
+  <!-- wordmark -->
+  <text x="63" y="33"
+        font-family="Georgia, 'Iowan Old Style', 'Palatino Linotype', serif" font-size="24" font-weight="700"
+        letter-spacing="0.3" fill="url(#ntgold)">NET-TRADE</text>
+  <text x="64" y="50"
+        font-family="-apple-system, 'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600"
+        letter-spacing="4.2" fill="#9a9c8d">HUNGARY KFT.</text>
+</svg>
