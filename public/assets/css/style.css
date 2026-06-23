@@ -533,3 +533,64 @@ a.panel-link:hover { color: var(--gold-2); }
     .kpi--wide { grid-column: auto; }
     .admin-content, .admin-topbar { padding-left: 20px; padding-right: 20px; }
 }
+
+/* ==========================================================================
+   Pénztár, fizetés, visszaigazolás
+   ========================================================================== */
+
+.narrow { max-width: 720px; }
+
+.checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: 32px; align-items: start; margin-top: 8px; }
+.checkout-form { min-width: 0; }
+
+.form-card { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; background: var(--surface); }
+.form-card legend { padding: 0 8px; color: var(--gold-2); font-weight: 600; font-size: .95rem; }
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; color: var(--muted); font-size: .84rem; margin-bottom: 6px; }
+.field input, .field textarea {
+    width: 100%; padding: 11px 13px; background: var(--bg-2); border: 1px solid var(--line);
+    border-radius: 10px; color: var(--text); font-size: 1rem; font-family: inherit;
+}
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.check, .radio { display: flex; align-items: center; gap: 10px; color: var(--text); margin-bottom: 10px; cursor: pointer; font-size: .95rem; }
+.check input, .radio input { width: 18px; height: 18px; accent-color: #cba14e; flex: 0 0 auto; }
+.check--terms { margin: 6px 0 4px; }
+.field-err { color: #e08a8a; font-size: .82rem; margin: 6px 0 0; }
+.form-alert { background: rgba(196, 86, 86, .12); border: 1px solid #6e3b3b; color: #e9b6b6; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; }
+.ship-fields[hidden] { display: none; }
+
+.checkout-summary { position: sticky; top: calc(var(--header-h) + 16px); }
+.summary-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+.summary-card h2 { font-size: 1.1rem; margin: 0 0 16px; }
+.summary-items { list-style: none; margin: 0 0 8px; padding: 0; }
+.summary-items li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.summary-items small { color: var(--muted); }
+.summary-total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 0 18px; }
+.summary-total strong { font-size: 1.5rem; color: var(--gold-2); }
+.summary-back { display: block; text-align: center; margin-top: 14px; color: var(--muted); font-size: .88rem; }
+.summary-back:hover { color: var(--gold-2); }
+
+.pay-card { text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 36px 32px; }
+.pay-badge { display: inline-block; background: var(--gold-soft); color: var(--gold-2); border: 1px solid var(--line-gold); font-size: .74rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; margin-bottom: 14px; }
+.pay-note { color: var(--muted); margin: 18px 0 22px; }
+.pay-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 0; }
+
+.confirm-head { text-align: center; margin-bottom: 24px; }
+.confirm-check { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: #1c1709; font-size: 2rem; font-weight: 700; margin-bottom: 14px; }
+.info-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; margin-bottom: 24px; }
+.info-box strong { color: var(--gold-2); }
+.narrow .summary-card { margin-top: 8px; }
+
+.sub-h { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gold-2); margin: 18px 0 6px; }
+.addr { color: var(--text); margin: 0 0 6px; line-height: 1.5; }
+.admin-table tfoot td { border-top: 1px solid var(--line); border-bottom: 0; padding-top: 14px; }
+
+@media (max-width: 860px) {
+    .checkout-grid { grid-template-columns: 1fr; }
+    .checkout-summary { position: static; }
+}
+@media (max-width: 520px) {
+    .field-row { grid-template-columns: 1fr; }
+}

@@ -24,6 +24,8 @@ use App\Core\Csrf;
 use App\Core\Router;
 use App\Core\View;
 use App\Integration\MockAxelGateway;
+use App\Order\OrderStore;
+use App\Payment\MockPaymentGateway;
 
 $config = require dirname(__DIR__) . '/config/config.php';
 
@@ -46,6 +48,37 @@ $axel = match ($config['axel']['gateway'] ?? 'mock') {
 
 // Kategóriafa (config/categories.php).
 $cats = new Categories();
+
+// Rendeléstár és fizetési szolgáltató (utóbbi a config alapján választva).
+$orders = new OrderStore($config['shop']['orders_dir']);
+$payment = match ($config['shop']['payment'] ?? 'mock') {
+    // 'simplepay' => new App\Payment\SimplePayGateway(...),  // éles bekötéskor
+    default => new MockPaymentGateway(),
+};
+
+/**
+ * A kosár tartalmát feloldja rendelési tételekké az aktuális (Axel) árakkal.
+ * @return array{items: array<int, array<string, mixed>>, total: int}
+ */
+$buildCart = static function () use ($axel): array {
+    $items = [];
+    $total = 0;
+    foreach (Cart::items() as $sku => $qty) {
+        foreach ($axel->products() as $p) {
+            if ($p->sku === $sku) {
+                $sub = $p->priceGross() * $qty;
+                $total += $sub;
+                $items[] = [
+                    'sku' => $p->sku, 'name' => $p->name, 'unit' => $p->unit,
+                    'qty' => $qty, 'price_gross' => $p->priceGross(), 'subtotal' => $sub,
+                    'stock' => $p->stock,
+                ];
+                break;
+            }
+        }
+    }
+    return ['items' => $items, 'total' => $total];
+};
 
 /** Átirányítás + futás leállítása (POST műveletek után). */
 $redirect = static function (string $to): string {
@@ -133,6 +166,162 @@ $router->post('/kosar/torol', static function () use ($redirect): string {
         Cart::remove((string) $_POST['sku']);
     }
     return $redirect('/kosar');
+});
+
+/* ------------------------------------------------------------------ */
+/* Pénztár                                                             */
+/* ------------------------------------------------------------------ */
+
+/** Rendelés átadása az Axelnek számlázásra; az eredményt elmenti. */
+$finalizeInvoice = static function (string $token) use ($axel, $orders): void {
+    $order = $orders->find($token);
+    if ($order === null) {
+        return;
+    }
+    $result = $axel->createInvoice($order);
+    $orders->update($token, ['invoice' => [
+        'ok' => $result->ok, 'number' => $result->invoiceNumber, 'message' => $result->message,
+    ]]);
+};
+
+$router->get('/penztar', static function () use ($buildCart, $payment, $redirect): string {
+    $cart = $buildCart();
+    if (!$cart['items']) {
+        return $redirect('/kosar');
+    }
+    return View::render('shop/checkout', [
+        'title' => 'Pénztár',
+        'cart' => $cart,
+        'paymentLabel' => $payment->label(),
+        'errors' => [],
+        'old' => [],
+    ]);
+});
+
+$router->post('/penztar', static function () use ($buildCart, $orders, $payment, $finalizeInvoice, $redirect): string {
+    $cart = $buildCart();
+    if (!$cart['items']) {
+        return $redirect('/kosar');
+    }
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/penztar');
+    }
+
+    $val = static fn (string $k): string => trim((string) ($_POST[$k] ?? ''));
+    $old = $_POST;
+    $errors = [];
+
+    foreach (['name' => 'Név', 'email' => 'E-mail', 'phone' => 'Telefon',
+              'billing_zip' => 'Irányítószám', 'billing_city' => 'Város', 'billing_address' => 'Cím'] as $f => $label) {
+        if ($val($f) === '') {
+            $errors[$f] = "A(z) „{$label}” megadása kötelező.";
+        }
+    }
+    if ($val('email') !== '' && !filter_var($val('email'), FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Érvénytelen e-mail cím.';
+    }
+    $method = in_array($val('payment_method'), ['card', 'transfer'], true) ? $val('payment_method') : '';
+    if ($method === '') {
+        $errors['payment_method'] = 'Válassz fizetési módot.';
+    }
+    if (!isset($_POST['terms'])) {
+        $errors['terms'] = 'Az ÁSZF elfogadása kötelező.';
+    }
+    $shipDiff = isset($_POST['shipping_diff']);
+    if ($shipDiff) {
+        foreach (['shipping_zip' => 'Irányítószám', 'shipping_city' => 'Város', 'shipping_address' => 'Cím'] as $f => $label) {
+            if ($val($f) === '') {
+                $errors[$f] = "A szállítási „{$label}” megadása kötelező.";
+            }
+        }
+    }
+    foreach ($cart['items'] as $it) {
+        if ($it['qty'] > $it['stock']) {
+            $errors['stock'] = "Nincs elég készlet: {$it['name']} (elérhető: {$it['stock']} {$it['unit']}).";
+        }
+    }
+
+    if ($errors) {
+        return View::render('shop/checkout', [
+            'title' => 'Pénztár', 'cart' => $cart, 'paymentLabel' => $payment->label(),
+            'errors' => $errors, 'old' => $old,
+        ]);
+    }
+
+    $token = bin2hex(random_bytes(16));
+    $order = [
+        'token' => $token,
+        'number' => $orders->nextNumber(),
+        'created' => date('c'),
+        'status' => $method === 'card' ? 'pending' : 'placed',
+        'payment' => [
+            'method' => $method,
+            'status' => $method === 'card' ? 'pending' : 'awaiting_transfer',
+            'paid_at' => null,
+        ],
+        'customer' => [
+            'name' => $val('name'), 'email' => $val('email'), 'phone' => $val('phone'),
+            'company' => $val('company'), 'tax_number' => $val('tax_number'), 'note' => $val('note'),
+        ],
+        'billing' => ['zip' => $val('billing_zip'), 'city' => $val('billing_city'), 'address' => $val('billing_address')],
+        'shipping' => $shipDiff
+            ? ['zip' => $val('shipping_zip'), 'city' => $val('shipping_city'), 'address' => $val('shipping_address')]
+            : null,
+        'items' => $cart['items'],
+        'totals' => ['gross' => $cart['total']],
+        'invoice' => ['ok' => false, 'number' => null, 'message' => null],
+    ];
+    $orders->save($order);
+
+    if ($method === 'transfer') {
+        $finalizeInvoice($token);
+        Cart::clear();
+        return $redirect('/rendeles/' . $token);
+    }
+    return $redirect($payment->start($order));
+});
+
+$router->get('/fizetes/{token}', static function (array $params) use ($orders, $redirect): string {
+    $order = $orders->find($params['token'] ?? '');
+    if ($order === null) {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'Ismeretlen fizetés']);
+    }
+    if (($order['status'] ?? '') !== 'pending') {
+        return $redirect('/rendeles/' . $order['token']);
+    }
+    return View::render('shop/payment', ['title' => 'Fizetés', 'order' => $order, 'failed' => isset($_GET['hiba'])]);
+});
+
+$router->post('/fizetes/{token}', static function (array $params) use ($orders, $finalizeInvoice, $redirect): string {
+    $token = $params['token'] ?? '';
+    $order = $orders->find($token);
+    if ($order === null || !Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/kosar');
+    }
+    if (($order['status'] ?? '') !== 'pending') {
+        return $redirect('/rendeles/' . $token);
+    }
+    if (($_POST['result'] ?? '') === 'success') {
+        $orders->update($token, [
+            'status' => 'paid',
+            'payment' => ['status' => 'paid', 'paid_at' => date('c')],
+        ]);
+        $finalizeInvoice($token);
+        Cart::clear();
+        return $redirect('/rendeles/' . $token);
+    }
+    $orders->update($token, ['payment' => ['status' => 'failed']]);
+    return $redirect('/fizetes/' . $token . '?hiba=1');
+});
+
+$router->get('/rendeles/{token}', static function (array $params) use ($orders): string {
+    $order = $orders->find($params['token'] ?? '');
+    if ($order === null) {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'A rendelés nem található']);
+    }
+    return View::render('shop/confirmation', ['title' => 'Rendelés visszaigazolása', 'order' => $order]);
 });
 
 /* ------------------------------------------------------------------ */
@@ -235,9 +424,19 @@ $router->get('/admin/kategoriak', static function () use ($axel, $cats, $adminVi
     ]);
 });
 
-$router->get('/admin/rendelesek', static function () use ($adminView, $guard): string {
+$router->get('/admin/rendelesek', static function () use ($adminView, $guard, $orders): string {
     $guard();
-    return $adminView('admin/orders', 'orders', ['title' => 'Rendelések']);
+    return $adminView('admin/orders', 'orders', ['title' => 'Rendelések', 'orders' => $orders->all()]);
+});
+
+$router->get('/admin/rendeles/{token}', static function (array $params) use ($adminView, $guard, $orders): string {
+    $guard();
+    $order = $orders->find($params['token'] ?? '');
+    if ($order === null) {
+        http_response_code(404);
+        return $adminView('admin/order', 'orders', ['title' => 'Rendelés', 'order' => null]);
+    }
+    return $adminView('admin/order', 'orders', ['title' => 'Rendelés · ' . ($order['number'] ?? ''), 'order' => $order]);
 });
 
 $router->get('/admin/integracio', static function () use ($adminView, $guard): string {

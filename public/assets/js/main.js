@@ -26,6 +26,15 @@
         window.addEventListener('scroll', onScroll, { passive: true });
     }
 
+    // Pénztár: szállítási mezők ki/be
+    var shipToggle = document.querySelector('[data-ship-toggle]');
+    var shipFields = document.querySelector('[data-ship-fields]');
+    if (shipToggle && shipFields) {
+        shipToggle.addEventListener('change', function () {
+            shipFields.hidden = !shipToggle.checked;
+        });
+    }
+
     // Belépő animációk
     var reveals = document.querySelectorAll('.reveal');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

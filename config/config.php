@@ -37,6 +37,13 @@ $config = [
         'gateway'      => getenv('AXEL_GATEWAY') ?: 'mock',     // mock | xml | rest
         'exchange_dir' => getenv('AXEL_DIR') ?: dirname(__DIR__) . '/storage/axel',
     ],
+
+    // Webshop / pénztár.
+    'shop' => [
+        'payment'    => getenv('PAYMENT_GATEWAY') ?: 'mock',    // mock | simplepay | barion | stripe
+        'currency'   => 'HUF',
+        'orders_dir' => getenv('ORDERS_DIR') ?: dirname(__DIR__) . '/storage/orders',
+    ],
 ];
 
 // Helyi felülírás (titkok, éles útvonalak) – ha létezik.

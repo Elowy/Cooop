@@ -10,6 +10,9 @@ config/config.local.php
 *.log
 /tmp/
 
+# Helyi adat (rendelések, Axel-csere)
+/storage/
+
 # Szerkesztő / OS
 .DS_Store
 .idea/

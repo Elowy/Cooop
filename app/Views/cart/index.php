@@ -45,10 +45,8 @@ use App\Core\View;
                     <span>Végösszeg (bruttó)</span>
                     <strong class="display"><?= View::huf($total) ?></strong>
                 </div>
-                <button type="button" class="btn btn--gold btn--lg" disabled title="A fizetés és a számlázás a következő körben készül el">
-                    Tovább a pénztárhoz
-                </button>
-                <p class="note">A pénztár (online fizetés + Axel Pro számlázás) a következő fejlesztési körben kerül be.</p>
+                <a href="/penztar" class="btn btn--gold btn--lg">Tovább a pénztárhoz</a>
+                <p class="note">A fizetés jelenleg teszt módban van; az éles fizetés és az Axel Pro számlázás bekötése a következő kör.</p>
             </div>
         <?php endif; ?>
     </div>
