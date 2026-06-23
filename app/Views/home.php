@@ -28,7 +28,7 @@ $stats = [
 ];
 ?>
 <section class="hero" id="top">
-    <div class="hero-bg" data-parallax aria-hidden="true"></div>
+    <div class="hero-bg" data-parallax aria-hidden="true"><?= file_get_contents(dirname(__DIR__, 2) . '/public/assets/img/forest.svg') ?></div>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="container hero-inner">
         <div class="hero-copy reveal">
