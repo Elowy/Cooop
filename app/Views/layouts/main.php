@@ -61,6 +61,7 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
     <?php if ($gaId !== ''): ?><script>window.NT_GA=<?= json_encode($gaId) ?>;</script><?php endif; ?>
 </head>
 <body>
+<div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar" data-scroll-progress></span></div>
 <?php include dirname(__DIR__) . '/partials/header.php'; ?>
 
 <main>
@@ -71,6 +72,7 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
 
 <?php include dirname(__DIR__) . '/partials/contact-widget.php'; ?>
 <?php if ($cookieConsent === ''): include dirname(__DIR__) . '/partials/cookie-wall.php'; endif; ?>
+<?php include dirname(__DIR__) . '/partials/newsletter.php'; ?>
 <?php include dirname(__DIR__) . '/partials/footer.php'; ?>
 
 <script src="/assets/js/main.js" defer></script>

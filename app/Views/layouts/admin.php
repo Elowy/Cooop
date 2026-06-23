@@ -16,6 +16,7 @@ $nav = [
     'categories'  => ['/admin/kategoriak', 'Kategóriák', 'tree'],
     'orders'      => ['/admin/rendelesek', 'Rendelések', 'cart'],
     'messages'    => ['/admin/uzenetek', 'Üzenetek', 'mail'],
+    'newsletter'  => ['/admin/hirlevel', 'Hírlevél', 'send'],
     'references'  => ['/admin/referenciak', 'Referenciák', 'star'],
     'leaders'     => ['/admin/vezetok', 'Vezetők', 'person'],
     'map'         => ['/admin/terkep', 'Térkép', 'pin'],

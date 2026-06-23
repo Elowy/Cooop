@@ -2,10 +2,8 @@
 
 use App\Core\Csrf;
 use App\Core\View;
-use App\Integration\Product;
 
 /** @var array<string, mixed> $config */
-/** @var Product[] $featured */
 /** @var array<int, array<string, mixed>> $topCats */
 /** @var array<int, array<string, mixed>> $references */
 /** @var array<int, array<string, mixed>> $leaders */
@@ -64,37 +62,6 @@ $stats = [
         </div>
     </div>
 </section>
-
-<?php if (!empty($featured)): ?>
-<section class="section section--alt" id="kiemelt">
-    <div class="container">
-        <header class="section-head reveal">
-            <p class="eyebrow"><span class="eyebrow-dot"></span> Webshop</p>
-            <h2 class="display">Kiemelt termékek</h2>
-            <p class="section-sub">Néhány cikk a kínálatból.</p>
-        </header>
-
-        <div class="card-grid product-grid">
-            <?php foreach ($featured as $p): ?>
-                <article class="card product-card reveal">
-                    <a class="product-media" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
-                        <span class="badge">Raktáron</span>
-                    </a>
-                    <h3><a href="/termek/<?= View::e($p->slug) ?>"><?= View::e($p->name) ?></a></h3>
-                    <p><?= View::e($p->short) ?></p>
-                    <div class="price-row">
-                        <span class="price"><?= View::huf($p->priceGross()) ?></span>
-                        <span class="price-unit">/ <?= View::e($p->unit) ?> · bruttó</span>
-                    </div>
-                    <a href="/termek/<?= View::e($p->slug) ?>" class="card-link">Megnézem →</a>
-                </article>
-            <?php endforeach; ?>
-        </div>
-
-        <p class="center-cta reveal"><a href="/webshop" class="btn btn--outline">Összes termék</a></p>
-    </div>
-</section>
-<?php endif; ?>
 
 <section class="section" id="kategoriak">
     <div class="container">

@@ -85,6 +85,23 @@ final class Schema
                 keywords VARCHAR(255) NOT NULL DEFAULT '',
                 og_image VARCHAR(500) NOT NULL DEFAULT ''
             )$suffix",
+
+            "CREATE TABLE IF NOT EXISTS subscribers (
+                id $id,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                name VARCHAR(190) NOT NULL DEFAULT '',
+                token VARCHAR(64) NOT NULL DEFAULT '',
+                active INT NOT NULL DEFAULT 1,
+                created_at VARCHAR(40) NOT NULL
+            )$suffix",
+
+            "CREATE TABLE IF NOT EXISTS newsletter_templates (
+                id $id,
+                name VARCHAR(190) NOT NULL,
+                subject VARCHAR(255) NOT NULL DEFAULT '',
+                body $txt,
+                created_at VARCHAR(40) NOT NULL
+            )$suffix",
         ];
 
         foreach ($tables as $sql) {

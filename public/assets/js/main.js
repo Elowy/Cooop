@@ -41,6 +41,24 @@
         }, { passive: true });
     }
 
+    // Görgetés-állapotjelző csík (a fejléc felett)
+    var progress = document.querySelector('[data-scroll-progress]');
+    if (progress) {
+        var progTicking = false;
+        var updateProgress = function () {
+            var doc = document.documentElement;
+            var max = (doc.scrollHeight - window.innerHeight);
+            var pct = max > 0 ? Math.min((window.scrollY || doc.scrollTop || 0) / max, 1) : 0;
+            progress.style.width = (pct * 100) + '%';
+            progTicking = false;
+        };
+        updateProgress();
+        window.addEventListener('scroll', function () {
+            if (!progTicking) { progTicking = true; window.requestAnimationFrame(updateProgress); }
+        }, { passive: true });
+        window.addEventListener('resize', updateProgress, { passive: true });
+    }
+
     // Vissza a tetejére gomb
     var toTop = document.querySelector('[data-to-top]');
     if (toTop) {

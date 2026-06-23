@@ -31,6 +31,8 @@ use App\Integration\MockAxelGateway;
 use App\Leader\LeaderStore;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
+use App\Newsletter\SubscriberStore;
+use App\Newsletter\TemplateStore;
 use App\Order\OrderStore;
 use App\Payment\MockPaymentGateway;
 use App\Reference\ReferenceStore;
@@ -85,6 +87,8 @@ $references = new ReferenceStore($pdo);
 $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
+$subscribers = new SubscriberStore($pdo);
+$templates = new TemplateStore($pdo);
 $users = $pdo ? new UserRepository($pdo) : null;
 
 // Általános képfeltöltő (referencia-logó, vezető-fotó) a megadott mappába.
@@ -144,12 +148,11 @@ $redirect = static function (string $to): string {
 
 $router = new Router();
 
-$router->get('/', static function () use ($axel, $cats, $references, $leaders, $pois): string {
+$router->get('/', static function () use ($cats, $references, $leaders, $pois): string {
     $flash = $_SESSION['_flash_contact'] ?? [];
     unset($_SESSION['_flash_contact']);
     return View::render('home', [
         'title' => null,
-        'featured' => array_slice($axel->products(), 0, 3),
         'topCats' => $cats->topLevel(),
         'references' => $references->all(),
         'leaders' => $leaders->all(),
@@ -302,6 +305,46 @@ $router->post('/kapcsolat', static function () use ($config, $messages, $redirec
 
     $_SESSION['_flash_contact'] = ['sent' => true];
     return $redirect('/#kapcsolat');
+});
+
+/* ------------------------------------------------------------------ */
+/* Hírlevél (publikus)                                                 */
+/* ------------------------------------------------------------------ */
+
+$router->post('/hirlevel', static function () use ($subscribers, $redirect): string {
+    // Vissza a feliratkozási sávhoz – csak a saját oldalra engedünk.
+    $back = (string) ($_SERVER['HTTP_REFERER'] ?? '/');
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
+    if ($host === '' || !str_contains($back, $host)) {
+        $back = '/';
+    }
+    $back = strtok($back, '#') . '#hirlevel';
+
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect($back);
+    }
+    $email = trim((string) ($_POST['email'] ?? ''));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['_flash_newsletter'] = ['type' => 'error', 'text' => 'Adj meg egy érvényes e-mail címet.'];
+        return $redirect($back);
+    }
+    if (!isset($_POST['privacy'])) {
+        $_SESSION['_flash_newsletter'] = ['type' => 'error', 'text' => 'A feliratkozáshoz fogadd el az adatkezelési tájékoztatót.'];
+        return $redirect($back);
+    }
+    $subscribers->subscribe($email, trim((string) ($_POST['name'] ?? '')));
+    $_SESSION['_flash_newsletter'] = ['type' => 'ok', 'text' => 'Köszönjük! Sikeresen feliratkoztál a hírlevelünkre.'];
+    return $redirect($back);
+});
+
+$router->get('/hirlevel/leiratkozas', static function () use ($subscribers): string {
+    $token = (string) ($_GET['t'] ?? '');
+    $sub = $token !== '' ? $subscribers->unsubscribeByToken($token) : null;
+    return View::render('newsletter-unsub', [
+        'title' => 'Leiratkozás',
+        'ok' => $sub !== null,
+        'email' => (string) ($sub['email'] ?? ''),
+    ]);
 });
 
 $router->get('/webshop', static function () use ($axel, $cats): string {
@@ -714,6 +757,148 @@ $router->post('/admin/integracio', static function () use ($guard, $settings, $r
 $router->get('/admin/uzenetek', static function () use ($adminView, $guard, $messages): string {
     $guard();
     return $adminView('admin/messages', 'messages', ['title' => 'Üzenetek', 'messages' => $messages->all()]);
+});
+
+/* ------------------------------------------------------------------ */
+/* Hírlevél (admin)                                                    */
+/* ------------------------------------------------------------------ */
+
+$router->get('/admin/hirlevel', static function () use ($adminView, $guard, $subscribers, $templates, $settings, $config): string {
+    $guard();
+    $s = $settings->all();
+    return $adminView('admin/newsletter', 'newsletter', [
+        'title' => 'Hírlevél',
+        'subscribers' => $subscribers->all(),
+        'activeCount' => $subscribers->activeCount(),
+        'templates' => $templates->all(),
+        'values' => [
+            'from' => (string) ($s['newsletter_from'] ?? $config['contact']['email']),
+            'from_name' => (string) ($s['newsletter_from_name'] ?? $config['app']['name']),
+        ],
+        'lastSent' => (string) ($s['newsletter_last_sent'] ?? ''),
+    ]);
+});
+
+$router->post('/admin/hirlevel/beallitasok', static function () use ($guard, $settings, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $settings->saveMany([
+            'newsletter_from' => trim((string) ($_POST['from'] ?? '')),
+            'newsletter_from_name' => trim((string) ($_POST['from_name'] ?? '')),
+        ]);
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Hírlevél-beállítások mentve.'];
+    }
+    return $redirect('/admin/hirlevel');
+});
+
+$router->get('/admin/hirlevel/sablon', static function () use ($adminView, $guard, $templates): string {
+    $guard();
+    $id = (int) ($_GET['id'] ?? 0);
+    $tpl = $id > 0 ? $templates->find($id) : null;
+    return $adminView('admin/newsletter-template', 'newsletter', [
+        'title' => $tpl ? 'Sablon szerkesztése' : 'Új sablon',
+        'tpl' => $tpl,
+    ]);
+});
+
+$router->post('/admin/hirlevel/sablon/mentes', static function () use ($guard, $templates, $redirect): string {
+    $guard();
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/hirlevel');
+    }
+    $id = (int) ($_POST['id'] ?? 0);
+    $tpl = [
+        'name' => trim((string) ($_POST['name'] ?? '')),
+        'subject' => trim((string) ($_POST['subject'] ?? '')),
+        'body' => (string) ($_POST['body'] ?? ''),
+    ];
+    if ($id > 0) {
+        $tpl['id'] = $id;
+    }
+    if ($tpl['name'] === '') {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A sablon nevét add meg.'];
+        return $redirect('/admin/hirlevel/sablon' . ($id ? '?id=' . $id : ''));
+    }
+    $templates->save($tpl);
+    $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Sablon mentve.'];
+    return $redirect('/admin/hirlevel');
+});
+
+$router->post('/admin/hirlevel/sablon/torles', static function () use ($guard, $templates, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $templates->delete((int) ($_POST['id'] ?? 0));
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Sablon törölve.'];
+    }
+    return $redirect('/admin/hirlevel');
+});
+
+$router->post('/admin/hirlevel/feliratkozo/torles', static function () use ($guard, $subscribers, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $subscribers->delete((int) ($_POST['id'] ?? 0));
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Feliratkozó törölve.'];
+    }
+    return $redirect('/admin/hirlevel');
+});
+
+$router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscribers, $templates, $settings, $config, $redirect): string {
+    $guard();
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/hirlevel');
+    }
+    $s = $settings->all();
+    $fromEmail = trim((string) ($s['newsletter_from'] ?? $config['contact']['email']));
+    $fromName = trim((string) ($s['newsletter_from_name'] ?? $config['app']['name']));
+
+    // Tárgy/törzs: közvetlenül megadva, vagy sablonból feltöltve.
+    $subject = trim((string) ($_POST['subject'] ?? ''));
+    $body = (string) ($_POST['body'] ?? '');
+    $tplId = (int) ($_POST['template_id'] ?? 0);
+    if ($tplId > 0 && ($tpl = $templates->find($tplId)) !== null) {
+        if ($subject === '') {
+            $subject = (string) $tpl['subject'];
+        }
+        if (trim($body) === '') {
+            $body = (string) $tpl['body'];
+        }
+    }
+
+    if ($subject === '' || trim($body) === '') {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'Add meg a tárgyat és a tartalmat (vagy válassz sablont).'];
+        return $redirect('/admin/hirlevel');
+    }
+    if (!filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'Állíts be érvényes feladó e-mail címet a küldéshez.'];
+        return $redirect('/admin/hirlevel');
+    }
+
+    $recipients = $subscribers->active();
+    $base = rtrim((string) $config['app']['url'], '/');
+    $subjectEnc = mb_encode_mimeheader($subject, 'UTF-8');
+    $fromHeader = mb_encode_mimeheader($fromName, 'UTF-8') . ' <' . $fromEmail . '>';
+    $sent = 0;
+
+    foreach ($recipients as $r) {
+        $unsub = $base . '/hirlevel/leiratkozas?t=' . urlencode((string) $r['token']);
+        $html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222">'
+            . $body
+            . '<hr style="border:0;border-top:1px solid #e0e0e0;margin:28px 0 14px">'
+            . '<p style="font-size:12px;color:#888">Ezt az üzenetet azért kapod, mert feliratkoztál a(z) '
+            . htmlspecialchars($fromName, ENT_QUOTES) . ' hírlevelére.<br>'
+            . '<a href="' . htmlspecialchars($unsub, ENT_QUOTES) . '" style="color:#888">Leiratkozás</a></p></div>';
+        $headers = "MIME-Version: 1.0\r\n"
+            . "Content-Type: text/html; charset=UTF-8\r\n"
+            . 'From: ' . $fromHeader . "\r\n"
+            . 'List-Unsubscribe: <' . $unsub . '>';
+        if (@mail((string) $r['email'], $subjectEnc, $html, $headers)) {
+            $sent++;
+        }
+    }
+
+    $settings->saveMany(['newsletter_last_sent' => date('c') . '|' . $sent . '/' . count($recipients)]);
+    $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => "Hírlevél elküldve: {$sent}/" . count($recipients) . ' címzettnek.'];
+    return $redirect('/admin/hirlevel');
 });
 
 $router->get('/admin/felhasznalok', static function () use ($adminView, $guard, $guardAdmin, $users): string {

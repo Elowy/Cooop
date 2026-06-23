@@ -28,6 +28,7 @@ $contact = $config['contact'];
                 <li><a href="/webshop">Webshop</a></li>
                 <li><a href="/#kategoriak">Kategóriák</a></li>
                 <li><a href="/#referenciak">Referenciák</a></li>
+                <li><a href="/#hirlevel">Hírlevél</a></li>
                 <li><a href="/#kapcsolat">Kapcsolat</a></li>
                 <li><a href="/admin">Vezérlőpult</a></li>
             </ul>
@@ -40,5 +41,13 @@ $contact = $config['contact'];
             <a href="/aszf">ÁSZF</a>
             <a href="/adatkezeles">Adatkezelési tájékoztató</a>
         </nav>
+    </div>
+
+    <div class="container footer-credit">
+        <p class="credit">
+            <span class="credit-text">Készítette</span>
+            <a href="https://luiz-tech.hu" target="_blank" rel="noopener" class="credit-link">luiz-tech.hu</a>
+            <span class="credit-heart" aria-hidden="true">❤️</span>
+        </p>
     </div>
 </footer>

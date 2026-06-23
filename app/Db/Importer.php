@@ -5,6 +5,8 @@ namespace App\Db;
 use App\Leader\LeaderStore;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
+use App\Newsletter\SubscriberStore;
+use App\Newsletter\TemplateStore;
 use App\Order\OrderStore;
 use App\Reference\ReferenceStore;
 use App\Seo\ProductSeoStore;
@@ -86,6 +88,27 @@ final class Importer
             if (count($db->all()) === 0) {
                 foreach ((new ProductSeoStore())->all() as $sku => $row) {
                     $db->save((string) $sku, $row);
+                }
+            }
+        });
+
+        // Hírlevél-feliratkozók
+        self::guard(static function () use ($pdo): void {
+            $db = new SubscriberStore($pdo);
+            if ($db->count() === 0) {
+                foreach ((new SubscriberStore())->all() as $s) {
+                    $db->subscribe((string) $s['email'], (string) ($s['name'] ?? ''));
+                }
+            }
+        });
+
+        // Hírlevél-sablonok
+        self::guard(static function () use ($pdo): void {
+            $db = new TemplateStore($pdo);
+            if (count($db->all()) === 0) {
+                foreach ((new TemplateStore())->all() as $tpl) {
+                    unset($tpl['id']);
+                    $db->save($tpl);
                 }
             }
         });
