@@ -11,7 +11,7 @@ use App\Core\View;
 </div>
 
 <?php if (!$references): ?>
-    <section class="panel"><p class="muted">Még nincs referencia. Adj hozzá egyet a „+ Új referencia" gombbal.</p></section>
+    <section class="panel"><p class="muted">Még nincs referencia. Adj hozzá egyet a „+ Új referencia” gombbal.</p></section>
 <?php else: ?>
     <div class="table-wrap">
         <table class="admin-table">

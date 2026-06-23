@@ -21,7 +21,7 @@ $leader = $leader ?? [];
         </div>
 
         <div class="field">
-            <label>Fotó (JPG, PNG vagy WEBP, max 3 MB)</label>
+            <label>Fotó (JPG, PNG vagy WEBP, max 16 MB)</label>
             <?php if (!empty($leader['photo'])): ?>
                 <div style="margin-bottom:10px"><img class="ref-thumb" src="/uploads/team/<?= View::e((string) $leader['photo']) ?>" alt=""></div>
             <?php endif; ?>

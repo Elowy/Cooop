@@ -143,7 +143,7 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
         var m = L.marker([p.lat, p.lng]).addTo(map);
         var html = '<strong>' + esc(p.title) + '</strong>';
         if (p.description) { html += '<br>' + esc(p.description); }
-        if (p.link) { html += '<br><a href="' + esc(p.link) + '" target="_blank" rel="noopener">Bővebben →</a>'; }
+        if (p.link && /^https?:\/\//i.test(p.link)) { html += '<br><a href="' + esc(p.link) + '" target="_blank" rel="noopener">Bővebben →</a>'; }
         m.bindPopup(html);
         group.push(m);
     });

@@ -8,7 +8,6 @@ use App\Core\View;
 /** @var string $content */
 /** @var string $title */
 /** @var string $active */
-/** @var bool $pwWeak */
 
 $nav = [
     'dashboard'   => ['/admin', 'Áttekintés', 'chart'],

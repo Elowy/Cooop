@@ -5,6 +5,7 @@ use App\Core\View;
 
 /** @var array<string, mixed> $config */
 /** @var bool $error */
+/** @var bool $installed */
 ?>
 <!DOCTYPE html>
 <html lang="hu">

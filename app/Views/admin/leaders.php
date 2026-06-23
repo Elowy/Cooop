@@ -11,7 +11,7 @@ use App\Core\View;
 </div>
 
 <?php if (!$leaders): ?>
-    <section class="panel"><p class="muted">Még nincs vezető. Adj hozzá egyet a „+ Új vezető" gombbal.</p></section>
+    <section class="panel"><p class="muted">Még nincs vezető. Adj hozzá egyet a „+ Új vezető” gombbal.</p></section>
 <?php else: ?>
     <div class="table-wrap">
         <table class="admin-table">

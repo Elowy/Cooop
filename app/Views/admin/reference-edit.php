@@ -19,7 +19,7 @@ $ref = $ref ?? [];
         </div>
 
         <div class="field">
-            <label>Logó (JPG, PNG vagy WEBP, max 3 MB)</label>
+            <label>Logó (JPG, PNG vagy WEBP, max 16 MB)</label>
             <?php if (!empty($ref['logo'])): ?>
                 <div style="margin-bottom:10px"><img class="ref-thumb" src="/uploads/references/<?= View::e((string) $ref['logo']) ?>" alt=""></div>
             <?php endif; ?>

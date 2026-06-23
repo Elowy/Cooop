@@ -49,6 +49,15 @@ if ($config['app']['debug']) {
     ini_set('log_errors', '1');
 }
 
+// Biztonságosabb session-süti: JS nem olvashatja, csak HTTPS-en megy, SameSite véd.
+$secureCookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+    || (($_SERVER['SERVER_PORT'] ?? '') == '443');
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => $secureCookie,
+    'samesite' => 'Lax',
+]);
 session_start();
 
 // Az Axel-kapu. A config 'gateway' alapján választunk megvalósítást; éles
@@ -110,6 +119,12 @@ $uploadImage = static function (array $file, string $dir): ?string {
     }
     $name = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
     return move_uploaded_file($file['tmp_name'], $dir . '/' . $name) ? $name : null;
+};
+
+// Csak http/https sémájú URL-t engedünk át (tárolt „javascript:" linkek ellen).
+$safeUrl = static function (string $u): string {
+    $u = trim($u);
+    return preg_match('#^https?://#i', $u) === 1 ? $u : '';
 };
 $payment = match ($config['shop']['payment'] ?? 'mock') {
     // 'simplepay' => new App\Payment\SimplePayGateway(...),  // éles bekötéskor
@@ -299,8 +314,9 @@ $router->post('/kapcsolat', static function () use ($config, $messages, $redirec
     // E-mail értesítés (ha a szerver tudja küldeni; az üzenet ettől függetlenül tárolódik).
     $subject = mb_encode_mimeheader('Új üzenet a weboldalról' . ($company !== '' ? ' – ' . $company : ''), 'UTF-8');
     $body = "Név: {$msg['name']}\nCég: {$company}\nE-mail: {$msg['email']}\nTelefon: {$msg['phone']}\n\nÜzenet:\n{$message}\n";
+    $fromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
     $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
-        . 'From: weboldal@' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\nReply-To: {$msg['email']}";
+        . 'From: weboldal@' . $fromHost . "\r\nReply-To: {$msg['email']}";
     @mail($config['contact']['email'], $subject, $body, $headers);
 
     $_SESSION['_flash_contact'] = ['sent' => true];
@@ -315,7 +331,8 @@ $router->post('/hirlevel', static function () use ($subscribers, $redirect): str
     // Vissza a feliratkozási sávhoz – csak a saját oldalra engedünk.
     $back = (string) ($_SERVER['HTTP_REFERER'] ?? '/');
     $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
-    if ($host === '' || !str_contains($back, $host)) {
+    // Csak a saját hostra engedünk vissza (nyílt átirányítás ellen, pontos host-egyezés).
+    if ($host === '' || parse_url($back, PHP_URL_HOST) !== $host) {
         $back = '/';
     }
     $back = strtok($back, '#') . '#hirlevel';
@@ -591,11 +608,10 @@ $router->get('/rendeles/{token}', static function (array $params) use ($orders):
 
 $adminPw = (string) ($config['admin']['password'] ?? '');
 $lowStock = (int) ($config['admin']['low_stock'] ?? 10);
-$pwWeak = $adminPw === '' || $adminPw === 'admin';
 
 /** Admin nézet a közös adatokkal + admin layouttal. */
-$adminView = static function (string $tpl, string $active, array $extra = []) use ($pwWeak): string {
-    return View::render($tpl, array_merge(['active' => $active, 'pwWeak' => $pwWeak], $extra), 'admin');
+$adminView = static function (string $tpl, string $active, array $extra = []): string {
+    return View::render($tpl, array_merge(['active' => $active], $extra), 'admin');
 };
 
 /** Vezérlőpult-hozzáférés (admin vagy szerkesztő); különben átirányít. */
@@ -980,11 +996,11 @@ $router->get('/admin/beallitasok', static function () use ($adminView, $guard, $
     ]);
 });
 
-$router->post('/admin/beallitasok', static function () use ($guard, $settings, $redirect): string {
+$router->post('/admin/beallitasok', static function () use ($guard, $settings, $redirect, $safeUrl): string {
     $guard();
     if (Csrf::check($_POST['_csrf'] ?? null)) {
         $settings->saveMany([
-            'contact_messenger' => trim((string) ($_POST['contact_messenger'] ?? '')),
+            'contact_messenger' => $safeUrl((string) ($_POST['contact_messenger'] ?? '')),
             'contact_viber' => trim((string) ($_POST['contact_viber'] ?? '')),
             'contact_email' => trim((string) ($_POST['contact_email'] ?? '')),
             'contact_phone' => trim((string) ($_POST['contact_phone'] ?? '')),
@@ -1080,7 +1096,7 @@ $router->get('/admin/referenciak/szerkesztes', static function () use ($adminVie
     ]);
 });
 
-$router->post('/admin/referenciak/mentes', static function () use ($guard, $references, $uploadImage, $redirect): string {
+$router->post('/admin/referenciak/mentes', static function () use ($guard, $references, $uploadImage, $redirect, $safeUrl): string {
     $guard();
     if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
         $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött fájl túl nagy a szerver korlátjához képest – tölts fel kisebb képet. (A módosítások nem mentődtek.)'];
@@ -1095,7 +1111,7 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
         'name' => trim((string) ($_POST['name'] ?? '')),
         'short' => trim((string) ($_POST['short'] ?? '')),
         'long' => trim((string) ($_POST['long'] ?? '')),
-        'url' => trim((string) ($_POST['url'] ?? '')),
+        'url' => $safeUrl((string) ($_POST['url'] ?? '')),
         'featured' => isset($_POST['featured']) ? 1 : 0,
         'logo' => $existing['logo'] ?? '',
     ];
@@ -1221,7 +1237,7 @@ $router->get('/admin/terkep', static function () use ($adminView, $guard, $pois)
     ]);
 });
 
-$router->post('/admin/terkep/mentes', static function () use ($guard, $pois, $redirect): string {
+$router->post('/admin/terkep/mentes', static function () use ($guard, $pois, $redirect, $safeUrl): string {
     $guard();
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/terkep');
@@ -1235,7 +1251,7 @@ $router->post('/admin/terkep/mentes', static function () use ($guard, $pois, $re
             'lat' => $lat,
             'lng' => $lng,
             'description' => trim((string) ($_POST['description'] ?? '')),
-            'link' => trim((string) ($_POST['link'] ?? '')),
+            'link' => $safeUrl((string) ($_POST['link'] ?? '')),
         ];
         if (!empty($_POST['id'])) {
             $poi['id'] = (int) $_POST['id'];

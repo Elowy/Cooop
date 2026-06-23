@@ -28,7 +28,7 @@ $viberHref = static function (string $v): string {
 };
 
 $channels = [];
-if ($messenger !== '') {
+if ($messenger !== '' && preg_match('#^https?://#i', $messenger)) {
     $channels[] = ['ch' => 'messenger', 'label' => 'Messenger', 'href' => $messenger, 'ext' => true];
 }
 if ($viber !== '') {

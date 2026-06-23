@@ -58,7 +58,7 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
     <script async src="https://www.googletagmanager.com/gtag/js?id=<?= View::e($gaId) ?>"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','<?= View::e($gaId) ?>');</script>
     <?php endif; ?>
-    <?php if ($gaId !== ''): ?><script>window.NT_GA=<?= json_encode($gaId) ?>;</script><?php endif; ?>
+    <?php if ($gaId !== ''): ?><script>window.NT_GA=<?= json_encode($gaId, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;</script><?php endif; ?>
 </head>
 <body>
 <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar" data-scroll-progress></span></div>
