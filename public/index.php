@@ -133,12 +133,20 @@ $redirect = static function (string $to): string {
 
 $router = new Router();
 
-$router->get('/', static fn (): string => View::render('home', [
-    'title' => null,
-    'featured' => array_slice($axel->products(), 0, 3),
-    'topCats' => $cats->topLevel(),
-    'references' => $references->all(),
-]));
+$router->get('/', static function () use ($axel, $cats, $references): string {
+    $flash = $_SESSION['_flash_contact'] ?? [];
+    unset($_SESSION['_flash_contact']);
+    return View::render('home', [
+        'title' => null,
+        'featured' => array_slice($axel->products(), 0, 3),
+        'topCats' => $cats->topLevel(),
+        'references' => $references->all(),
+        'leaders' => require dirname(__DIR__) . '/config/leaders.php',
+        'contactSent' => !empty($flash['sent']),
+        'contactErrors' => $flash['errors'] ?? [],
+        'contactOld' => $flash['old'] ?? [],
+    ]);
+});
 
 /* ------------------------------------------------------------------ */
 /* Telepítő                                                            */
@@ -227,22 +235,16 @@ $router->get('/terkep', static function () use ($pois): string {
     return View::render('map', ['title' => 'Térkép', 'pois' => $pois->all()]);
 });
 
-$router->get('/kapcsolat', static function (): string {
-    return View::render('contact', [
-        'title' => 'Kapcsolat',
-        'sent' => isset($_GET['elkuldve']),
-        'errors' => [],
-        'old' => [],
-    ]);
+$router->get('/kapcsolat', static function () use ($redirect): string {
+    return $redirect('/#kapcsolat');
 });
 
 $router->post('/kapcsolat', static function () use ($config, $messages, $redirect): string {
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
-        return $redirect('/kapcsolat');
+        return $redirect('/#kapcsolat');
     }
     $val = static fn (string $k): string => trim((string) ($_POST[$k] ?? ''));
     $errors = [];
-    $old = $_POST;
 
     if ($val('name') === '') {
         $errors['name'] = 'A név megadása kötelező.';
@@ -258,25 +260,29 @@ $router->post('/kapcsolat', static function () use ($config, $messages, $redirec
     }
 
     if ($errors) {
-        return View::render('contact', ['title' => 'Kapcsolat', 'sent' => false, 'errors' => $errors, 'old' => $old]);
+        $_SESSION['_flash_contact'] = ['errors' => $errors, 'old' => $_POST];
+        return $redirect('/#kapcsolat');
     }
 
+    $company = $val('company');
+    $message = $val('message');
+    $stored = ($company !== '' ? "Cég: {$company}\n\n" : '') . $message;
     $msg = [
         'created' => date('c'),
         'name' => $val('name'), 'email' => $val('email'), 'phone' => $val('phone'),
-        'subject' => $val('subject'), 'message' => $val('message'),
+        'subject' => $company, 'message' => $stored,
     ];
     $messages->save($msg);
 
     // E-mail értesítés (ha a szerver tudja küldeni; az üzenet ettől függetlenül tárolódik).
-    $subject = mb_encode_mimeheader('Új üzenet a weboldalról' . ($msg['subject'] !== '' ? ': ' . $msg['subject'] : ''), 'UTF-8');
-    $body = "Név: {$msg['name']}\nE-mail: {$msg['email']}\nTelefon: {$msg['phone']}\n"
-        . "Tárgy: {$msg['subject']}\n\nÜzenet:\n{$msg['message']}\n";
+    $subject = mb_encode_mimeheader('Új üzenet a weboldalról' . ($company !== '' ? ' – ' . $company : ''), 'UTF-8');
+    $body = "Név: {$msg['name']}\nCég: {$company}\nE-mail: {$msg['email']}\nTelefon: {$msg['phone']}\n\nÜzenet:\n{$message}\n";
     $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
         . 'From: weboldal@' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\nReply-To: {$msg['email']}";
     @mail($config['contact']['email'], $subject, $body, $headers);
 
-    return $redirect('/kapcsolat?elkuldve=1');
+    $_SESSION['_flash_contact'] = ['sent' => true];
+    return $redirect('/#kapcsolat');
 });
 
 $router->get('/webshop', static function () use ($axel, $cats): string {

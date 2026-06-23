@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Csrf;
 use App\Core\View;
 use App\Integration\Product;
 
@@ -7,6 +8,10 @@ use App\Integration\Product;
 /** @var Product[] $featured */
 /** @var array<int, array<string, mixed>> $topCats */
 /** @var array<int, array<string, mixed>> $references */
+/** @var array<int, array<string, mixed>> $leaders */
+/** @var bool $contactSent */
+/** @var array<string, string> $contactErrors */
+/** @var array<string, mixed> $contactOld */
 
 // Megjelenítési adatok a fő kategóriákhoz (ikon + rövid leírás).
 $catMeta = [
@@ -133,7 +138,7 @@ $stats = [
                 <li>Ipari gépek és berendezések csomagolása</li>
                 <li>Export csomagolás a nemzetközi szállításhoz</li>
             </ul>
-            <a href="/kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
+            <a href="#kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
         </div>
     </div>
 </section>
@@ -186,10 +191,86 @@ $stats = [
 </section>
 <?php endif; ?>
 
-<section class="cta">
-    <div class="container cta-inner reveal">
-        <h2 class="display">Dolgozzunk együtt</h2>
-        <p>Mondja el, mire van szüksége — visszajelzünk egy ajánlattal.</p>
-        <a href="/kapcsolat" class="btn btn--gold btn--lg">Ajánlatkérés</a>
+<?php
+$cfg = $config['contact'];
+$cv = static fn (string $k): string => View::e((string) ($contactOld[$k] ?? ''));
+$cerr = static fn (string $k): string => isset($contactErrors[$k])
+    ? '<p class="field-err">' . View::e($contactErrors[$k]) . '</p>' : '';
+$teamDir = dirname(__DIR__, 2) . '/public/assets/img/team/';
+?>
+<section class="section section--alt" id="kapcsolat">
+    <div class="container">
+        <header class="section-head reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Kapcsolat</p>
+            <h2 class="display">Lépjünk kapcsolatba</h2>
+            <p class="section-sub">Kérdése van vagy ajánlatot kérne? Írjon nekünk — hamarosan válaszolunk.</p>
+        </header>
+
+        <div class="contact-grid reveal">
+            <div class="contact-form-col">
+                <?php if (!empty($contactSent)): ?>
+                    <div class="form-success">
+                        <span class="confirm-check" aria-hidden="true">✓</span>
+                        <h3>Köszönjük az üzenetet!</h3>
+                        <p class="muted">Hamarosan felvesszük Önnel a kapcsolatot a megadott elérhetőségen.</p>
+                    </div>
+                <?php else: ?>
+                    <form method="post" action="/kapcsolat" class="form-card" novalidate>
+                        <?= Csrf::field() ?>
+                        <div class="field-row">
+                            <div class="field"><label>Név *</label><input name="name" value="<?= $cv('name') ?>"><?= $cerr('name') ?></div>
+                            <div class="field"><label>Cég</label><input name="company" value="<?= $cv('company') ?>"></div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field"><label>Telefon</label><input name="phone" value="<?= $cv('phone') ?>"></div>
+                            <div class="field"><label>E-mail *</label><input type="email" name="email" value="<?= $cv('email') ?>"><?= $cerr('email') ?></div>
+                        </div>
+                        <div class="field"><label>Üzenet *</label><textarea name="message" rows="5"><?= $cv('message') ?></textarea><?= $cerr('message') ?></div>
+                        <label class="check"><input type="checkbox" name="privacy"> Elfogadom az adatkezelési tájékoztatót. *</label>
+                        <?= $cerr('privacy') ?>
+                        <button type="submit" class="btn btn--gold btn--lg">Üzenet küldése</button>
+                    </form>
+                <?php endif; ?>
+            </div>
+
+            <aside class="contact-info">
+                <h3>Itt találsz minket</h3>
+                <ul class="contact-list">
+                    <li><span>Cím</span><strong><?= View::e($cfg['address']) ?></strong></li>
+                    <li><span>Nyitvatartás</span><strong><?= View::e($cfg['hours']) ?></strong></li>
+                    <li><span>Telefon</span>
+                        <a href="tel:<?= View::e(str_replace(' ', '', $cfg['phone'])) ?>"><?= View::e($cfg['phone']) ?></a>
+                        <?php if (!empty($cfg['phone2'])): ?> · <a href="tel:<?= View::e(str_replace(' ', '', $cfg['phone2'])) ?>"><?= View::e($cfg['phone2']) ?></a><?php endif; ?>
+                    </li>
+                    <li><span>E-mail</span><a href="mailto:<?= View::e($cfg['email']) ?>"><?= View::e($cfg['email']) ?></a></li>
+                </ul>
+            </aside>
+        </div>
+
+        <?php if (!empty($leaders)): ?>
+        <div class="team reveal">
+            <h3 class="team-title">Akikkel személyesen is találkozhatsz</h3>
+            <div class="team-grid">
+                <?php foreach ($leaders as $p):
+                    $hasPhoto = !empty($p['photo']) && is_file($teamDir . $p['photo']); ?>
+                    <article class="team-card">
+                        <div class="team-photo">
+                            <?php if ($hasPhoto): ?>
+                                <img src="/assets/img/team/<?= View::e((string) $p['photo']) ?>" alt="<?= View::e((string) $p['name']) ?>" loading="lazy">
+                            <?php else: ?>
+                                <span class="team-monogram"><?= View::e(mb_strtoupper(mb_substr((string) $p['name'], 0, 1))) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <h4><?= View::e((string) $p['name']) ?></h4>
+                        <p class="team-role"><?= View::e((string) $p['role']) ?></p>
+                        <div class="team-contact">
+                            <?php if (!empty($p['phone'])): ?><a href="tel:<?= View::e(str_replace(' ', '', (string) $p['phone'])) ?>"><?= View::e((string) $p['phone']) ?></a><?php endif; ?>
+                            <a href="mailto:<?= View::e((string) $p['email']) ?>"><?= View::e((string) $p['email']) ?></a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </section>

@@ -22,8 +22,10 @@ $config = [
     'contact' => [
         'email'        => 'info@net-trade.hu',
         'phone'        => '+36 20 387 1450',
+        'phone2'       => '+36 20 415 2695',
         'person'       => 'Nagy László (projektvezető)',
         'address'      => '2660 Balassagyarmat, Mártírok útja 72.',
+        'hours'        => 'Hétfő–Péntek 8:00–16:00 · Hétvégén zárva',
         'messages_dir' => getenv('MESSAGES_DIR') ?: dirname(__DIR__) . '/storage/messages',
     ],
 

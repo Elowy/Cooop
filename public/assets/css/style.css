@@ -721,3 +721,22 @@ body.modal-open { overflow: hidden; }
 .footer-brand { flex-direction: column; align-items: flex-start; gap: 14px; }
 .footer-brand .brand-logo { height: 38px; }
 @media (max-width: 680px) { .brand-logo { height: 34px; } }
+
+/* ==========================================================================
+   Kapcsolat – vezetők (csapat)
+   ========================================================================== */
+.contact-info h3 { font-size: 1.1rem; margin: 0 0 16px; }
+.form-success h3 { margin: 6px 0 8px; }
+.team { margin-top: 56px; }
+.team-title { text-align: center; font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 2rem); margin: 0 0 32px; }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 22px; }
+.team-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; text-align: center; transition: border-color .15s, transform .15s; }
+.team-card:hover { border-color: var(--line-gold); transform: translateY(-4px); }
+.team-photo { width: 110px; height: 110px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, var(--gold-2), var(--gold)); display: grid; place-items: center; border: 2px solid var(--line-gold); }
+.team-photo img { width: 100%; height: 100%; object-fit: cover; }
+.team-monogram { font-family: var(--serif); font-weight: 600; font-size: 2.6rem; color: #17150d; }
+.team-card h4 { font-family: var(--serif); font-size: 1.2rem; margin: 0 0 4px; }
+.team-role { color: var(--gold-2); font-size: .88rem; margin: 0 0 14px; }
+.team-contact { display: flex; flex-direction: column; gap: 4px; }
+.team-contact a { color: var(--muted); font-size: .9rem; }
+.team-contact a:hover { color: var(--gold-2); }

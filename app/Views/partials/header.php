@@ -9,7 +9,7 @@ $nav = [
     '/#kategoriak' => 'Kategóriák',
     '/terkep'      => 'Térkép',
     '/#rolunk'     => 'Rólunk',
-    '/kapcsolat'   => 'Kapcsolat',
+    '/#kapcsolat'  => 'Kapcsolat',
 ];
 $cartCount = Cart::count();
 ?>
