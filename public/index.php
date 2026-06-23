@@ -90,8 +90,8 @@ $uploadImage = static function (array $file, string $dir): ?string {
     if (($file['error'] ?? 1) !== UPLOAD_ERR_OK || empty($file['tmp_name'])) {
         return null;
     }
-    if (($file['size'] ?? 0) > 3 * 1024 * 1024) {
-        return null; // max 3 MB
+    if (($file['size'] ?? 0) > 16 * 1024 * 1024) {
+        return null; // max 16 MB
     }
     $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
     $info = @getimagesize($file['tmp_name']);
@@ -783,6 +783,10 @@ $router->get('/admin/referenciak/szerkesztes', static function () use ($adminVie
 
 $router->post('/admin/referenciak/mentes', static function () use ($guard, $references, $uploadImage, $redirect): string {
     $guard();
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött fájl túl nagy a szerver korlátjához képest – tölts fel kisebb képet. (A módosítások nem mentődtek.)'];
+        return $redirect('/admin/referenciak');
+    }
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/referenciak');
     }
@@ -797,14 +801,29 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
     if ($id > 0) {
         $ref['id'] = $id;
     }
-    if (isset($_FILES['logo']) && ($_FILES['logo']['error'] ?? 4) === UPLOAD_ERR_OK) {
-        $uploaded = $uploadImage($_FILES['logo'], dirname(__DIR__) . '/public/uploads/references');
-        if ($uploaded !== null) {
-            $ref['logo'] = $uploaded;
+
+    $photoError = null;
+    $fileErr = $_FILES['logo']['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($fileErr !== UPLOAD_ERR_NO_FILE) {
+        if ($fileErr === UPLOAD_ERR_INI_SIZE || $fileErr === UPLOAD_ERR_FORM_SIZE) {
+            $photoError = 'A logó túl nagy – tölts fel kisebbet (max 16 MB).';
+        } elseif ($fileErr !== UPLOAD_ERR_OK) {
+            $photoError = 'A logó feltöltése megszakadt, próbáld újra.';
+        } else {
+            $uploaded = $uploadImage($_FILES['logo'], dirname(__DIR__) . '/public/uploads/references');
+            if ($uploaded === null) {
+                $photoError = 'A logó nem menthető – JPG/PNG/WEBP, max 16 MB legyen.';
+            } else {
+                $ref['logo'] = $uploaded;
+            }
         }
     }
+
     if ($ref['name'] !== '') {
         $references->save($ref);
+        $_SESSION['_flash_admin'] = $photoError !== null
+            ? ['type' => 'error', 'text' => 'Adatok mentve, de: ' . $photoError]
+            : ['type' => 'ok', 'text' => 'Mentve.'];
     }
     return $redirect('/admin/referenciak');
 });
@@ -826,6 +845,11 @@ $router->get('/admin/vezetok/szerkesztes', static function () use ($adminView, $
 
 $router->post('/admin/vezetok/mentes', static function () use ($guard, $leaders, $uploadImage, $redirect): string {
     $guard();
+    // Túl nagy feltöltésnél a PHP eldobja a teljes $_POST-ot (post_max_size).
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött fájl túl nagy a szerver korlátjához képest – tölts fel kisebb képet. (A módosítások nem mentődtek.)'];
+        return $redirect('/admin/vezetok');
+    }
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/vezetok');
     }
@@ -841,14 +865,31 @@ $router->post('/admin/vezetok/mentes', static function () use ($guard, $leaders,
     if ($id > 0) {
         $leader['id'] = $id;
     }
-    if (isset($_FILES['photo']) && ($_FILES['photo']['error'] ?? 4) === UPLOAD_ERR_OK) {
-        $uploaded = $uploadImage($_FILES['photo'], dirname(__DIR__) . '/public/uploads/team');
-        if ($uploaded !== null) {
-            $leader['photo'] = $uploaded;
+
+    $photoError = null;
+    $fileErr = $_FILES['photo']['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($fileErr !== UPLOAD_ERR_NO_FILE) {
+        if ($fileErr === UPLOAD_ERR_INI_SIZE || $fileErr === UPLOAD_ERR_FORM_SIZE) {
+            $photoError = 'A kép túl nagy – tölts fel kisebbet (max 16 MB).';
+        } elseif ($fileErr !== UPLOAD_ERR_OK) {
+            $photoError = 'A kép feltöltése megszakadt, próbáld újra.';
+        } else {
+            $uploaded = $uploadImage($_FILES['photo'], dirname(__DIR__) . '/public/uploads/team');
+            if ($uploaded === null) {
+                $photoError = 'A kép nem menthető – JPG/PNG/WEBP, max 16 MB legyen.';
+            } else {
+                $leader['photo'] = $uploaded;
+            }
         }
     }
+
     if ($leader['name'] !== '') {
         $leaders->save($leader);
+        $_SESSION['_flash_admin'] = $photoError !== null
+            ? ['type' => 'error', 'text' => 'Adatok mentve, de: ' . $photoError]
+            : ['type' => 'ok', 'text' => 'Mentve.'];
+    } else {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A név megadása kötelező.'];
     }
     return $redirect('/admin/vezetok');
 });

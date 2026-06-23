@@ -29,7 +29,8 @@ $stats = [
 ];
 ?>
 <section class="hero" id="top">
-    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-bg" data-parallax aria-hidden="true"></div>
+    <div class="hero-scrim" aria-hidden="true"></div>
     <div class="container hero-inner">
         <div class="hero-copy reveal">
             <p class="eyebrow"><span class="eyebrow-dot"></span> Az ügyfél sikere a mi sikerünk!</p>

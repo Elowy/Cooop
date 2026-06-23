@@ -26,6 +26,21 @@
         window.addEventListener('scroll', onScroll, { passive: true });
     }
 
+    // Hero parallax (erdő háttér)
+    var parallax = document.querySelector('[data-parallax]');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (parallax && !reduceMotion) {
+        var ticking = false;
+        var applyParallax = function () {
+            parallax.style.transform = 'translate3d(0,' + ((window.scrollY || 0) * 0.35) + 'px,0)';
+            ticking = false;
+        };
+        applyParallax();
+        window.addEventListener('scroll', function () {
+            if (!ticking) { ticking = true; window.requestAnimationFrame(applyParallax); }
+        }, { passive: true });
+    }
+
     // Lebegő kapcsolati gomb
     var fab = document.querySelector('[data-fab]');
     var fabToggle = document.querySelector('[data-fab-toggle]');

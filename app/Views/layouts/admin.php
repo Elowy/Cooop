@@ -65,10 +65,10 @@ $nav = [
         </header>
 
         <div class="admin-content">
-            <?php if ($pwWeak): ?>
-                <div class="pw-warning">
-                    ⚠️ Alapértelmezett jelszó van használatban. Élesben állíts be sajátot az
-                    <code>ADMIN_PASSWORD</code> környezeti változóval.
+            <?php $flash = $_SESSION['_flash_admin'] ?? null; unset($_SESSION['_flash_admin']); ?>
+            <?php if ($flash): ?>
+                <div class="admin-flash admin-flash--<?= ($flash['type'] ?? '') === 'ok' ? 'ok' : 'error' ?>">
+                    <?= View::e((string) ($flash['text'] ?? '')) ?>
                 </div>
             <?php endif; ?>
             <?= $content ?>
