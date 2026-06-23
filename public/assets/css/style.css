@@ -845,13 +845,27 @@ body.modal-open { overflow: hidden; }
 /* ==========================================================================
    Lábléc – készítő credit (animált)
    ========================================================================== */
-.footer-credit { margin-top: 18px; text-align: center; }
-.credit { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-size: .82rem; color: var(--muted); letter-spacing: .02em; }
-.credit-link { color: var(--gold-2); font-weight: 600; position: relative; }
-.credit-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px;
-    background: linear-gradient(90deg, var(--gold), var(--gold-2)); transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
-.credit-link:hover::after { transform: scaleX(1); }
+.footer-credit { margin-top: 22px; text-align: center; }
+.credit {
+    display: inline-flex; align-items: center; gap: .55rem;
+    padding: .55rem 1.1rem; border-radius: 999px;
+    background: rgba(255, 255, 255, .025); border: 1px solid var(--line);
+    font-size: .9rem; font-weight: 600;
+    transition: border-color .25s, transform .25s, box-shadow .25s;
+}
+.credit:hover { transform: translateY(-2px); border-color: rgba(255, 90, 31, .5); box-shadow: 0 10px 26px rgba(0, 0, 0, .35); }
+.credit-label { color: var(--muted); text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; }
+.credit-spark { color: #39ff7a; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; }
+.credit-name {
+    font-weight: 800; letter-spacing: .02em;
+    background: linear-gradient(90deg, #ff5a1f, #ffd400, #39ff7a, #1fb6ff, #b14bff, #ff5a1f);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: creditHue 6s linear infinite;
+}
 .credit-heart { display: inline-block; animation: creditBeat 1.4s ease-in-out infinite; transform-origin: center; }
+@keyframes creditHue { to { background-position: 300% 50%; } }
 @keyframes creditBeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.32); } 30% { transform: scale(1); } 45% { transform: scale(1.22); } 60% { transform: scale(1); } }
 
 /* Admin „küldés" ikon + állapot-pill */
@@ -861,5 +875,6 @@ body.modal-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
     .credit-heart { animation: none; }
+    .credit-name { animation: none; background-position: 0 50%; }
     .scroll-progress-bar { transition: none; }
 }

@@ -44,10 +44,11 @@ $contact = $config['contact'];
     </div>
 
     <div class="container footer-credit">
-        <p class="credit">
-            <span class="credit-text">Készítette</span>
-            <a href="https://luiz-tech.hu" target="_blank" rel="noopener" class="credit-link">luiz-tech.hu</a>
+        <a href="https://luiz-tech.hu" target="_blank" rel="noopener" class="credit" aria-label="Készítette: luiz-tech.hu">
+            <span class="credit-label">Készítette</span>
+            <span class="credit-spark" aria-hidden="true">&lt;/&gt;</span>
+            <span class="credit-name">luiz-tech.hu</span>
             <span class="credit-heart" aria-hidden="true">❤️</span>
-        </p>
+        </a>
     </div>
 </footer>
