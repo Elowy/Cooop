@@ -7,6 +7,7 @@ use App\Core\View;
 /** @var string $paymentLabel */
 /** @var array<string, string> $errors */
 /** @var array<string, mixed> $old */
+$payError = $payError ?? false;
 
 $v = static fn (string $k): string => View::e((string) ($old[$k] ?? ''));
 $err = static fn (string $k): string => isset($errors[$k])
@@ -26,6 +27,10 @@ $vatTotal = (int) $cart['total'] - $netTotal;
 
         <?php if (isset($errors['stock'])): ?>
             <div class="form-alert"><?= View::e($errors['stock']) ?></div>
+        <?php endif; ?>
+
+        <?php if ($payError): ?>
+            <div class="form-alert">A bankkártyás fizetést most nem sikerült elindítani. Kérjük, próbáld újra, vagy válassz banki átutalást.</div>
         <?php endif; ?>
 
         <form method="post" action="/penztar" class="checkout-grid" novalidate>

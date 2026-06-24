@@ -166,10 +166,21 @@ $safeUrl = static function (string $u): string {
     $u = trim($u);
     return preg_match('#^https?://#i', $u) === 1 ? $u : '';
 };
-$payment = match ($config['shop']['payment'] ?? 'mock') {
-    // 'simplepay' => new App\Payment\SimplePayGateway(...),  // éles bekötéskor
-    default => new MockPaymentGateway(),
-};
+// Fizetési kapu: ha be van állítva a Barion POSKey + kifizetett (Payee) e-mail,
+// éles/sandbox Barion-fizetés; különben a belső teszt-kapu.
+$barionSettings = $settings->all();
+$barionPoskey = trim((string) ($barionSettings['barion_poskey'] ?? ''));
+$barionPayee = trim((string) ($barionSettings['barion_payee'] ?? ''));
+$barionEnv = ($barionSettings['barion_env'] ?? 'test') === 'prod' ? 'prod' : 'test';
+$barionEnabled = $barionPoskey !== '' && $barionPayee !== '';
+$barionClient = $barionEnabled ? new App\Payment\BarionClient($barionPoskey, $barionEnv) : null;
+$payment = ($barionEnabled && $barionClient !== null)
+    ? new App\Payment\BarionPaymentGateway($barionClient, $orders, [
+        'base_url' => rtrim((string) $config['app']['url'], '/'),
+        'payee' => $barionPayee,
+        'currency' => (string) ($config['shop']['currency'] ?? 'HUF'),
+    ])
+    : new MockPaymentGateway();
 
 /**
  * A kosár tartalmát feloldja rendelési tételekké az aktuális (Axel) árakkal.
@@ -491,6 +502,7 @@ $router->get('/robots.txt', static function () use ($config): string {
         . "Disallow: /telepito\n"
         . "Disallow: /penztar\n"
         . "Disallow: /fizetes\n"
+        . "Disallow: /barion\n"
         . "Disallow: /kosar\n\n"
         . "Sitemap: {$base}/sitemap.xml\n";
 });
@@ -912,6 +924,45 @@ $orderEmail = static function (array $order) use ($config, $mailer): void {
     }
 };
 
+// Barion fizetési állapot egyeztetése a rendeléssel (a vásárló visszatérése és
+// a szerver-szerver IPN is ezt hívja). Idempotens: a pending → paid átmenetet
+// (számla + e-mail) csak egyszer végzi el.
+$barionReconcile = static function (array $order) use ($orders, $barionClient, $finalizeInvoice, $orderEmail): array {
+    if ($barionClient === null) {
+        return $order;
+    }
+    $token = (string) ($order['token'] ?? '');
+    if (($order['status'] ?? '') !== 'pending') {
+        return $order;
+    }
+    $paymentId = (string) ($order['payment']['payment_id'] ?? '');
+    if ($paymentId === '') {
+        return $order;
+    }
+    try {
+        $state = $barionClient->getPaymentState($paymentId);
+    } catch (\Throwable $e) {
+        error_log('Barion állapot-lekérés hiba: ' . $e->getMessage());
+        return $order;
+    }
+    $status = (string) ($state['Status'] ?? '');
+    if (App\Payment\BarionPaymentGateway::isPaid($status)) {
+        $paid = $orders->update($token, [
+            'status' => 'paid',
+            'payment' => ['status' => 'paid', 'paid_at' => date('c'), 'barion_status' => $status],
+        ]);
+        $finalizeInvoice($token);
+        if ($paid !== null) {
+            $orderEmail($paid);
+        }
+        return $paid ?? $order;
+    }
+    if (App\Payment\BarionPaymentGateway::isFinalFailure($status)) {
+        return $orders->update($token, ['payment' => ['status' => 'failed', 'barion_status' => $status]]) ?? $order;
+    }
+    return $order;
+};
+
 $router->get('/penztar', static function () use ($buildCart, $payment, $redirect): string {
     $cart = $buildCart();
     if (!$cart['items']) {
@@ -923,6 +974,7 @@ $router->get('/penztar', static function () use ($buildCart, $payment, $redirect
         'cart' => $cart,
         'paymentLabel' => $payment->label(),
         'errors' => [],
+        'payError' => isset($_GET['fizetes']) && $_GET['fizetes'] === 'hiba',
         'old' => $me !== null ? ['name' => $me['name'], 'email' => $me['email']] : [],
     ]);
 });
@@ -1057,6 +1109,41 @@ $router->get('/rendeles/{token}', static function (array $params) use ($orders):
     }
     return View::render('shop/confirmation', ['title' => 'Rendelés visszaigazolása', 'order' => $order]);
 });
+
+/* ------------------------------------------------------------------ */
+/* Barion fizetés – visszatérés (vásárló) és callback (IPN)            */
+/* ------------------------------------------------------------------ */
+
+// A vásárló visszatér a Barion fizetőoldaláról: egyeztetjük az állapotot,
+// sikeres fizetésnél ürítjük a kosarat, majd a visszaigazoló oldalra megyünk.
+$router->get('/barion/vissza', static function () use ($orders, $barionReconcile, $redirect): string {
+    $token = (string) ($_GET['token'] ?? '');
+    $order = $orders->find($token);
+    if ($order === null) {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'Ismeretlen rendelés']);
+    }
+    $order = $barionReconcile($order);
+    if (($order['status'] ?? '') === 'paid') {
+        Cart::clear();
+    }
+    return $redirect('/rendeles/' . $token);
+});
+
+// Szerver-szerver értesítés (IPN): a Barion a paymentId-t küldi. A rendelést
+// a tárolt PaymentId alapján keressük meg, és egyeztetjük az állapotát.
+$barionCallback = static function () use ($orders, $barionReconcile): string {
+    header('Content-Type: text/plain; charset=utf-8');
+    $paymentId = (string) ($_GET['paymentId'] ?? $_POST['paymentId'] ?? '');
+    $order = $orders->findByPaymentId($paymentId);
+    if ($order !== null) {
+        $barionReconcile($order);
+    }
+    http_response_code(200);
+    return 'OK';
+};
+$router->get('/barion/callback', $barionCallback);
+$router->post('/barion/callback', $barionCallback);
 
 /* ------------------------------------------------------------------ */
 /* Vezérlőpult (admin)                                                 */
@@ -1459,6 +1546,9 @@ $router->get('/admin/beallitasok', static function () use ($adminView, $guard, $
             'contact_phone' => array_key_exists('contact_phone', $s) ? $s['contact_phone'] : $config['contact']['phone'],
             'social_facebook' => $s['social_facebook'] ?? '',
             'social_youtube' => $s['social_youtube'] ?? '',
+            'barion_poskey' => $s['barion_poskey'] ?? '',
+            'barion_payee' => $s['barion_payee'] ?? '',
+            'barion_env' => ($s['barion_env'] ?? 'test') === 'prod' ? 'prod' : 'test',
         ],
     ]);
 });
@@ -1473,6 +1563,9 @@ $router->post('/admin/beallitasok', static function () use ($guard, $settings, $
             'contact_phone' => trim((string) ($_POST['contact_phone'] ?? '')),
             'social_facebook' => $safeUrl((string) ($_POST['social_facebook'] ?? '')),
             'social_youtube' => $safeUrl((string) ($_POST['social_youtube'] ?? '')),
+            'barion_poskey' => trim((string) ($_POST['barion_poskey'] ?? '')),
+            'barion_payee' => trim((string) ($_POST['barion_payee'] ?? '')),
+            'barion_env' => ($_POST['barion_env'] ?? 'test') === 'prod' ? 'prod' : 'test',
         ]);
     }
     return $redirect('/admin/beallitasok?mentve=1');

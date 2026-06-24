@@ -195,6 +195,57 @@ eq('encode(false,false) → necessary', 'necessary', \App\Core\Consent::encode(f
 eq('encode(true,true) → minden', 'necessary-analytics-marketing', \App\Core\Consent::encode(true, true));
 eq('parse∘encode oda-vissza', true, \App\Core\Consent::parse(\App\Core\Consent::encode(true, true))['marketing']);
 
+echo "Barion\n";
+$bTokenA = str_repeat('a', 32);
+$bOrder = [
+    'token' => $bTokenA,
+    'number' => 'NT-000123',
+    'totals' => ['gross' => 2540],
+    'items' => [['name' => 'Raklap', 'unit' => 'db', 'qty' => 2, 'price_gross' => 1270, 'subtotal' => 2540]],
+];
+$bPayload = \App\Payment\BarionPaymentGateway::buildStartPayload($bOrder, ['base_url' => 'https://shop.example/', 'payee' => 'penztar@ceg.hu', 'currency' => 'HUF']);
+eq('payload PaymentRequestId = token', $bTokenA, $bPayload['PaymentRequestId']);
+eq('payload RedirectUrl a tokennel', 'https://shop.example/barion/vissza?token=' . $bTokenA, $bPayload['RedirectUrl']);
+eq('payload CallbackUrl', 'https://shop.example/barion/callback', $bPayload['CallbackUrl']);
+eq('payload Payee a tranzakcióban', 'penztar@ceg.hu', $bPayload['Transactions'][0]['Payee']);
+eq('payload Total bruttó', 2540.0, $bPayload['Transactions'][0]['Total']);
+eq('payload tételszám', 1, count($bPayload['Transactions'][0]['Items']));
+eq('tétel ItemTotal', 2540.0, $bPayload['Transactions'][0]['Items'][0]['ItemTotal']);
+ok('Succeeded = fizetve', \App\Payment\BarionPaymentGateway::isPaid('Succeeded'));
+ok('Prepared != fizetve', !\App\Payment\BarionPaymentGateway::isPaid('Prepared'));
+ok('Expired = végleges kudarc', \App\Payment\BarionPaymentGateway::isFinalFailure('Expired'));
+ok('Started != végleges kudarc', !\App\Payment\BarionPaymentGateway::isFinalFailure('Started'));
+
+$bCaptured = [];
+$bTransport = static function (string $method, string $url, ?array $body) use (&$bCaptured): string {
+    $bCaptured[] = ['method' => $method, 'url' => $url, 'body' => $body];
+    return str_contains($url, 'Payment/Start')
+        ? (string) json_encode(['PaymentId' => 'PID-1', 'GatewayUrl' => 'https://barion/pay/PID-1'])
+        : (string) json_encode(['Status' => 'Succeeded', 'PaymentRequestId' => 'tok']);
+};
+$bClient = new \App\Payment\BarionClient('POS-GUID', 'test', $bTransport);
+$bStart = $bClient->startPayment(['PaymentRequestId' => 'tok']);
+eq('startPayment GatewayUrl', 'https://barion/pay/PID-1', $bStart['GatewayUrl']);
+ok('startPayment POST a Start végpontra', $bCaptured[0]['method'] === 'POST' && str_contains($bCaptured[0]['url'], '/v2/Payment/Start'));
+ok('startPayment a POSKey-t hozzáfűzi', ($bCaptured[0]['body']['POSKey'] ?? '') === 'POS-GUID');
+ok('test env = sandbox host', str_contains($bCaptured[0]['url'], 'api.test.barion.com'));
+$bState = $bClient->getPaymentState('PID-1');
+eq('getPaymentState Status', 'Succeeded', $bState['Status']);
+ok('getPaymentState GET + POSKey + PaymentId', $bCaptured[1]['method'] === 'GET' && str_contains($bCaptured[1]['url'], 'POSKey=POS-GUID') && str_contains($bCaptured[1]['url'], 'PaymentId=PID-1'));
+$bProdUrl = '';
+$bClientProd = new \App\Payment\BarionClient('POS', 'prod', static function ($m, $u, $b) use (&$bProdUrl): string { $bProdUrl = $u; return '{}'; });
+$bClientProd->getPaymentState('X');
+ok('prod env = éles host', str_contains($bProdUrl, 'https://api.barion.com') && !str_contains($bProdUrl, 'test'));
+
+$bStore = new OrderStore(null, $tmp . '/border');
+$bTokenB = str_repeat('b', 32);
+$bStore->save(['token' => $bTokenB, 'number' => 'NT-1', 'status' => 'pending', 'payment' => ['method' => 'card', 'status' => 'pending'], 'totals' => ['gross' => 1000], 'items' => [['name' => 'X', 'unit' => 'db', 'qty' => 1, 'price_gross' => 1000, 'subtotal' => 1000]]]);
+$bGwClient = new \App\Payment\BarionClient('POS', 'test', static fn ($m, $u, $b): string => (string) json_encode(['PaymentId' => 'PID-9', 'GatewayUrl' => 'https://barion/pay/PID-9']));
+$bGw = new \App\Payment\BarionPaymentGateway($bGwClient, $bStore, ['base_url' => 'https://shop', 'payee' => 'p@c.hu', 'currency' => 'HUF']);
+eq('start() a GatewayUrl-t adja', 'https://barion/pay/PID-9', $bGw->start($bStore->find($bTokenB)));
+eq('start() eltárolja a PaymentId-t', 'PID-9', $bStore->find($bTokenB)['payment']['payment_id']);
+eq('findByPaymentId visszatalál', $bTokenB, $bStore->findByPaymentId('PID-9')['token']);
+
 // Takarítás
 array_map('unlink', glob($tmp . '/*') ?: []);
 @rmdir($tmp);

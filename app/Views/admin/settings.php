@@ -48,6 +48,27 @@ use App\Core\View;
             <input name="social_youtube" type="url" value="<?= View::e($values['social_youtube']) ?>" placeholder="https://youtube.com/@csatornad">
         </div>
 
+        <header class="panel-head" style="margin-top:26px">
+            <h2 style="font-size:1.1rem">Bankkártyás fizetés (Barion)</h2>
+        </header>
+        <p class="muted" style="margin-top:0">Kitöltve a pénztár Barionnal indít kártyás fizetést. Üres POSKey esetén a beépített teszt-fizetés marad érvényben.</p>
+        <div class="field">
+            <label>POSKey (Barion azonosító)</label>
+            <input name="barion_poskey" value="<?= View::e($values['barion_poskey']) ?>" placeholder="pl. 1a2b3c4d-…" autocomplete="off">
+        </div>
+        <div class="field">
+            <label>Kifizetett (Payee) — a Barion-fiók e-mail címe</label>
+            <input name="barion_payee" type="email" value="<?= View::e($values['barion_payee']) ?>" placeholder="penztar@ceged.hu">
+        </div>
+        <div class="field">
+            <label>Környezet</label>
+            <select name="barion_env">
+                <option value="test"<?= $values['barion_env'] !== 'prod' ? ' selected' : '' ?>>Teszt (sandbox)</option>
+                <option value="prod"<?= $values['barion_env'] === 'prod' ? ' selected' : '' ?>>Éles (production)</option>
+            </select>
+            <p class="note" style="margin-top:6px">Élesítés előtt teszt-környezetben, sandbox POSKey-jel próbáld ki a teljes folyamatot.</p>
+        </div>
+
         <button type="submit" class="btn btn--gold">Mentés</button>
     </form>
 </section>

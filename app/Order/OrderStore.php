@@ -111,6 +111,23 @@ final class OrderStore
         }));
     }
 
+    /**
+     * Rendelés keresése a fizetési szolgáltató (Barion) PaymentId-je alapján.
+     * A callback (IPN) csak a paymentId-t kapja, ez köti vissza a rendeléshez.
+     */
+    public function findByPaymentId(string $paymentId): ?array
+    {
+        if ($paymentId === '') {
+            return null;
+        }
+        foreach ($this->all() as $o) {
+            if ((string) ($o['payment']['payment_id'] ?? '') === $paymentId) {
+                return $o;
+            }
+        }
+        return null;
+    }
+
     public function nextNumber(): string
     {
         if ($this->pdo) {
