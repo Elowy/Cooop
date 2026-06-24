@@ -9,9 +9,12 @@ use App\Integration\Product;
 /** @var array<int, array<string, mixed>> $catsTree */
 /** @var string $activeCat */
 /** @var string[] $activePath */
+/** @var string $sort */
 /** @var Categories $cats */
+/** @var array<string, mixed> $config */
 
 $title = $activeCat !== '' ? $cats->name($activeCat) : 'Termékeink';
+$LOW = 15; // e készletszint alatt „már csak X" sürgetést mutatunk
 
 /** Oldalsáv kategóriafa – csak az aktív ág kibontva (accordion). */
 $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath): void {
@@ -42,7 +45,7 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
     <div class="container">
         <p class="eyebrow"><span class="eyebrow-dot"></span> Webshop</p>
         <h1 class="display"><?= View::e($title) ?></h1>
-        <p class="section-sub">Placeholder árak és készlet — éles üzemben az Axel Pro-ból frissül.</p>
+        <p class="section-sub">Az árak bruttó, az ÁFÁ-t tartalmazó árak. Raktáron lévő termékek gyors kiszállítással.</p>
     </div>
 </section>
 
@@ -67,7 +70,22 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                 <?php endforeach; ?>
             </nav>
 
-            <p class="result-count"><?= count($products) ?> termék</p>
+            <div class="shop-toolbar">
+                <p class="result-count"><?= count($products) ?> termék</p>
+                <?php if ($products): ?>
+                    <form method="get" action="/webshop" class="sort-form">
+                        <?php if ($activeCat !== ''): ?><input type="hidden" name="kat" value="<?= View::e($activeCat) ?>"><?php endif; ?>
+                        <label class="sort-label" for="sort-select">Rendezés</label>
+                        <select id="sort-select" name="rendezes" class="sort-select" data-autosubmit>
+                            <option value=""<?= $sort === '' ? ' selected' : '' ?>>Alapértelmezett</option>
+                            <option value="ar-fel"<?= $sort === 'ar-fel' ? ' selected' : '' ?>>Ár szerint növekvő</option>
+                            <option value="ar-le"<?= $sort === 'ar-le' ? ' selected' : '' ?>>Ár szerint csökkenő</option>
+                            <option value="nev"<?= $sort === 'nev' ? ' selected' : '' ?>>Név szerint (A–Z)</option>
+                        </select>
+                        <button type="submit" class="btn btn--outline btn--sm sort-go">Rendez</button>
+                    </form>
+                <?php endif; ?>
+            </div>
 
             <?php if (!$products): ?>
                 <p class="empty">Ebben a kategóriában jelenleg nincs termék.</p>
@@ -76,8 +94,13 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                     <?php foreach ($products as $p): ?>
                         <article class="card product-card reveal">
                             <a class="product-media" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
-                                <?php if (!$p->inStock()): ?><span class="badge badge--out">Elfogyott</span>
-                                <?php else: ?><span class="badge">Raktáron</span><?php endif; ?>
+                                <?php if (!$p->inStock()): ?>
+                                    <span class="badge badge--out">Elfogyott</span>
+                                <?php elseif ($p->stock <= $LOW): ?>
+                                    <span class="badge badge--low">Már csak <?= (int) $p->stock ?> <?= View::e($p->unit) ?></span>
+                                <?php else: ?>
+                                    <span class="badge">Raktáron</span>
+                                <?php endif; ?>
                             </a>
                             <h3><a href="/termek/<?= View::e($p->slug) ?>"><?= View::e($p->name) ?></a></h3>
                             <p><?= View::e($p->short) ?></p>
@@ -85,10 +108,15 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                                 <span class="price"><?= View::huf($p->priceGross()) ?></span>
                                 <span class="price-unit">/ <?= View::e($p->unit) ?> · bruttó</span>
                             </div>
-                            <form method="post" action="/kosar/hozzaad" class="add-form">
+                            <p class="price-net">nettó <?= View::huf($p->priceNet) ?> + <?= (int) $p->vat ?>% áfa</p>
+                            <form method="post" action="/kosar/hozzaad" class="add-form add-form--card">
                                 <?= Csrf::field() ?>
                                 <input type="hidden" name="sku" value="<?= View::e($p->sku) ?>">
-                                <button type="submit" class="btn btn--gold btn--sm btn--block"<?= $p->inStock() ? '' : ' disabled' ?>>
+                                <label class="qty-mini">
+                                    <span class="vh">Mennyiség (<?= View::e($p->unit) ?>)</span>
+                                    <input type="number" name="qty" value="1" min="1" max="<?= max(1, (int) $p->stock) ?>" inputmode="numeric"<?= $p->inStock() ? '' : ' disabled' ?>>
+                                </label>
+                                <button type="submit" class="btn btn--gold btn--sm"<?= $p->inStock() ? '' : ' disabled' ?>>
                                     Kosárba
                                 </button>
                             </form>
@@ -99,3 +127,23 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
         </div>
     </div>
 </section>
+<?php
+$base = rtrim((string) ($config['app']['url'] ?? ''), '/');
+$ldFlags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG;
+
+$breadcrumbLd = ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => []];
+$crumbs = [['name' => 'Webshop', 'url' => $base . '/webshop']];
+foreach ($activePath as $key) {
+    $crumbs[] = ['name' => $cats->name($key), 'url' => $base . '/webshop?kat=' . urlencode($key)];
+}
+foreach ($crumbs as $i => $c) {
+    $breadcrumbLd['itemListElement'][] = ['@type' => 'ListItem', 'position' => $i + 1, 'name' => $c['name'], 'item' => $c['url']];
+}
+
+$itemListLd = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'itemListElement' => []];
+foreach ($products as $i => $p) {
+    $itemListLd['itemListElement'][] = ['@type' => 'ListItem', 'position' => $i + 1, 'name' => $p->name, 'url' => $base . '/termek/' . rawurlencode($p->slug)];
+}
+?>
+<script type="application/ld+json"><?= json_encode($breadcrumbLd, $ldFlags) ?></script>
+<?php if ($products): ?><script type="application/ld+json"><?= json_encode($itemListLd, $ldFlags) ?></script><?php endif; ?>
