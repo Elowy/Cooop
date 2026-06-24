@@ -21,6 +21,14 @@ if (!empty($config['installed'])) {
 $seo = (new SettingsStore($seoPdo))->all();
 $meta = $meta ?? []; // oldal-specifikus felülírás (pl. termékoldal)
 
+// Tevékenységek a fejléc legördülő menüjéhez (publikált, sorrendben).
+$servicesNav = [];
+try {
+    $servicesNav = (new \App\Service\ServiceStore($seoPdo))->menu();
+} catch (\Throwable $e) {
+    $servicesNav = [];
+}
+
 $defaultDesc = 'Net-Trade Hungary Kft. – egyedi raklapgyártás, ipari csomagolás, nemzetközi árufuvarozás és fűrészáru-nagykereskedelem.';
 $baseTitle = trim((string) ($seo['seo_title'] ?? '')) ?: ($appName . ' — ' . $config['app']['tagline']);
 $ovTitle = trim((string) ($meta['title'] ?? ''));

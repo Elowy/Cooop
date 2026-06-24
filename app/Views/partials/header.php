@@ -5,8 +5,9 @@ use App\Core\Cart;
 use App\Core\View;
 
 /** @var array<string, mixed> $config */
+/** @var array<int, array{slug: string, title: string}> $servicesNav */
+$servicesNav = $servicesNav ?? [];
 $nav = [
-    '/webshop'      => 'Webshop',
     '/#kategoriak'  => 'Kategóriák',
     '/#rolunk'      => 'Rólunk',
     '/#terkep'      => 'Térkép',
@@ -14,6 +15,7 @@ $nav = [
     '/blog'         => 'Blog',
     '/#kapcsolat'   => 'Kapcsolat',
 ];
+// Megjegyzés: a Webshop és a „Tevékenységek" legördülő külön renderelődik alább.
 $cartCount = Cart::count();
 $me = Auth::user();
 ?>
@@ -28,6 +30,21 @@ $me = Auth::user();
         </button>
 
         <nav class="main-nav" data-nav>
+            <a href="/webshop">Webshop</a>
+            <?php if (!empty($servicesNav)): ?>
+                <div class="nav-group">
+                    <a href="/szolgaltatasok" class="nav-group-trigger" aria-haspopup="true">
+                        Tevékenységek <span class="nav-caret" aria-hidden="true">▾</span>
+                    </a>
+                    <div class="nav-dropdown">
+                        <?php foreach ($servicesNav as $sv): ?>
+                            <a href="/szolgaltatasok/<?= View::e((string) $sv['slug']) ?>"><?= View::e((string) $sv['title']) ?></a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php else: ?>
+                <a href="/szolgaltatasok">Tevékenységek</a>
+            <?php endif; ?>
             <?php foreach ($nav as $href => $label): ?>
                 <a href="<?= View::e($href) ?>"><?= View::e($label) ?></a>
             <?php endforeach; ?>

@@ -41,6 +41,7 @@ use App\Order\OrderStore;
 use App\Payment\MockPaymentGateway;
 use App\Reference\ReferenceStore;
 use App\Seo\ProductSeoStore;
+use App\Service\ServiceStore;
 use App\Settings\SettingsStore;
 
 $config = require dirname(__DIR__) . '/config/config.php';
@@ -122,6 +123,7 @@ $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
 $productImages = new ProductImageStore($pdo);
 $blog = new BlogStore($pdo);
+$services = new ServiceStore($pdo);
 $throttle = new LoginThrottle();
 $clientIp = static fn (): string => (string) ($_SERVER['REMOTE_ADDR'] ?? 'cli');
 
@@ -311,6 +313,36 @@ $router->get('/terkep', static function () use ($redirect): string {
 });
 
 /* ------------------------------------------------------------------ */
+/* Tevékenységek / szolgáltatások                                       */
+/* ------------------------------------------------------------------ */
+
+$router->get('/szolgaltatasok', static function () use ($services): string {
+    return View::render('services/index', [
+        'title' => 'Tevékenységek',
+        'services' => $services->all(true),
+    ]);
+});
+
+$router->get('/szolgaltatasok/{slug}', static function (array $params) use ($services): string {
+    $service = $services->findBySlug((string) ($params['slug'] ?? ''), true);
+    if ($service === null) {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'A tevékenység nem található']);
+    }
+    return View::render('services/show', [
+        'title' => (string) $service['title'],
+        'service' => $service,
+        'others' => array_values(array_filter(
+            $services->all(true),
+            static fn ($s) => (int) $s['id'] !== (int) $service['id']
+        )),
+        'meta' => [
+            'description' => trim((string) ($service['summary'] ?? '')),
+        ],
+    ]);
+});
+
+/* ------------------------------------------------------------------ */
 /* Blog                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -356,11 +388,14 @@ $router->get('/adatkezeles', static fn (): string => View::render('legal', [
 /* SEO – sitemap és robots (dinamikus, a katalógusból)                  */
 /* ------------------------------------------------------------------ */
 
-$router->get('/sitemap.xml', static function () use ($axel, $cats, $blog, $config): string {
+$router->get('/sitemap.xml', static function () use ($axel, $cats, $blog, $services, $config): string {
     header('Content-Type: application/xml; charset=UTF-8');
     $base = rtrim((string) $config['app']['url'], '/');
     $esc = static fn (string $u): string => htmlspecialchars($u, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    $rows = [['/', '1.0'], ['/webshop', '0.9'], ['/blog', '0.6']];
+    $rows = [['/', '1.0'], ['/webshop', '0.9'], ['/szolgaltatasok', '0.7'], ['/blog', '0.6']];
+    foreach ($services->all(true) as $service) {
+        $rows[] = ['/szolgaltatasok/' . rawurlencode((string) $service['slug']), '0.6'];
+    }
     foreach ($cats->all() as $key => $node) {
         if ($node['children'] === []) { // csak levél-kategóriák
             $rows[] = ['/webshop?kat=' . urlencode((string) $key), '0.5'];
@@ -1764,6 +1799,61 @@ $router->post('/admin/blog/torles', static function () use ($guard, $blog, $redi
         $blog->delete($id);
     }
     return $redirect('/admin/blog');
+});
+
+/* ------------------------------------------------------------------ */
+/* Tevékenységek (admin)                                                */
+/* ------------------------------------------------------------------ */
+
+$router->get('/admin/szolgaltatasok', static function () use ($adminView, $guard, $services): string {
+    $guard();
+    return $adminView('admin/services', 'services_admin', ['title' => 'Tevékenységek', 'services' => $services->all()]);
+});
+
+$router->get('/admin/szolgaltatasok/szerkesztes', static function () use ($adminView, $guard, $services): string {
+    $guard();
+    $id = (int) ($_GET['id'] ?? 0);
+    $service = $id > 0 ? $services->find($id) : null;
+    return $adminView('admin/service-edit', 'services_admin', [
+        'title' => $service ? 'Tevékenység szerkesztése' : 'Új tevékenység',
+        'service' => $service,
+    ]);
+});
+
+$router->post('/admin/szolgaltatasok/mentes', static function () use ($guard, $services, $redirect): string {
+    $guard();
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/szolgaltatasok');
+    }
+    $id = (int) ($_POST['id'] ?? 0);
+    $service = [
+        'title' => trim((string) ($_POST['title'] ?? '')),
+        'slug' => trim((string) ($_POST['slug'] ?? '')),
+        'icon' => trim((string) ($_POST['icon'] ?? '')),
+        'summary' => trim((string) ($_POST['summary'] ?? '')),
+        'body' => (string) ($_POST['body'] ?? ''),
+        'sort' => (int) ($_POST['sort'] ?? 0),
+        'published' => isset($_POST['published']) ? 1 : 0,
+    ];
+    if ($id > 0) {
+        $service['id'] = $id;
+    }
+    if ($service['title'] === '') {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A cím megadása kötelező.'];
+        return $redirect('/admin/szolgaltatasok/szerkesztes' . ($id ? '?id=' . $id : ''));
+    }
+    $services->save($service);
+    $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Tevékenység mentve.'];
+    return $redirect('/admin/szolgaltatasok');
+});
+
+$router->post('/admin/szolgaltatasok/torles', static function () use ($guard, $services, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $services->delete((int) ($_POST['id'] ?? 0));
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Tevékenység törölve.'];
+    }
+    return $redirect('/admin/szolgaltatasok');
 });
 
 $router->get('/admin/terkep', static function () use ($adminView, $guard, $pois): string {

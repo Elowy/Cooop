@@ -29,6 +29,7 @@ use App\Core\Mailer;
 use App\Core\View;
 use App\Integration\Product;
 use App\Order\OrderStore;
+use App\Service\ServiceStore;
 
 $tests = 0;
 $failed = 0;
@@ -134,6 +135,20 @@ $blogStore->save(['id' => $bId2, 'title' => 'Első bejegyzés', 'published' => 1
 eq('publikálás után 2 látszik', 2, count($blogStore->all(true)));
 $blogStore->delete($bId1);
 eq('törlés után 1 marad', 1, count($blogStore->all()));
+
+echo "ServiceStore (fájl mód)\n";
+$svcStore = new ServiceStore(null, $tmp . '/services.json', $tmp . '/noseed.php');
+$svcStore->save(['title' => 'Második', 'sort' => 2, 'published' => 1]);
+$svcStore->save(['title' => 'Első', 'sort' => 1, 'published' => 1]);
+$sId3 = $svcStore->save(['title' => 'Rejtett', 'sort' => 3, 'published' => 0]);
+eq('sort szerint rendez (Első előre)', 'Első', $svcStore->all()[0]['title']);
+eq('all(true) csak a publikáltakat', 2, count($svcStore->all(true)));
+eq('menu() a publikáltakat sorrendben', ['Első', 'Második'], array_column($svcStore->menu(), 'title'));
+ok('findBySlug megtalál', $svcStore->findBySlug('elso') !== null);
+ok('findBySlug publishedOnly rejti', $svcStore->findBySlug('rejtett', true) === null);
+eq('slugify fallback', 'szolgaltatas', ServiceStore::slugify('!!!'));
+$svcStore->delete($sId3);
+eq('törlés után 2 marad', 2, count($svcStore->all()));
 
 echo "LoginThrottle\n";
 $throttle = new LoginThrottle($tmp . '/login.json', 3, 60);

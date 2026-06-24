@@ -121,6 +121,18 @@ final class Schema
                 published INT NOT NULL DEFAULT 1,
                 created_at VARCHAR(40) NOT NULL
             )$suffix",
+
+            "CREATE TABLE IF NOT EXISTS services (
+                id $id,
+                slug VARCHAR(190) NOT NULL UNIQUE,
+                title VARCHAR(255) NOT NULL,
+                icon VARCHAR(40) NOT NULL DEFAULT '',
+                summary $txt,
+                body $txt,
+                sort INT NOT NULL DEFAULT 0,
+                published INT NOT NULL DEFAULT 1,
+                created_at VARCHAR(40) NOT NULL
+            )$suffix",
         ];
 
         foreach ($tables as $sql) {
