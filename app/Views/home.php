@@ -196,7 +196,17 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
 (function () {
     if (!window.L || !document.getElementById('map')) { return; }
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-    var map = L.map('map', { scrollWheelZoom: false }).setView([30, 10], 2);
+    // Statikus térkép: nem mozgatható/nagyítható, csak a pontok kattinthatók.
+    var map = L.map('map', {
+        scrollWheelZoom: false,
+        dragging: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        touchZoom: false,
+        zoomControl: false,
+        tap: false
+    }).setView([30, 10], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 18 }).addTo(map);
     var group = [];
     (window.NT_POIS || []).forEach(function (p) {
@@ -207,7 +217,10 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
         m.bindPopup(html);
         group.push(m);
     });
-    if (group.length) { map.fitBounds(L.featureGroup(group).getBounds(), { padding: [36, 36], maxZoom: 6 }); }
+    // Az összes pontra illesztés, hogy mind látszódjon.
+    if (group.length) {
+        map.fitBounds(L.featureGroup(group).getBounds(), { padding: [40, 40], maxZoom: 6 });
+    }
 })();
 </script>
 <?php endif; ?>
