@@ -1197,3 +1197,39 @@ body.modal-open { overflow: hidden; }
 .sitemap-list a { color: var(--muted); }
 .sitemap-list a:hover { color: var(--text); }
 @media (max-width: 680px) { .sitemap-cols { columns: 1; } }
+
+/* ---------- Tevékenység-kártyák + részletek-ablak ---------- */
+.service-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.service-card { padding: 0; overflow: hidden; }
+.service-card-link { display: flex; flex-direction: column; height: 100%; color: inherit; }
+.service-card-link:hover { color: inherit; }
+.service-card-media { position: relative; aspect-ratio: 16 / 10; background: var(--gold-soft); display: grid; place-items: center; overflow: hidden; border-bottom: 1px solid var(--line); }
+.service-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.service-card-media .card-icon { width: 64px; height: 64px; }
+.service-card-body { padding: 22px 24px 26px; display: flex; flex-direction: column; flex: 1; }
+.service-card-title { display: block; font-family: var(--serif); font-weight: 600; font-size: 1.12rem; margin: 0 0 8px; color: var(--text); }
+.service-card-sum { display: block; color: var(--muted); font-size: .92rem; margin: 0 0 16px; }
+.service-card-body .card-link { margin-top: auto; }
+
+.service-modal { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; opacity: 0; transition: opacity .25s ease; }
+.service-modal[hidden] { display: none; }
+.service-modal.is-open { opacity: 1; }
+.service-modal-backdrop { position: absolute; inset: 0; background: rgba(8, 8, 6, .66); backdrop-filter: blur(3px); }
+.service-modal-dialog { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 760px; max-height: 88vh; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 30px 90px rgba(0, 0, 0, .6); transform: translateY(12px) scale(.98); transition: transform .25s ease; }
+.service-modal.is-open .service-modal-dialog { transform: none; }
+.service-modal-close { position: absolute; top: 12px; right: 14px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: rgba(0, 0, 0, .4); color: #fff; font-size: 1.5rem; line-height: 1; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.service-modal-close:hover { background: rgba(0, 0, 0, .65); border-color: var(--line-gold); }
+.service-modal-content { overflow-y: auto; }
+.service-detail { padding-bottom: 30px; }
+.service-detail-img { width: 100%; height: 240px; object-fit: cover; display: block; }
+.service-detail > :not(img) { padding-left: 34px; padding-right: 34px; }
+.service-detail > .eyebrow { padding-top: 26px; margin: 0 0 2px; }
+.service-detail h2 { margin: 6px 0 14px; font-size: 1.6rem; }
+body.modal-open { overflow: hidden; }
+@media (max-width: 560px) {
+    .service-detail-img { height: 180px; }
+    .service-detail > :not(img) { padding-left: 22px; padding-right: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .service-modal, .service-modal-dialog { transition: none; }
+}

@@ -210,12 +210,13 @@ $wantsJson = static function (): bool {
 
 $router = new Router();
 
-$router->get('/', static function () use ($cats, $references, $leaders, $pois): string {
+$router->get('/', static function () use ($cats, $references, $leaders, $pois, $services): string {
     $flash = $_SESSION['_flash_contact'] ?? [];
     unset($_SESSION['_flash_contact']);
     return View::render('home', [
         'title' => null,
         'topCats' => $cats->topLevel(),
+        'services' => $services->all(true),
         'references' => $references->all(),
         'leaders' => $leaders->all(),
         'pois' => $pois->all(),
@@ -1898,6 +1899,7 @@ $router->post('/admin/szolgaltatasok/mentes', static function () use ($guard, $s
         'title' => trim((string) ($_POST['title'] ?? '')),
         'slug' => trim((string) ($_POST['slug'] ?? '')),
         'icon' => trim((string) ($_POST['icon'] ?? '')),
+        'image' => trim((string) ($_POST['image'] ?? '')),
         'summary' => trim((string) ($_POST['summary'] ?? '')),
         'body' => (string) ($_POST['body'] ?? ''),
         'sort' => (int) ($_POST['sort'] ?? 0),

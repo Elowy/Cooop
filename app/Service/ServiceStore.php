@@ -9,8 +9,8 @@ use PDO;
  * tábla), előtte JSON fájl. Fájl-módban első használatkor a config/services.php
  * kezdő-adatokból töltődik fel; DB-módban a telepítő importálja.
  *
- * Szolgáltatás: id, slug, title, icon, summary, body (Markdown), sort,
- * published (0/1), created (ISO dátum).
+ * Szolgáltatás: id, slug, title, icon, image (URL), summary, body (Markdown),
+ * sort, published (0/1), created (ISO dátum).
  */
 final class ServiceStore
 {
@@ -32,7 +32,7 @@ final class ServiceStore
     {
         if ($this->pdo) {
             $out = [];
-            $rows = $this->pdo->query('SELECT id, slug, title, icon, summary, body, sort, published, created_at FROM services ORDER BY sort, id');
+            $rows = $this->pdo->query('SELECT id, slug, title, icon, image, summary, body, sort, published, created_at FROM services ORDER BY sort, id');
             foreach ($rows as $r) {
                 $out[] = self::mapRow($r);
             }
@@ -69,7 +69,7 @@ final class ServiceStore
     public function find(int $id): ?array
     {
         if ($this->pdo) {
-            $stmt = $this->pdo->prepare('SELECT id, slug, title, icon, summary, body, sort, published, created_at FROM services WHERE id = ?');
+            $stmt = $this->pdo->prepare('SELECT id, slug, title, icon, image, summary, body, sort, published, created_at FROM services WHERE id = ?');
             $stmt->execute([$id]);
             $r = $stmt->fetch();
             return $r ? self::mapRow($r) : null;
@@ -103,6 +103,7 @@ final class ServiceStore
             'slug' => $slug,
             'title' => $title,
             'icon' => trim((string) ($service['icon'] ?? '')),
+            'image' => trim((string) ($service['image'] ?? '')),
             'summary' => trim((string) ($service['summary'] ?? '')),
             'body' => (string) ($service['body'] ?? ''),
             'sort' => (int) ($service['sort'] ?? 0),
@@ -111,12 +112,12 @@ final class ServiceStore
 
         if ($this->pdo) {
             if ($id > 0) {
-                $this->pdo->prepare('UPDATE services SET slug=?, title=?, icon=?, summary=?, body=?, sort=?, published=? WHERE id=?')
-                    ->execute([$row['slug'], $row['title'], $row['icon'], $row['summary'], $row['body'], $row['sort'], $row['published'], $id]);
+                $this->pdo->prepare('UPDATE services SET slug=?, title=?, icon=?, image=?, summary=?, body=?, sort=?, published=? WHERE id=?')
+                    ->execute([$row['slug'], $row['title'], $row['icon'], $row['image'], $row['summary'], $row['body'], $row['sort'], $row['published'], $id]);
                 return $id;
             }
-            $this->pdo->prepare('INSERT INTO services (slug, title, icon, summary, body, sort, published, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-                ->execute([$row['slug'], $row['title'], $row['icon'], $row['summary'], $row['body'], $row['sort'], $row['published'], date('c')]);
+            $this->pdo->prepare('INSERT INTO services (slug, title, icon, image, summary, body, sort, published, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+                ->execute([$row['slug'], $row['title'], $row['icon'], $row['image'], $row['summary'], $row['body'], $row['sort'], $row['published'], date('c')]);
             return (int) $this->pdo->lastInsertId();
         }
         return $this->fileSave($id, $row);
@@ -204,6 +205,7 @@ final class ServiceStore
             'slug' => (string) $r['slug'],
             'title' => (string) $r['title'],
             'icon' => (string) ($r['icon'] ?? ''),
+            'image' => (string) ($r['image'] ?? ''),
             'summary' => (string) ($r['summary'] ?? ''),
             'body' => (string) ($r['body'] ?? ''),
             'sort' => (int) ($r['sort'] ?? 0),
@@ -226,6 +228,7 @@ final class ServiceStore
                 'slug' => self::slugify((string) ($s['slug'] ?? '') !== '' ? (string) $s['slug'] : $title),
                 'title' => $title,
                 'icon' => (string) ($s['icon'] ?? ''),
+                'image' => (string) ($s['image'] ?? ''),
                 'summary' => (string) ($s['summary'] ?? ''),
                 'body' => (string) ($s['body'] ?? ''),
                 'sort' => (int) ($s['sort'] ?? $i),
