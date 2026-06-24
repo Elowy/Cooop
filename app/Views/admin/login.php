@@ -5,6 +5,7 @@ use App\Core\View;
 
 /** @var array<string, mixed> $config */
 /** @var bool $error */
+/** @var bool $locked */
 /** @var bool $installed */
 ?>
 <!DOCTYPE html>
@@ -14,7 +15,7 @@ use App\Core\View;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
     <title>Belépés — Vezérlőpult</title>
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="<?= View::e(View::asset('/assets/css/style.css')) ?>">
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 </head>
 <body class="admin">
@@ -26,7 +27,9 @@ use App\Core\View;
         </a>
         <p class="login-sub">Jelentkezz be a folytatáshoz.</p>
 
-        <?php if (!empty($error)): ?>
+        <?php if (!empty($locked)): ?>
+            <div class="login-error">Túl sok sikertelen próbálkozás. Várj néhány percet, mielőtt újra próbálkozol.</div>
+        <?php elseif (!empty($error)): ?>
             <div class="login-error">Hibás jelszó.</div>
         <?php endif; ?>
 

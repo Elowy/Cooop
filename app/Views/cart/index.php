@@ -5,7 +5,9 @@ use App\Core\View;
 
 /** @var array<int, array{product: \App\Integration\Product, qty: int, subtotal: int}> $lines */
 /** @var int $total */
+/** @var array<string, string[]> $images */
 
+$images = $images ?? [];
 $netTotal = 0;
 foreach ($lines as $line) {
     $netTotal += $line['product']->priceNet * $line['qty'];
@@ -23,9 +25,9 @@ $vatTotal = $total - $netTotal;
             </div>
         <?php else: ?>
             <div class="cart-table">
-                <?php foreach ($lines as $line): $p = $line['product']; ?>
+                <?php foreach ($lines as $line): $p = $line['product']; $cImg = $images[$p->sku][0] ?? null; ?>
                     <div class="cart-row">
-                        <span class="cart-thumb" data-icon="<?= View::e($p->icon) ?>" aria-hidden="true"></span>
+                        <span class="cart-thumb<?= $cImg ? ' has-image' : '' ?>" data-icon="<?= View::e($p->icon) ?>" aria-hidden="true"><?php if ($cImg): ?><img src="/uploads/products/<?= View::e($cImg) ?>" alt="" loading="lazy"><?php endif; ?></span>
                         <div class="cart-info">
                             <a href="/termek/<?= View::e($p->slug) ?>" class="cart-name"><?= View::e($p->name) ?></a>
                             <small><?= View::huf($p->priceGross()) ?> / <?= View::e($p->unit) ?></small>

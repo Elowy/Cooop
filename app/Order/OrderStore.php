@@ -95,6 +95,22 @@ final class OrderStore
         return $orders;
     }
 
+    /**
+     * Egy vásárló rendelései: a hozzá kötött (user_id) vagy az e-mail-egyezésű
+     * rendelések, létrehozás szerint csökkenő sorrendben.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function forCustomer(int $userId, string $email): array
+    {
+        $email = strtolower(trim($email));
+        return array_values(array_filter($this->all(), static function ($o) use ($userId, $email): bool {
+            $oUser = (int) ($o['customer']['user_id'] ?? 0);
+            $oEmail = strtolower(trim((string) ($o['customer']['email'] ?? '')));
+            return ($userId > 0 && $oUser === $userId) || ($email !== '' && $oEmail === $email);
+        }));
+    }
+
     public function nextNumber(): string
     {
         if ($this->pdo) {

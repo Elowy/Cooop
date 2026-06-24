@@ -12,8 +12,16 @@ use App\Integration\Product;
 /** @var array<string, mixed> $config */
 
 $related = $related ?? [];
+$images = $images ?? [];
 $LOW = 15;
 $phone = (string) ($config['contact']['phone'] ?? '');
+
+// Készlet-badge (a galériában és az ikonos nézetben is ezt használjuk).
+ob_start(); ?>
+<?php if (!$product->inStock()): ?><span class="badge badge--out">Elfogyott</span>
+<?php elseif ($product->stock <= $LOW): ?><span class="badge badge--low">Már csak <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span>
+<?php else: ?><span class="badge">Raktáron · <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span><?php endif;
+$badge = ob_get_clean();
 ?>
 <section class="section section--clear-top product-detail">
     <div class="container">
@@ -28,15 +36,27 @@ $phone = (string) ($config['contact']['phone'] ?? '');
         </nav>
 
         <div class="detail-grid">
-            <div class="detail-media reveal" data-icon="<?= View::e($product->icon) ?>" aria-hidden="true">
-                <?php if (!$product->inStock()): ?>
-                    <span class="badge badge--out">Elfogyott</span>
-                <?php elseif ($product->stock <= $LOW): ?>
-                    <span class="badge badge--low">Már csak <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span>
-                <?php else: ?>
-                    <span class="badge">Raktáron · <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span>
-                <?php endif; ?>
-            </div>
+            <?php if ($images): ?>
+                <div class="detail-media detail-gallery reveal">
+                    <div class="gallery-main">
+                        <img id="gallery-main-img" src="/uploads/products/<?= View::e($images[0]) ?>" alt="<?= View::e($product->name) ?>">
+                        <?= $badge ?>
+                    </div>
+                    <?php if (count($images) > 1): ?>
+                        <div class="gallery-thumbs">
+                            <?php foreach ($images as $i => $f): ?>
+                                <button type="button" class="gallery-thumb<?= $i === 0 ? ' is-active' : '' ?>" data-gallery-thumb="/uploads/products/<?= View::e($f) ?>" aria-label="<?= View::e($product->name) ?> – <?= $i + 1 ?>. kép">
+                                    <img src="/uploads/products/<?= View::e($f) ?>" alt="" loading="lazy">
+                                </button>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <div class="detail-media reveal" data-icon="<?= View::e($product->icon) ?>" aria-hidden="true">
+                    <?= $badge ?>
+                </div>
+            <?php endif; ?>
 
             <div class="detail-copy reveal">
                 <p class="eyebrow"><span class="eyebrow-dot"></span> Cikkszám: <?= View::e($product->sku) ?></p>
@@ -143,6 +163,9 @@ $productLd = [
         'itemCondition' => 'https://schema.org/NewCondition',
     ],
 ];
+if ($images) {
+    $productLd['image'] = array_map(static fn ($f) => $base . '/uploads/products/' . $f, $images);
+}
 
 $breadcrumbLd = ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => []];
 $crumbs = [['name' => 'Webshop', 'url' => $base . '/webshop']];

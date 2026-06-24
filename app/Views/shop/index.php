@@ -10,9 +10,20 @@ use App\Integration\Product;
 /** @var string $activeCat */
 /** @var string[] $activePath */
 /** @var string $sort */
+/** @var string $q */
+/** @var int|null $min */
+/** @var int|null $max */
+/** @var bool $inStockOnly */
 /** @var Categories $cats */
+/** @var array<string, string[]> $images */
 /** @var array<string, mixed> $config */
 
+$images = $images ?? [];
+$q = $q ?? '';
+$min = $min ?? null;
+$max = $max ?? null;
+$inStockOnly = $inStockOnly ?? false;
+$hasFilter = $q !== '' || $min !== null || $max !== null || $inStockOnly;
 $title = $activeCat !== '' ? $cats->name($activeCat) : 'Termékeink';
 $LOW = 15; // e készletszint alatt „már csak X" sürgetést mutatunk
 
@@ -55,6 +66,25 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
             <h2 class="sidebar-title">Kategóriák</h2>
             <a href="/webshop" class="cat-all<?= $activeCat === '' ? ' is-current' : '' ?>">Összes termék</a>
             <?php $renderTree($catsTree); ?>
+
+            <form method="get" action="/webshop" class="shop-filters">
+                <h2 class="sidebar-title">Keresés és szűrés</h2>
+                <?php if ($activeCat !== ''): ?><input type="hidden" name="kat" value="<?= View::e($activeCat) ?>"><?php endif; ?>
+                <?php if ($sort !== ''): ?><input type="hidden" name="rendezes" value="<?= View::e($sort) ?>"><?php endif; ?>
+                <div class="field">
+                    <label for="f-q">Kulcsszó</label>
+                    <input id="f-q" type="search" name="q" value="<?= View::e($q) ?>" placeholder="Név vagy cikkszám">
+                </div>
+                <div class="field-row">
+                    <div class="field"><label for="f-min">Ár min.</label><input id="f-min" type="number" name="min" min="0" inputmode="numeric" value="<?= $min !== null ? (int) $min : '' ?>"></div>
+                    <div class="field"><label for="f-max">Ár max.</label><input id="f-max" type="number" name="max" min="0" inputmode="numeric" value="<?= $max !== null ? (int) $max : '' ?>"></div>
+                </div>
+                <label class="check"><input type="checkbox" name="keszlet" value="1"<?= $inStockOnly ? ' checked' : '' ?>> Csak raktáron lévő</label>
+                <button type="submit" class="btn btn--gold btn--sm btn--block">Szűrés</button>
+                <?php if ($hasFilter): ?>
+                    <a href="/webshop<?= $activeCat !== '' ? '?kat=' . urlencode($activeCat) : '' ?>" class="filter-clear">Szűrők törlése</a>
+                <?php endif; ?>
+            </form>
         </aside>
 
         <div class="shop-main">
@@ -75,6 +105,10 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                 <?php if ($products): ?>
                     <form method="get" action="/webshop" class="sort-form">
                         <?php if ($activeCat !== ''): ?><input type="hidden" name="kat" value="<?= View::e($activeCat) ?>"><?php endif; ?>
+                        <?php if ($q !== ''): ?><input type="hidden" name="q" value="<?= View::e($q) ?>"><?php endif; ?>
+                        <?php if ($min !== null): ?><input type="hidden" name="min" value="<?= (int) $min ?>"><?php endif; ?>
+                        <?php if ($max !== null): ?><input type="hidden" name="max" value="<?= (int) $max ?>"><?php endif; ?>
+                        <?php if ($inStockOnly): ?><input type="hidden" name="keszlet" value="1"><?php endif; ?>
                         <label class="sort-label" for="sort-select">Rendezés</label>
                         <select id="sort-select" name="rendezes" class="sort-select" data-autosubmit>
                             <option value=""<?= $sort === '' ? ' selected' : '' ?>>Alapértelmezett</option>
@@ -88,12 +122,16 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
             </div>
 
             <?php if (!$products): ?>
-                <p class="empty">Ebben a kategóriában jelenleg nincs termék.</p>
+                <p class="empty">
+                    <?= $hasFilter ? 'Nincs a szűrésnek megfelelő termék.' : 'Ebben a kategóriában jelenleg nincs termék.' ?>
+                    <?php if ($hasFilter): ?><a href="/webshop<?= $activeCat !== '' ? '?kat=' . urlencode($activeCat) : '' ?>">Szűrők törlése</a><?php endif; ?>
+                </p>
             <?php else: ?>
                 <div class="card-grid product-grid">
-                    <?php foreach ($products as $p): ?>
+                    <?php foreach ($products as $p): $pImg = $images[$p->sku][0] ?? null; ?>
                         <article class="card product-card reveal">
-                            <a class="product-media" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
+                            <a class="product-media<?= $pImg ? ' has-image' : '' ?>" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
+                                <?php if ($pImg): ?><img src="/uploads/products/<?= View::e($pImg) ?>" alt="<?= View::e($p->name) ?>" loading="lazy"><?php endif; ?>
                                 <?php if (!$p->inStock()): ?>
                                     <span class="badge badge--out">Elfogyott</span>
                                 <?php elseif ($p->stock <= $LOW): ?>

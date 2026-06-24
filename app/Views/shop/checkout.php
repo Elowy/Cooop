@@ -34,20 +34,20 @@ $vatTotal = (int) $cart['total'] - $netTotal;
             <div class="checkout-form">
                 <fieldset class="form-card">
                     <legend>Számlázási adatok</legend>
-                    <div class="field"><label>Név *</label><input name="name" value="<?= $v('name') ?>"><?= $err('name') ?></div>
+                    <div class="field"><label for="co-name">Név *</label><input id="co-name" name="name" autocomplete="name" value="<?= $v('name') ?>"><?= $err('name') ?></div>
                     <div class="field-row">
-                        <div class="field"><label>E-mail *</label><input type="email" name="email" value="<?= $v('email') ?>"><?= $err('email') ?></div>
-                        <div class="field"><label>Telefon *</label><input name="phone" value="<?= $v('phone') ?>"><?= $err('phone') ?></div>
+                        <div class="field"><label for="co-email">E-mail *</label><input id="co-email" type="email" name="email" autocomplete="email" value="<?= $v('email') ?>"><?= $err('email') ?></div>
+                        <div class="field"><label for="co-phone">Telefon *</label><input id="co-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" value="<?= $v('phone') ?>"><?= $err('phone') ?></div>
                     </div>
                     <div class="field-row">
-                        <div class="field"><label>Cégnév</label><input name="company" value="<?= $v('company') ?>"></div>
-                        <div class="field"><label>Adószám</label><input name="tax_number" value="<?= $v('tax_number') ?>"></div>
+                        <div class="field"><label for="co-company">Cégnév</label><input id="co-company" name="company" autocomplete="organization" value="<?= $v('company') ?>"></div>
+                        <div class="field"><label for="co-tax">Adószám</label><input id="co-tax" name="tax_number" autocomplete="off" value="<?= $v('tax_number') ?>"></div>
                     </div>
                     <div class="field-row">
-                        <div class="field field--zip"><label>Irányítószám *</label><input name="billing_zip" value="<?= $v('billing_zip') ?>"><?= $err('billing_zip') ?></div>
-                        <div class="field"><label>Város *</label><input name="billing_city" value="<?= $v('billing_city') ?>"><?= $err('billing_city') ?></div>
+                        <div class="field field--zip"><label for="co-bzip">Irányítószám *</label><input id="co-bzip" name="billing_zip" autocomplete="postal-code" inputmode="numeric" value="<?= $v('billing_zip') ?>"><?= $err('billing_zip') ?></div>
+                        <div class="field"><label for="co-bcity">Város *</label><input id="co-bcity" name="billing_city" autocomplete="address-level2" value="<?= $v('billing_city') ?>"><?= $err('billing_city') ?></div>
                     </div>
-                    <div class="field"><label>Cím (utca, házszám) *</label><input name="billing_address" value="<?= $v('billing_address') ?>"><?= $err('billing_address') ?></div>
+                    <div class="field"><label for="co-baddr">Cím (utca, házszám) *</label><input id="co-baddr" name="billing_address" autocomplete="address-line1" value="<?= $v('billing_address') ?>"><?= $err('billing_address') ?></div>
                 </fieldset>
 
                 <fieldset class="form-card">
@@ -55,12 +55,12 @@ $vatTotal = (int) $cart['total'] - $netTotal;
                     <label class="check"><input type="checkbox" name="shipping_diff" data-ship-toggle<?= $checked('shipping_diff') ?>> A szállítási cím eltér a számlázásitól</label>
                     <div class="ship-fields" data-ship-fields<?= isset($old['shipping_diff']) ? '' : ' hidden' ?>>
                         <div class="field-row">
-                            <div class="field field--zip"><label>Irányítószám</label><input name="shipping_zip" value="<?= $v('shipping_zip') ?>"><?= $err('shipping_zip') ?></div>
-                            <div class="field"><label>Város</label><input name="shipping_city" value="<?= $v('shipping_city') ?>"><?= $err('shipping_city') ?></div>
+                            <div class="field field--zip"><label for="co-szip">Irányítószám</label><input id="co-szip" name="shipping_zip" autocomplete="shipping postal-code" inputmode="numeric" value="<?= $v('shipping_zip') ?>"><?= $err('shipping_zip') ?></div>
+                            <div class="field"><label for="co-scity">Város</label><input id="co-scity" name="shipping_city" autocomplete="shipping address-level2" value="<?= $v('shipping_city') ?>"><?= $err('shipping_city') ?></div>
                         </div>
-                        <div class="field"><label>Cím</label><input name="shipping_address" value="<?= $v('shipping_address') ?>"><?= $err('shipping_address') ?></div>
+                        <div class="field"><label for="co-saddr">Cím</label><input id="co-saddr" name="shipping_address" autocomplete="shipping address-line1" value="<?= $v('shipping_address') ?>"><?= $err('shipping_address') ?></div>
                     </div>
-                    <div class="field"><label>Megjegyzés</label><textarea name="note" rows="3"><?= $v('note') ?></textarea></div>
+                    <div class="field"><label for="co-note">Megjegyzés</label><textarea id="co-note" name="note" rows="3"><?= $v('note') ?></textarea></div>
                 </fieldset>
 
                 <fieldset class="form-card">

@@ -44,6 +44,9 @@ jobs:
           echo "Kapcsos zárójelek: { = $o, } = $c"
           [ "$o" = "$c" ] || { echo "::error::CSS zárójel-eltérés a style.css-ben"; exit 1; }
 
+      - name: Egységtesztek
+        run: php tests/run.php
+
   deploy:
     needs: lint
     runs-on: ubuntu-latest

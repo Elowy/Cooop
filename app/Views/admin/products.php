@@ -54,7 +54,10 @@ use App\Integration\Product;
                         <?php elseif ($low): ?><span class="tag tag--low">Alacsony</span>
                         <?php else: ?><span class="tag tag--ok">Raktáron</span><?php endif; ?>
                     </td>
-                    <td class="ta-r"><a class="btn btn--outline btn--sm" href="/admin/termek-seo?sku=<?= View::e($p->sku) ?>">SEO</a></td>
+                    <td class="ta-r adm-actions">
+                        <a class="btn btn--outline btn--sm" href="/admin/termek-kepek?sku=<?= View::e($p->sku) ?>">Képek</a>
+                        <a class="btn btn--outline btn--sm" href="/admin/termek-seo?sku=<?= View::e($p->sku) ?>">SEO</a>
+                    </td>
                 </tr>
             <?php endforeach; endif; ?>
         </tbody>

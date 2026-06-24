@@ -123,8 +123,8 @@ $stats = [
         <div id="map" class="world-map reveal"></div>
     </div>
 </section>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
+<script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script>
 window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
     'title' => (string) $p['title'],
@@ -230,14 +230,14 @@ $teamDir = dirname(__DIR__, 2) . '/public/uploads/team/';
                     <form method="post" action="/kapcsolat" class="form-card" novalidate>
                         <?= Csrf::field() ?>
                         <div class="field-row">
-                            <div class="field"><label>Név *</label><input name="name" value="<?= $cv('name') ?>"><?= $cerr('name') ?></div>
-                            <div class="field"><label>Cég</label><input name="company" value="<?= $cv('company') ?>"></div>
+                            <div class="field"><label for="ct-name">Név *</label><input id="ct-name" name="name" autocomplete="name" value="<?= $cv('name') ?>"><?= $cerr('name') ?></div>
+                            <div class="field"><label for="ct-company">Cég</label><input id="ct-company" name="company" autocomplete="organization" value="<?= $cv('company') ?>"></div>
                         </div>
                         <div class="field-row">
-                            <div class="field"><label>Telefon</label><input name="phone" value="<?= $cv('phone') ?>"></div>
-                            <div class="field"><label>E-mail *</label><input type="email" name="email" value="<?= $cv('email') ?>"><?= $cerr('email') ?></div>
+                            <div class="field"><label for="ct-phone">Telefon</label><input id="ct-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" value="<?= $cv('phone') ?>"></div>
+                            <div class="field"><label for="ct-email">E-mail *</label><input id="ct-email" type="email" name="email" autocomplete="email" value="<?= $cv('email') ?>"><?= $cerr('email') ?></div>
                         </div>
-                        <div class="field"><label>Üzenet *</label><textarea name="message" rows="5"><?= $cv('message') ?></textarea><?= $cerr('message') ?></div>
+                        <div class="field"><label for="ct-message">Üzenet *</label><textarea id="ct-message" name="message" rows="5"><?= $cv('message') ?></textarea><?= $cerr('message') ?></div>
                         <label class="check"><input type="checkbox" name="privacy"> Elfogadom az adatkezelési tájékoztatót. *</label>
                         <?= $cerr('privacy') ?>
                         <button type="submit" class="btn btn--gold btn--lg">Üzenet küldése</button>
@@ -295,3 +295,38 @@ $teamDir = dirname(__DIR__, 2) . '/public/uploads/team/';
         <?php endif; ?>
     </div>
 </section>
+<?php
+// Lokális SEO: LocalBusiness strukturált adat a cég adataiból.
+$base = rtrim((string) $config['app']['url'], '/');
+$addr = (string) ($cfg['address'] ?? '');
+$postal = ['@type' => 'PostalAddress', 'streetAddress' => $addr, 'addressCountry' => 'HU'];
+if (preg_match('/^(\d{4})\s+([^,]+),\s*(.+)$/u', $addr, $m)) {
+    $postal = [
+        '@type' => 'PostalAddress',
+        'postalCode' => $m[1],
+        'addressLocality' => trim($m[2]),
+        'streetAddress' => trim($m[3]),
+        'addressCountry' => 'HU',
+    ];
+}
+$phones = array_values(array_filter([(string) ($cfg['phone'] ?? ''), (string) ($cfg['phone2'] ?? '')]));
+$localBusinessLd = [
+    '@context' => 'https://schema.org',
+    '@type' => 'LocalBusiness',
+    'name' => (string) $config['app']['name'],
+    'url' => $base . '/',
+    'image' => $base . '/assets/img/logo.svg',
+    'logo' => $base . '/assets/img/logo.svg',
+    'email' => (string) ($cfg['email'] ?? ''),
+    'telephone' => $phones[0] ?? '',
+    'address' => $postal,
+    'openingHours' => 'Mo-Fr 08:00-16:00',
+    'priceRange' => '$$',
+];
+if ($phones) {
+    $localBusinessLd['contactPoint'] = array_map(static fn ($t) => [
+        '@type' => 'ContactPoint', 'telephone' => $t, 'contactType' => 'sales',
+    ], $phones);
+}
+?>
+<script type="application/ld+json"><?= json_encode($localBusinessLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>

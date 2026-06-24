@@ -51,4 +51,15 @@ final class View
     {
         return number_format($amount, 0, ',', "\u{00A0}") . "\u{00A0}Ft";
     }
+
+    /**
+     * Statikus asset URL cache-busting verzióval (?v=fájl-mtime). Így a böngésző
+     * sokáig cache-elheti a fájlt, de deploy/módosítás után azonnal újratölti.
+     */
+    public static function asset(string $path): string
+    {
+        $file = dirname(__DIR__, 2) . '/public' . $path;
+        $version = is_file($file) ? (string) filemtime($file) : '';
+        return $version !== '' ? $path . '?v=' . $version : $path;
+    }
 }

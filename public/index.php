@@ -18,9 +18,12 @@ spl_autoload_register(static function (string $class): void {
 });
 
 use App\Catalog\Categories;
+use App\Catalog\ProductImageStore;
 use App\Core\Auth;
 use App\Core\Cart;
 use App\Core\Csrf;
+use App\Core\LoginThrottle;
+use App\Core\Mailer;
 use App\Core\Router;
 use App\Core\View;
 use App\Db\Database;
@@ -48,6 +51,26 @@ if ($config['app']['debug']) {
     ini_set('display_errors', '0');
     ini_set('log_errors', '1');
 }
+
+// Végzetes (nem elkapható) hibák biztonsági hálója: éles üzemben barátságos
+// üzenet a fehér oldal / kiszivárgó hibaüzenet helyett.
+register_shutdown_function(static function () use ($config): void {
+    $err = error_get_last();
+    if ($err === null || !in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        return;
+    }
+    error_log('[NetTrade] Végzetes hiba: ' . $err['message'] . ' @ ' . ($err['file'] ?? '?') . ':' . ($err['line'] ?? 0));
+    if (!empty($config['app']['debug'])) {
+        return; // fejlesztéskor a PHP mutassa a részleteket
+    }
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=UTF-8');
+    }
+    echo '<!doctype html><meta charset="utf-8"><title>Hiba</title>'
+        . '<p style="font-family:sans-serif;max-width:40rem;margin:4rem auto;text-align:center;color:#333">'
+        . 'Váratlan hiba történt. Kérjük, próbáld újra később.</p>';
+});
 
 // Biztonságosabb session-süti: JS nem olvashatja, csak HTTPS-en megy, SameSite véd.
 $secureCookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -96,6 +119,19 @@ $references = new ReferenceStore($pdo);
 $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
+$productImages = new ProductImageStore($pdo);
+$throttle = new LoginThrottle();
+$clientIp = static fn (): string => (string) ($_SERVER['REMOTE_ADDR'] ?? 'cli');
+
+// E-mail küldő (SMTP, ha konfigurált; különben PHP mail()). Feladó-alapértékek.
+$mailFromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
+if (($config['mail']['from_email'] ?? '') === '') {
+    $config['mail']['from_email'] = 'no-reply@' . $mailFromHost;
+}
+if (($config['mail']['from_name'] ?? '') === '') {
+    $config['mail']['from_name'] = (string) $config['app']['name'];
+}
+$mailer = Mailer::fromConfig($config);
 $subscribers = new SubscriberStore($pdo);
 $templates = new TemplateStore($pdo);
 $users = $pdo ? new UserRepository($pdo) : null;
@@ -325,7 +361,7 @@ $router->get('/kapcsolat', static function () use ($redirect): string {
     return $redirect('/#kapcsolat');
 });
 
-$router->post('/kapcsolat', static function () use ($config, $messages, $redirect): string {
+$router->post('/kapcsolat', static function () use ($config, $messages, $mailer, $redirect): string {
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/#kapcsolat');
     }
@@ -361,12 +397,9 @@ $router->post('/kapcsolat', static function () use ($config, $messages, $redirec
     $messages->save($msg);
 
     // E-mail értesítés (ha a szerver tudja küldeni; az üzenet ettől függetlenül tárolódik).
-    $subject = mb_encode_mimeheader('Új üzenet a weboldalról' . ($company !== '' ? ' – ' . $company : ''), 'UTF-8');
+    $subject = 'Új üzenet a weboldalról' . ($company !== '' ? ' – ' . $company : '');
     $body = "Név: {$msg['name']}\nCég: {$company}\nE-mail: {$msg['email']}\nTelefon: {$msg['phone']}\n\nÜzenet:\n{$message}\n";
-    $fromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
-    $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
-        . 'From: weboldal@' . $fromHost . "\r\nReply-To: {$msg['email']}";
-    @mail($config['contact']['email'], $subject, $body, $headers);
+    $mailer->send((string) $config['contact']['email'], $subject, $body, ['reply_to' => (string) $msg['email']]);
 
     $_SESSION['_flash_contact'] = ['sent' => true];
     return $redirect('/#kapcsolat');
@@ -413,7 +446,102 @@ $router->get('/hirlevel/leiratkozas', static function () use ($subscribers): str
     ]);
 });
 
-$router->get('/webshop', static function () use ($axel, $cats): string {
+/* ------------------------------------------------------------------ */
+/* Vásárlói fiók (regisztráció / belépés / rendeléstörténet)           */
+/* ------------------------------------------------------------------ */
+
+$router->get('/belepes', static function () use ($redirect): string {
+    if (Auth::user() !== null) {
+        return $redirect('/fiokom');
+    }
+    return View::render('auth/login', ['title' => 'Belépés', 'error' => isset($_GET['hiba']), 'locked' => isset($_GET['zar'])]);
+});
+
+$router->post('/belepes', static function () use ($users, $throttle, $clientIp, $redirect): string {
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/belepes');
+    }
+    $key = 'cust:' . $clientIp();
+    if ($throttle->blocked($key)) {
+        return $redirect('/belepes?zar=1');
+    }
+    if ($users !== null) {
+        $user = $users->findByEmail(trim((string) ($_POST['email'] ?? '')));
+        if ($user !== null && password_verify((string) ($_POST['password'] ?? ''), $user['password'])) {
+            $throttle->clear($key);
+            Auth::loginUser($user);
+            return $redirect('/fiokom');
+        }
+    }
+    $throttle->registerFailure($key);
+    return $redirect('/belepes?hiba=1');
+});
+
+$router->get('/regisztracio', static function () use ($redirect): string {
+    if (Auth::user() !== null) {
+        return $redirect('/fiokom');
+    }
+    return View::render('auth/register', ['title' => 'Regisztráció', 'errors' => [], 'old' => []]);
+});
+
+$router->post('/regisztracio', static function () use ($users, $redirect): string {
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/regisztracio');
+    }
+    $val = static fn (string $k): string => trim((string) ($_POST[$k] ?? ''));
+    $name = $val('name');
+    $email = $val('email');
+    $password = (string) ($_POST['password'] ?? '');
+    $errors = [];
+    if ($name === '') {
+        $errors['name'] = 'A név megadása kötelező.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Érvényes e-mail cím szükséges.';
+    }
+    if (strlen($password) < 6) {
+        $errors['password'] = 'A jelszó legalább 6 karakter legyen.';
+    }
+    if (!isset($_POST['privacy'])) {
+        $errors['privacy'] = 'Az adatkezelési tájékoztató elfogadása kötelező.';
+    }
+    if (!$errors && $users === null) {
+        $errors['email'] = 'A regisztráció jelenleg nem elérhető.';
+    }
+    if (!$errors && $users !== null && $users->findByEmail($email) !== null) {
+        $errors['email'] = 'Ezzel az e-mail címmel már van fiók – jelentkezz be.';
+    }
+    if ($errors) {
+        return View::render('auth/register', ['title' => 'Regisztráció', 'errors' => $errors, 'old' => $_POST]);
+    }
+    $id = $users->create($name, $email, password_hash($password, PASSWORD_DEFAULT), 'customer');
+    $user = $users->find($id);
+    if ($user !== null) {
+        Auth::loginUser($user);
+    }
+    return $redirect('/fiokom');
+});
+
+$router->post('/kilepes', static function () use ($redirect): string {
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        Auth::logout();
+    }
+    return $redirect('/');
+});
+
+$router->get('/fiokom', static function () use ($orders, $redirect): string {
+    $me = Auth::user();
+    if ($me === null) {
+        return $redirect('/belepes');
+    }
+    return View::render('account/index', [
+        'title' => 'Fiókom',
+        'me' => $me,
+        'orders' => $orders->forCustomer((int) $me['id'], (string) $me['email']),
+    ]);
+});
+
+$router->get('/webshop', static function () use ($axel, $cats, $productImages): string {
     $activeCat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
     $products = $axel->products();
     $path = [];
@@ -424,6 +552,24 @@ $router->get('/webshop', static function () use ($axel, $cats): string {
         $path = $cats->path($activeCat);
     } else {
         $activeCat = '';
+    }
+
+    // Kereső + szűrők (név/cikkszám, ár-tartomány bruttóban, csak raktáron).
+    $q = trim((string) ($_GET['q'] ?? ''));
+    $min = ($_GET['min'] ?? '') !== '' ? max(0, (int) $_GET['min']) : null;
+    $max = ($_GET['max'] ?? '') !== '' ? max(0, (int) $_GET['max']) : null;
+    $inStockOnly = isset($_GET['keszlet']);
+    if ($q !== '') {
+        $products = array_filter($products, static fn ($p) => mb_stripos($p->name, $q) !== false || stripos($p->sku, $q) !== false);
+    }
+    if ($min !== null) {
+        $products = array_filter($products, static fn ($p) => $p->priceGross() >= $min);
+    }
+    if ($max !== null) {
+        $products = array_filter($products, static fn ($p) => $p->priceGross() <= $max);
+    }
+    if ($inStockOnly) {
+        $products = array_filter($products, static fn ($p) => $p->inStock());
     }
 
     // Rendezés (raktáron lévők előre, azon belül a választott szempont szerint).
@@ -451,22 +597,34 @@ $router->get('/webshop', static function () use ($axel, $cats): string {
         'activeCat' => $activeCat,
         'activePath' => $path,
         'sort' => $sort,
+        'q' => $q,
+        'min' => $min,
+        'max' => $max,
+        'inStockOnly' => $inStockOnly,
         'cats' => $cats,
+        'images' => $productImages->all(),
     ]);
 });
 
-$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo, $config): string {
+$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo, $productImages, $config): string {
     $product = $axel->findProduct($params['slug'] ?? '');
     if ($product === null) {
         http_response_code(404);
         return View::render('errors/404', ['title' => 'A termék nem található']);
     }
     $pseo = $productSeo->find($product->sku) ?? [];
+    $images = $productImages->find($product->sku);
+    // OG-kép: a kézi SEO-felülírás elsőbbséget élvez, különben az első termékkép.
+    $base = rtrim((string) ($config['app']['url'] ?? ''), '/');
+    $ogImage = trim((string) ($pseo['og_image'] ?? ''));
+    if ($ogImage === '' && $images) {
+        $ogImage = $base . '/uploads/products/' . $images[0];
+    }
     $meta = [
         'title' => (string) ($pseo['title'] ?? ''),
         'description' => trim((string) ($pseo['description'] ?? '')) !== '' ? (string) $pseo['description'] : $product->short,
         'keywords' => (string) ($pseo['keywords'] ?? ''),
-        'og_image' => (string) ($pseo['og_image'] ?? ''),
+        'og_image' => $ogImage,
         'og_type' => 'product',
         'product_price' => (string) $product->priceGross(),
         'product_currency' => (string) ($config['shop']['currency'] ?? 'HUF'),
@@ -502,11 +660,12 @@ $router->get('/termek/{slug}', static function (array $params) use ($axel, $cats
         'catPath' => $cats->path($product->category),
         'cats' => $cats,
         'related' => $related,
+        'images' => $images,
         'meta' => $meta,
     ]);
 });
 
-$router->get('/kosar', static function () use ($axel): string {
+$router->get('/kosar', static function () use ($axel, $productImages): string {
     $lines = [];
     $total = 0;
     foreach (Cart::items() as $sku => $qty) {
@@ -519,7 +678,7 @@ $router->get('/kosar', static function () use ($axel): string {
             }
         }
     }
-    return View::render('cart/index', ['title' => 'Kosár', 'lines' => $lines, 'total' => $total]);
+    return View::render('cart/index', ['title' => 'Kosár', 'lines' => $lines, 'total' => $total, 'images' => $productImages->all()]);
 });
 
 $router->post('/kosar/hozzaad', static function () use ($redirect, $wantsJson, $axel): string {
@@ -574,21 +733,63 @@ $finalizeInvoice = static function (string $token) use ($axel, $orders): void {
     ]]);
 };
 
+/** Rendelés-visszaigazoló e-mail a vevőnek, és értesítés a shopnak. */
+$orderEmail = static function (array $order) use ($config, $mailer): void {
+    $email = (string) ($order['customer']['email'] ?? '');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return;
+    }
+    $appName = (string) $config['app']['name'];
+    $number = (string) ($order['number'] ?? '');
+    $method = (string) ($order['payment']['method'] ?? '');
+    $money = static fn (int $n): string => number_format($n, 0, ',', ' ') . ' Ft';
+    $grossFmt = $money((int) ($order['totals']['gross'] ?? 0));
+
+    $lines = '';
+    foreach ($order['items'] ?? [] as $it) {
+        $lines .= '- ' . (string) $it['name'] . ' x ' . (int) $it['qty'] . ' ' . (string) $it['unit']
+            . ' = ' . $money((int) $it['subtotal']) . "\n";
+    }
+
+    $body = 'Kedves ' . (string) ($order['customer']['name'] ?? '') . "!\n\n"
+        . "Köszönjük a rendelésed a(z) {$appName} webáruházban.\n\n"
+        . "Rendelésszám: {$number}\n\nTételek:\n{$lines}\nVégösszeg (bruttó): {$grossFmt}\n\n";
+    $body .= $method === 'transfer'
+        ? "Fizetési mód: banki átutalás. Kérjük, utald a {$grossFmt} összeget a közleményben "
+            . "a(z) {$number} rendelésszámmal; a számlaszámot külön jelezzük.\n\n"
+        : "Fizetési mód: bankkártya - a fizetésed rögzítettük.\n\n";
+    $body .= "Hamarosan felvesszük veled a kapcsolatot a szállítás egyeztetéséhez.\n\n"
+        . "Üdvözlettel:\n{$appName}\n";
+
+    $contactEmail = (string) ($config['contact']['email'] ?? '');
+    $mailer->send($email, "Rendelés visszaigazolása - {$number}", $body, ['reply_to' => $contactEmail]);
+
+    // Értesítés a shopnak (ha van érvényes cím).
+    if (filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+        $adminBody = "Új rendelés érkezett.\n\nRendelésszám: {$number}\n"
+            . 'Vevő: ' . (string) ($order['customer']['name'] ?? '') . " <{$email}>\n"
+            . 'Telefon: ' . (string) ($order['customer']['phone'] ?? '') . "\n"
+            . "Fizetési mód: {$method}\nVégösszeg: {$grossFmt}\n\nTételek:\n{$lines}";
+        $mailer->send($contactEmail, "Új rendelés - {$number}", $adminBody, ['reply_to' => $email]);
+    }
+};
+
 $router->get('/penztar', static function () use ($buildCart, $payment, $redirect): string {
     $cart = $buildCart();
     if (!$cart['items']) {
         return $redirect('/kosar');
     }
+    $me = Auth::user();
     return View::render('shop/checkout', [
         'title' => 'Pénztár',
         'cart' => $cart,
         'paymentLabel' => $payment->label(),
         'errors' => [],
-        'old' => [],
+        'old' => $me !== null ? ['name' => $me['name'], 'email' => $me['email']] : [],
     ]);
 });
 
-$router->post('/penztar', static function () use ($buildCart, $orders, $payment, $finalizeInvoice, $redirect): string {
+$router->post('/penztar', static function () use ($buildCart, $orders, $payment, $finalizeInvoice, $orderEmail, $redirect): string {
     $cart = $buildCart();
     if (!$cart['items']) {
         return $redirect('/kosar');
@@ -652,6 +853,7 @@ $router->post('/penztar', static function () use ($buildCart, $orders, $payment,
         'customer' => [
             'name' => $val('name'), 'email' => $val('email'), 'phone' => $val('phone'),
             'company' => $val('company'), 'tax_number' => $val('tax_number'), 'note' => $val('note'),
+            'user_id' => (int) (Auth::user()['id'] ?? 0),
         ],
         'billing' => ['zip' => $val('billing_zip'), 'city' => $val('billing_city'), 'address' => $val('billing_address')],
         'shipping' => $shipDiff
@@ -665,6 +867,7 @@ $router->post('/penztar', static function () use ($buildCart, $orders, $payment,
 
     if ($method === 'transfer') {
         $finalizeInvoice($token);
+        $orderEmail($order);
         Cart::clear();
         return $redirect('/rendeles/' . $token);
     }
@@ -683,7 +886,7 @@ $router->get('/fizetes/{token}', static function (array $params) use ($orders, $
     return View::render('shop/payment', ['title' => 'Fizetés', 'order' => $order, 'failed' => isset($_GET['hiba'])]);
 });
 
-$router->post('/fizetes/{token}', static function (array $params) use ($orders, $finalizeInvoice, $redirect): string {
+$router->post('/fizetes/{token}', static function (array $params) use ($orders, $finalizeInvoice, $orderEmail, $redirect): string {
     $token = $params['token'] ?? '';
     $order = $orders->find($token);
     if ($order === null || !Csrf::check($_POST['_csrf'] ?? null)) {
@@ -693,11 +896,14 @@ $router->post('/fizetes/{token}', static function (array $params) use ($orders, 
         return $redirect('/rendeles/' . $token);
     }
     if (($_POST['result'] ?? '') === 'success') {
-        $orders->update($token, [
+        $paid = $orders->update($token, [
             'status' => 'paid',
             'payment' => ['status' => 'paid', 'paid_at' => date('c')],
         ]);
         $finalizeInvoice($token);
+        if ($paid !== null) {
+            $orderEmail($paid);
+        }
         Cart::clear();
         return $redirect('/rendeles/' . $token);
     }
@@ -746,13 +952,18 @@ $router->get('/admin/login', static function () use ($config, $redirect): string
     return View::render('admin/login', [
         'title' => 'Belépés',
         'error' => isset($_GET['hiba']),
+        'locked' => isset($_GET['zar']),
         'installed' => (bool) $config['installed'],
     ], '');
 });
 
-$router->post('/admin/login', static function () use ($config, $adminPw, $users, $redirect): string {
+$router->post('/admin/login', static function () use ($config, $adminPw, $users, $throttle, $clientIp, $redirect): string {
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/login');
+    }
+    $key = 'admin:' . $clientIp();
+    if ($throttle->blocked($key)) {
+        return $redirect('/admin/login?zar=1');
     }
     if ($config['installed'] && $users !== null) {
         $email = trim((string) ($_POST['email'] ?? ''));
@@ -760,15 +971,19 @@ $router->post('/admin/login', static function () use ($config, $adminPw, $users,
         $user = $users->findByEmail($email);
         if ($user !== null && password_verify($password, $user['password'])
             && in_array($user['role'], ['admin', 'editor'], true)) {
+            $throttle->clear($key);
             Auth::loginUser($user);
             return $redirect('/admin');
         }
+        $throttle->registerFailure($key);
         return $redirect('/admin/login?hiba=1');
     }
     // Telepítés előtti, egyszerű jelszavas belépés.
     if (Auth::attemptLegacy((string) ($_POST['password'] ?? ''), $adminPw)) {
+        $throttle->clear($key);
         return $redirect('/admin');
     }
+    $throttle->registerFailure($key);
     return $redirect('/admin/login?hiba=1');
 });
 
@@ -970,7 +1185,7 @@ $router->post('/admin/hirlevel/feliratkozo/torles', static function () use ($gua
     return $redirect('/admin/hirlevel');
 });
 
-$router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscribers, $templates, $settings, $config, $redirect): string {
+$router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscribers, $templates, $settings, $config, $mailer, $redirect): string {
     $guard();
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/hirlevel');
@@ -1003,8 +1218,6 @@ $router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscri
 
     $recipients = $subscribers->active();
     $base = rtrim((string) $config['app']['url'], '/');
-    $subjectEnc = mb_encode_mimeheader($subject, 'UTF-8');
-    $fromHeader = mb_encode_mimeheader($fromName, 'UTF-8') . ' <' . $fromEmail . '>';
     $sent = 0;
 
     foreach ($recipients as $r) {
@@ -1015,11 +1228,13 @@ $router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscri
             . '<p style="font-size:12px;color:#888">Ezt az üzenetet azért kapod, mert feliratkoztál a(z) '
             . htmlspecialchars($fromName, ENT_QUOTES) . ' hírlevelére.<br>'
             . '<a href="' . htmlspecialchars($unsub, ENT_QUOTES) . '" style="color:#888">Leiratkozás</a></p></div>';
-        $headers = "MIME-Version: 1.0\r\n"
-            . "Content-Type: text/html; charset=UTF-8\r\n"
-            . 'From: ' . $fromHeader . "\r\n"
-            . 'List-Unsubscribe: <' . $unsub . '>';
-        if (@mail((string) $r['email'], $subjectEnc, $html, $headers)) {
+        $okSent = $mailer->send((string) $r['email'], $subject, $html, [
+            'html' => true,
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+            'list_unsubscribe' => $unsub,
+        ]);
+        if ($okSent) {
             $sent++;
         }
     }
@@ -1191,6 +1406,89 @@ $router->post('/admin/termek-seo', static function () use ($guard, $productSeo, 
         $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Termék SEO mentve.'];
     }
     return $redirect('/admin/termekek');
+});
+
+$router->get('/admin/termek-kepek', static function () use ($adminView, $guard, $axel, $productImages): string {
+    $guard();
+    $sku = (string) ($_GET['sku'] ?? '');
+    $product = null;
+    foreach ($axel->products() as $p) {
+        if ($p->sku === $sku) {
+            $product = $p;
+            break;
+        }
+    }
+    if ($product === null) {
+        http_response_code(404);
+        return $adminView('admin/product-images', 'products', ['title' => 'Termékképek', 'product' => null, 'images' => []]);
+    }
+    return $adminView('admin/product-images', 'products', [
+        'title' => 'Képek · ' . $product->name,
+        'product' => $product,
+        'images' => $productImages->find($sku),
+    ]);
+});
+
+$router->post('/admin/termek-kepek/feltoltes', static function () use ($guard, $productImages, $uploadImage, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    $back = '/admin/termek-kepek?sku=' . urlencode($sku);
+    // Túl nagy feltöltésnél a PHP eldobja a teljes $_POST-ot (post_max_size).
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött fájl(ok) túl nagy(ok) a szerver korlátjához képest – tölts fel kisebb képet.'];
+        return $redirect($sku !== '' ? $back : '/admin/termekek');
+    }
+    if (!Csrf::check($_POST['_csrf'] ?? null) || $sku === '') {
+        return $redirect('/admin/termekek');
+    }
+    $uploaded = 0;
+    $errored = false;
+    $files = $_FILES['images'] ?? null;
+    if (is_array($files) && isset($files['name']) && is_array($files['name'])) {
+        for ($i = 0, $n = count($files['name']); $i < $n; $i++) {
+            if (((int) ($files['error'][$i] ?? UPLOAD_ERR_NO_FILE)) === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $one = [
+                'name' => $files['name'][$i] ?? '', 'type' => $files['type'][$i] ?? '',
+                'tmp_name' => $files['tmp_name'][$i] ?? '', 'error' => $files['error'][$i] ?? 1,
+                'size' => $files['size'][$i] ?? 0,
+            ];
+            $name = $uploadImage($one, dirname(__DIR__) . '/public/uploads/products');
+            if ($name !== null) {
+                $productImages->add($sku, $name);
+                $uploaded++;
+            } else {
+                $errored = true;
+            }
+        }
+    }
+    $_SESSION['_flash_admin'] = $uploaded > 0
+        ? ['type' => 'ok', 'text' => "{$uploaded} kép feltöltve." . ($errored ? ' (Néhány kimaradt – csak JPG/PNG/WEBP, max 16 MB.)' : '')]
+        : ['type' => 'error', 'text' => 'Nem sikerült kép feltöltése – JPG/PNG/WEBP, max 16 MB legyen.'];
+    return $redirect($back);
+});
+
+$router->post('/admin/termek-kepek/torles', static function () use ($guard, $productImages, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    if (Csrf::check($_POST['_csrf'] ?? null) && $sku !== '') {
+        $file = basename((string) ($_POST['file'] ?? ''));
+        if ($file !== '' && in_array($file, $productImages->find($sku), true)) {
+            $productImages->remove($sku, $file);
+            @unlink(dirname(__DIR__) . '/public/uploads/products/' . $file);
+        }
+    }
+    return $redirect('/admin/termek-kepek?sku=' . urlencode($sku));
+});
+
+$router->post('/admin/termek-kepek/elsodleges', static function () use ($guard, $productImages, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    if (Csrf::check($_POST['_csrf'] ?? null) && $sku !== '') {
+        $productImages->makePrimary($sku, basename((string) ($_POST['file'] ?? '')));
+    }
+    return $redirect('/admin/termek-kepek?sku=' . urlencode($sku));
 });
 
 $router->get('/admin/referenciak', static function () use ($adminView, $guard, $references): string {
@@ -1381,4 +1679,13 @@ $router->post('/admin/terkep/torles', static function () use ($guard, $pois, $re
     return $redirect('/admin/terkep');
 });
 
-echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+try {
+    echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+} catch (\Throwable $e) {
+    if (!empty($config['app']['debug'])) {
+        throw $e; // fejlesztéskor lássuk a hibát
+    }
+    error_log('[NetTrade] Kezeletlen hiba: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    http_response_code(500);
+    echo View::render('errors/500', ['title' => 'Hiba történt']);
+}

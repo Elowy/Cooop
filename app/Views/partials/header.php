@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Auth;
 use App\Core\Cart;
 use App\Core\View;
 
@@ -13,6 +14,7 @@ $nav = [
     '/#kapcsolat'   => 'Kapcsolat',
 ];
 $cartCount = Cart::count();
+$me = Auth::user();
 ?>
 <header class="site-header" data-header>
     <div class="container header-inner">
@@ -28,6 +30,13 @@ $cartCount = Cart::count();
             <?php foreach ($nav as $href => $label): ?>
                 <a href="<?= View::e($href) ?>"><?= View::e($label) ?></a>
             <?php endforeach; ?>
+            <a href="<?= $me !== null ? '/fiokom' : '/belepes' ?>" class="account-link" aria-label="<?= $me !== null ? 'Fiókom' : 'Belépés' ?>">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+                </svg>
+                <span><?= $me !== null ? 'Fiókom' : 'Belépés' ?></span>
+            </a>
             <a href="/kosar" class="cart-link<?= $cartCount > 0 ? ' has-items' : '' ?>" data-cart-link aria-label="Kosár">
                 <svg class="cart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
