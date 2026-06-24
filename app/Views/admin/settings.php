@@ -34,6 +34,20 @@ use App\Core\View;
             <label>Telefon</label>
             <input name="contact_phone" value="<?= View::e($values['contact_phone']) ?>" placeholder="+36 20 387 1450">
         </div>
+
+        <header class="panel-head" style="margin-top:26px">
+            <h2 style="font-size:1.1rem">Közösségi média</h2>
+        </header>
+        <p class="muted" style="margin-top:0">A láblécben jelennek meg ikonként. Üresen hagyva nem látszanak.</p>
+        <div class="field">
+            <label>Facebook oldal URL</label>
+            <input name="social_facebook" type="url" value="<?= View::e($values['social_facebook']) ?>" placeholder="https://facebook.com/oldalad">
+        </div>
+        <div class="field">
+            <label>YouTube csatorna URL</label>
+            <input name="social_youtube" type="url" value="<?= View::e($values['social_youtube']) ?>" placeholder="https://youtube.com/@csatornad">
+        </div>
+
         <button type="submit" class="btn btn--gold">Mentés</button>
     </form>
 </section>
