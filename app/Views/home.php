@@ -107,7 +107,10 @@ $stats = [
                 <li>Ipari gépek és berendezések csomagolása</li>
                 <li>Export csomagolás a nemzetközi szállításhoz</li>
             </ul>
-            <a href="#kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
+            <div class="hero-actions">
+                <a href="/bemutatkozas" class="btn btn--gold">Bővebben rólunk</a>
+                <a href="#kapcsolat" class="btn btn--outline">Kapcsolatfelvétel</a>
+            </div>
         </div>
     </div>
 </section>

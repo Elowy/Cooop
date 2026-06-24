@@ -385,6 +385,66 @@ $router->get('/adatkezeles', static fn (): string => View::render('legal', [
 ]));
 
 /* ------------------------------------------------------------------ */
+/* Statikus oldalak (bemutatkozás, szállítás) + HTML oldaltérkép        */
+/* ------------------------------------------------------------------ */
+
+$router->get('/bemutatkozas', static fn (): string => View::render('page', [
+    'title' => 'Bemutatkozás',
+    'eyebrow' => 'Rólunk',
+    'heading' => 'Net-Trade Hungary Kft.',
+    'lead' => 'Több évtizedes tapasztalat: egyedi raklapgyártás, ipari csomagolás, nemzetközi fuvarozás.',
+    'mdFile' => 'bemutatkozas.md',
+]));
+
+$router->get('/szallitas', static fn (): string => View::render('page', [
+    'title' => 'Szállítási információk',
+    'eyebrow' => 'Szállítás',
+    'heading' => 'Szállítási információk',
+    'lead' => 'Hogyan jut el hozzád a megrendelt áru – módok, díjak és határidők.',
+    'mdFile' => 'szallitas.md',
+]));
+
+$router->get('/oldalterkep', static function () use ($cats, $services, $blog): string {
+    $pages = [
+        ['url' => '/', 'label' => 'Főoldal'],
+        ['url' => '/webshop', 'label' => 'Webshop'],
+        ['url' => '/szolgaltatasok', 'label' => 'Tevékenységek'],
+        ['url' => '/blog', 'label' => 'Blog'],
+        ['url' => '/bemutatkozas', 'label' => 'Bemutatkozás'],
+        ['url' => '/szallitas', 'label' => 'Szállítási információk'],
+        ['url' => '/#kapcsolat', 'label' => 'Kapcsolat'],
+    ];
+    $serviceLinks = [];
+    foreach ($services->all(true) as $s) {
+        $serviceLinks[] = ['url' => '/szolgaltatasok/' . (string) $s['slug'], 'label' => (string) $s['title']];
+    }
+    $catLinks = [];
+    foreach ($cats->all() as $key => $node) {
+        if ($node['children'] === []) {
+            $catLinks[] = ['url' => '/webshop?kat=' . urlencode((string) $key), 'label' => $cats->name((string) $key)];
+        }
+    }
+    $blogLinks = [];
+    foreach ($blog->all(true) as $post) {
+        $blogLinks[] = ['url' => '/blog/' . (string) $post['slug'], 'label' => (string) $post['title']];
+    }
+    $legal = [
+        ['url' => '/aszf', 'label' => 'ÁSZF'],
+        ['url' => '/adatkezeles', 'label' => 'Adatkezelési tájékoztató'],
+    ];
+    return View::render('sitemap-page', [
+        'title' => 'Oldaltérkép',
+        'groups' => [
+            ['title' => 'Fő oldalak', 'links' => $pages],
+            ['title' => 'Tevékenységek', 'links' => $serviceLinks],
+            ['title' => 'Webshop kategóriák', 'links' => $catLinks],
+            ['title' => 'Blog', 'links' => $blogLinks],
+            ['title' => 'Jogi', 'links' => $legal],
+        ],
+    ]);
+});
+
+/* ------------------------------------------------------------------ */
 /* SEO – sitemap és robots (dinamikus, a katalógusból)                  */
 /* ------------------------------------------------------------------ */
 
@@ -407,6 +467,8 @@ $router->get('/sitemap.xml', static function () use ($axel, $cats, $blog, $servi
     foreach ($blog->all(true) as $post) {
         $rows[] = ['/blog/' . rawurlencode((string) $post['slug']), '0.5'];
     }
+    $rows[] = ['/bemutatkozas', '0.5'];
+    $rows[] = ['/szallitas', '0.4'];
     $rows[] = ['/aszf', '0.3'];
     $rows[] = ['/adatkezeles', '0.3'];
 
@@ -1394,6 +1456,8 @@ $router->get('/admin/beallitasok', static function () use ($adminView, $guard, $
             'contact_viber' => $s['contact_viber'] ?? '',
             'contact_email' => array_key_exists('contact_email', $s) ? $s['contact_email'] : $config['contact']['email'],
             'contact_phone' => array_key_exists('contact_phone', $s) ? $s['contact_phone'] : $config['contact']['phone'],
+            'social_facebook' => $s['social_facebook'] ?? '',
+            'social_youtube' => $s['social_youtube'] ?? '',
         ],
     ]);
 });
@@ -1406,6 +1470,8 @@ $router->post('/admin/beallitasok', static function () use ($guard, $settings, $
             'contact_viber' => trim((string) ($_POST['contact_viber'] ?? '')),
             'contact_email' => trim((string) ($_POST['contact_email'] ?? '')),
             'contact_phone' => trim((string) ($_POST['contact_phone'] ?? '')),
+            'social_facebook' => $safeUrl((string) ($_POST['social_facebook'] ?? '')),
+            'social_youtube' => $safeUrl((string) ($_POST['social_youtube'] ?? '')),
         ]);
     }
     return $redirect('/admin/beallitasok?mentve=1');

@@ -203,8 +203,11 @@ h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.15; color: var(--text); }
 
 /* ---------- Footer ---------- */
 .site-footer { background: #0b0c09; border-top: 1px solid var(--line); padding: 60px 0 28px; }
-.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 40px; padding-bottom: 36px; }
+.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 36px; }
 .footer-brand { display: flex; gap: 16px; align-items: flex-start; }
+.footer-social { display: flex; gap: 10px; margin-top: 14px; }
+.footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); transition: color .15s ease, border-color .15s ease, transform .15s ease; }
+.footer-social a:hover { color: var(--gold-2); border-color: var(--line-gold); transform: translateY(-2px); }
 .footer-brand strong { display: block; }
 .footer-brand p { color: var(--muted); font-size: .9rem; margin: 4px 0 0; max-width: 32ch; }
 .footer-col h4 { color: var(--gold-2); font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; margin: 0 0 16px; }
@@ -1167,3 +1170,12 @@ body.modal-open { overflow: hidden; }
     }
     .nav-dropdown a { padding: 10px 6px; border-bottom: 1px solid var(--line); border-radius: 0; white-space: normal; }
 }
+
+/* ---------- HTML oldaltérkép ---------- */
+.sitemap-cols { columns: 3 240px; column-gap: 36px; }
+.sitemap-group { break-inside: avoid; margin: 0 0 28px; }
+.sitemap-group-title { font-family: var(--serif); font-size: 1.15rem; margin: 0 0 12px; color: var(--gold-2); }
+.sitemap-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sitemap-list a { color: var(--muted); }
+.sitemap-list a:hover { color: var(--text); }
+@media (max-width: 680px) { .sitemap-cols { columns: 1; } }
