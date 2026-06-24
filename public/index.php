@@ -17,6 +17,7 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+use App\Blog\BlogStore;
 use App\Catalog\Categories;
 use App\Catalog\ProductImageStore;
 use App\Core\Auth;
@@ -120,6 +121,7 @@ $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
 $productImages = new ProductImageStore($pdo);
+$blog = new BlogStore($pdo);
 $throttle = new LoginThrottle();
 $clientIp = static fn (): string => (string) ($_SERVER['REMOTE_ADDR'] ?? 'cli');
 
@@ -308,6 +310,41 @@ $router->get('/terkep', static function () use ($redirect): string {
     return $redirect('/#terkep');
 });
 
+/* ------------------------------------------------------------------ */
+/* Blog                                                                */
+/* ------------------------------------------------------------------ */
+
+$router->get('/blog', static function () use ($blog): string {
+    return View::render('blog/index', [
+        'title' => 'Blog',
+        'posts' => $blog->all(true),
+    ]);
+});
+
+$router->get('/blog/{slug}', static function (array $params) use ($blog, $config): string {
+    $post = $blog->findBySlug((string) ($params['slug'] ?? ''), true);
+    if ($post === null) {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'A bejegyzés nem található']);
+    }
+    $base = rtrim((string) ($config['app']['url'] ?? ''), '/');
+    $cover = trim((string) ($post['cover'] ?? ''));
+    $meta = [
+        'description' => trim((string) ($post['excerpt'] ?? '')),
+        'og_type' => 'article',
+        'og_image' => $cover !== '' ? $base . '/uploads/blog/' . $cover : '',
+    ];
+    return View::render('blog/show', [
+        'title' => (string) $post['title'],
+        'post' => $post,
+        'recent' => array_slice(array_values(array_filter(
+            $blog->all(true),
+            static fn ($p) => (int) $p['id'] !== (int) $post['id']
+        )), 0, 3),
+        'meta' => $meta,
+    ]);
+});
+
 $router->get('/aszf', static fn (): string => View::render('legal', [
     'title' => 'ÁSZF', 'heading' => 'Általános Szerződési Feltételek', 'mdFile' => 'aszf.txt',
 ]));
@@ -319,11 +356,11 @@ $router->get('/adatkezeles', static fn (): string => View::render('legal', [
 /* SEO – sitemap és robots (dinamikus, a katalógusból)                  */
 /* ------------------------------------------------------------------ */
 
-$router->get('/sitemap.xml', static function () use ($axel, $cats, $config): string {
+$router->get('/sitemap.xml', static function () use ($axel, $cats, $blog, $config): string {
     header('Content-Type: application/xml; charset=UTF-8');
     $base = rtrim((string) $config['app']['url'], '/');
     $esc = static fn (string $u): string => htmlspecialchars($u, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    $rows = [['/', '1.0'], ['/webshop', '0.9']];
+    $rows = [['/', '1.0'], ['/webshop', '0.9'], ['/blog', '0.6']];
     foreach ($cats->all() as $key => $node) {
         if ($node['children'] === []) { // csak levél-kategóriák
             $rows[] = ['/webshop?kat=' . urlencode((string) $key), '0.5'];
@@ -331,6 +368,9 @@ $router->get('/sitemap.xml', static function () use ($axel, $cats, $config): str
     }
     foreach ($axel->products() as $p) {
         $rows[] = ['/termek/' . rawurlencode($p->slug), '0.7'];
+    }
+    foreach ($blog->all(true) as $post) {
+        $rows[] = ['/blog/' . rawurlencode((string) $post['slug']), '0.5'];
     }
     $rows[] = ['/aszf', '0.3'];
     $rows[] = ['/adatkezeles', '0.3'];
@@ -1635,6 +1675,95 @@ $router->post('/admin/referenciak/torles', static function () use ($guard, $refe
         $references->delete((int) ($_POST['id'] ?? 0));
     }
     return $redirect('/admin/referenciak');
+});
+
+/* ------------------------------------------------------------------ */
+/* Blog (admin)                                                        */
+/* ------------------------------------------------------------------ */
+
+$router->get('/admin/blog', static function () use ($adminView, $guard, $blog): string {
+    $guard();
+    return $adminView('admin/blog', 'blog', ['title' => 'Blog', 'posts' => $blog->all()]);
+});
+
+$router->get('/admin/blog/szerkesztes', static function () use ($adminView, $guard, $blog): string {
+    $guard();
+    $id = (int) ($_GET['id'] ?? 0);
+    $post = $id > 0 ? $blog->find($id) : null;
+    return $adminView('admin/blog-edit', 'blog', [
+        'title' => $post ? 'Bejegyzés szerkesztése' : 'Új bejegyzés',
+        'post' => $post,
+    ]);
+});
+
+$router->post('/admin/blog/mentes', static function () use ($guard, $blog, $uploadImage, $redirect): string {
+    $guard();
+    // Túl nagy feltöltésnél a PHP eldobja a teljes $_POST-ot (post_max_size).
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött kép túl nagy a szerver korlátjához képest – tölts fel kisebbet. (A módosítások nem mentődtek.)'];
+        return $redirect('/admin/blog');
+    }
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/blog');
+    }
+    $id = (int) ($_POST['id'] ?? 0);
+    $existing = $id > 0 ? $blog->find($id) : null;
+    $post = [
+        'title' => trim((string) ($_POST['title'] ?? '')),
+        'slug' => trim((string) ($_POST['slug'] ?? '')),
+        'excerpt' => trim((string) ($_POST['excerpt'] ?? '')),
+        'body' => (string) ($_POST['body'] ?? ''),
+        'author' => trim((string) ($_POST['author'] ?? '')),
+        'published' => isset($_POST['published']) ? 1 : 0,
+        'cover' => (string) ($existing['cover'] ?? ''),
+    ];
+    if ($id > 0) {
+        $post['id'] = $id;
+    }
+
+    if ($post['title'] === '') {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A cím megadása kötelező.'];
+        return $redirect('/admin/blog/szerkesztes' . ($id ? '?id=' . $id : ''));
+    }
+
+    $coverError = null;
+    $fileErr = $_FILES['cover']['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($fileErr !== UPLOAD_ERR_NO_FILE) {
+        if ($fileErr === UPLOAD_ERR_INI_SIZE || $fileErr === UPLOAD_ERR_FORM_SIZE) {
+            $coverError = 'A borítókép túl nagy – tölts fel kisebbet (max 16 MB).';
+        } elseif ($fileErr !== UPLOAD_ERR_OK) {
+            $coverError = 'A borítókép feltöltése megszakadt, próbáld újra.';
+        } else {
+            $uploaded = $uploadImage($_FILES['cover'], dirname(__DIR__) . '/public/uploads/blog');
+            if ($uploaded === null) {
+                $coverError = 'A borítókép nem menthető – JPG/PNG/WEBP, max 16 MB legyen.';
+            } else {
+                if (($existing['cover'] ?? '') !== '') {
+                    @unlink(dirname(__DIR__) . '/public/uploads/blog/' . basename((string) $existing['cover']));
+                }
+                $post['cover'] = $uploaded;
+            }
+        }
+    }
+
+    $blog->save($post);
+    $_SESSION['_flash_admin'] = $coverError !== null
+        ? ['type' => 'error', 'text' => 'Adatok mentve, de: ' . $coverError]
+        : ['type' => 'ok', 'text' => 'Bejegyzés mentve.'];
+    return $redirect('/admin/blog');
+});
+
+$router->post('/admin/blog/torles', static function () use ($guard, $blog, $redirect): string {
+    $guard();
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        $id = (int) ($_POST['id'] ?? 0);
+        $post = $id > 0 ? $blog->find($id) : null;
+        if ($post !== null && ($post['cover'] ?? '') !== '') {
+            @unlink(dirname(__DIR__) . '/public/uploads/blog/' . basename((string) $post['cover']));
+        }
+        $blog->delete($id);
+    }
+    return $redirect('/admin/blog');
 });
 
 $router->get('/admin/terkep', static function () use ($adminView, $guard, $pois): string {

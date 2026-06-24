@@ -28,6 +28,7 @@ $contact = $config['contact'];
                 <li><a href="/webshop">Webshop</a></li>
                 <li><a href="/#kategoriak">Kategóriák</a></li>
                 <li><a href="/#referenciak">Referenciák</a></li>
+                <li><a href="/blog">Blog</a></li>
                 <li><a href="/#hirlevel">Hírlevél</a></li>
                 <li><a href="/#kapcsolat">Kapcsolat</a></li>
                 <li><a href="/admin">Vezérlőpult</a></li>

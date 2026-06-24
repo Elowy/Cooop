@@ -109,6 +109,18 @@ final class Schema
                 body $txt,
                 created_at VARCHAR(40) NOT NULL
             )$suffix",
+
+            "CREATE TABLE IF NOT EXISTS posts (
+                id $id,
+                slug VARCHAR(190) NOT NULL UNIQUE,
+                title VARCHAR(255) NOT NULL,
+                excerpt $txt,
+                body $txt,
+                cover VARCHAR(255) NOT NULL DEFAULT '',
+                author VARCHAR(190) NOT NULL DEFAULT '',
+                published INT NOT NULL DEFAULT 1,
+                created_at VARCHAR(40) NOT NULL
+            )$suffix",
         ];
 
         foreach ($tables as $sql) {

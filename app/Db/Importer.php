@@ -2,6 +2,7 @@
 
 namespace App\Db;
 
+use App\Blog\BlogStore;
 use App\Leader\LeaderStore;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
@@ -109,6 +110,17 @@ final class Importer
                 foreach ((new TemplateStore())->all() as $tpl) {
                     unset($tpl['id']);
                     $db->save($tpl);
+                }
+            }
+        });
+
+        // Blogbejegyzések (fájl-módban a config/blog.php-ból töltődnek fel)
+        self::guard(static function () use ($pdo): void {
+            $db = new BlogStore($pdo);
+            if (count($db->all()) === 0) {
+                foreach (array_reverse((new BlogStore())->all()) as $post) {
+                    unset($post['id']);
+                    $db->save($post);
                 }
             }
         });
