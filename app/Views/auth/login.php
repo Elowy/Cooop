@@ -3,13 +3,16 @@
 use App\Core\Csrf;
 
 /** @var bool $error */
+/** @var bool $locked */
 ?>
 <section class="section section--clear-top">
     <div class="container narrow auth-wrap">
         <h1 class="display">Belépés</h1>
         <p class="muted">Lépj be a fiókodba a rendeléseid követéséhez és a gyorsabb pénztárhoz.</p>
 
-        <?php if (!empty($error)): ?>
+        <?php if (!empty($locked)): ?>
+            <div class="form-alert">Túl sok sikertelen próbálkozás. Kérjük, várj néhány percet, mielőtt újra próbálkozol.</div>
+        <?php elseif (!empty($error)): ?>
             <div class="form-alert">Hibás e-mail cím vagy jelszó.</div>
         <?php endif; ?>
 

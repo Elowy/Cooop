@@ -22,6 +22,8 @@ use App\Catalog\ProductImageStore;
 use App\Core\Auth;
 use App\Core\Cart;
 use App\Core\Csrf;
+use App\Core\LoginThrottle;
+use App\Core\Mailer;
 use App\Core\Router;
 use App\Core\View;
 use App\Db\Database;
@@ -49,6 +51,26 @@ if ($config['app']['debug']) {
     ini_set('display_errors', '0');
     ini_set('log_errors', '1');
 }
+
+// Végzetes (nem elkapható) hibák biztonsági hálója: éles üzemben barátságos
+// üzenet a fehér oldal / kiszivárgó hibaüzenet helyett.
+register_shutdown_function(static function () use ($config): void {
+    $err = error_get_last();
+    if ($err === null || !in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        return;
+    }
+    error_log('[NetTrade] Végzetes hiba: ' . $err['message'] . ' @ ' . ($err['file'] ?? '?') . ':' . ($err['line'] ?? 0));
+    if (!empty($config['app']['debug'])) {
+        return; // fejlesztéskor a PHP mutassa a részleteket
+    }
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=UTF-8');
+    }
+    echo '<!doctype html><meta charset="utf-8"><title>Hiba</title>'
+        . '<p style="font-family:sans-serif;max-width:40rem;margin:4rem auto;text-align:center;color:#333">'
+        . 'Váratlan hiba történt. Kérjük, próbáld újra később.</p>';
+});
 
 // Biztonságosabb session-süti: JS nem olvashatja, csak HTTPS-en megy, SameSite véd.
 $secureCookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -98,6 +120,18 @@ $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
 $productImages = new ProductImageStore($pdo);
+$throttle = new LoginThrottle();
+$clientIp = static fn (): string => (string) ($_SERVER['REMOTE_ADDR'] ?? 'cli');
+
+// E-mail küldő (SMTP, ha konfigurált; különben PHP mail()). Feladó-alapértékek.
+$mailFromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
+if (($config['mail']['from_email'] ?? '') === '') {
+    $config['mail']['from_email'] = 'no-reply@' . $mailFromHost;
+}
+if (($config['mail']['from_name'] ?? '') === '') {
+    $config['mail']['from_name'] = (string) $config['app']['name'];
+}
+$mailer = Mailer::fromConfig($config);
 $subscribers = new SubscriberStore($pdo);
 $templates = new TemplateStore($pdo);
 $users = $pdo ? new UserRepository($pdo) : null;
@@ -327,7 +361,7 @@ $router->get('/kapcsolat', static function () use ($redirect): string {
     return $redirect('/#kapcsolat');
 });
 
-$router->post('/kapcsolat', static function () use ($config, $messages, $redirect): string {
+$router->post('/kapcsolat', static function () use ($config, $messages, $mailer, $redirect): string {
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/#kapcsolat');
     }
@@ -363,12 +397,9 @@ $router->post('/kapcsolat', static function () use ($config, $messages, $redirec
     $messages->save($msg);
 
     // E-mail értesítés (ha a szerver tudja küldeni; az üzenet ettől függetlenül tárolódik).
-    $subject = mb_encode_mimeheader('Új üzenet a weboldalról' . ($company !== '' ? ' – ' . $company : ''), 'UTF-8');
+    $subject = 'Új üzenet a weboldalról' . ($company !== '' ? ' – ' . $company : '');
     $body = "Név: {$msg['name']}\nCég: {$company}\nE-mail: {$msg['email']}\nTelefon: {$msg['phone']}\n\nÜzenet:\n{$message}\n";
-    $fromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
-    $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
-        . 'From: weboldal@' . $fromHost . "\r\nReply-To: {$msg['email']}";
-    @mail($config['contact']['email'], $subject, $body, $headers);
+    $mailer->send((string) $config['contact']['email'], $subject, $body, ['reply_to' => (string) $msg['email']]);
 
     $_SESSION['_flash_contact'] = ['sent' => true];
     return $redirect('/#kapcsolat');
@@ -423,20 +454,26 @@ $router->get('/belepes', static function () use ($redirect): string {
     if (Auth::user() !== null) {
         return $redirect('/fiokom');
     }
-    return View::render('auth/login', ['title' => 'Belépés', 'error' => isset($_GET['hiba'])]);
+    return View::render('auth/login', ['title' => 'Belépés', 'error' => isset($_GET['hiba']), 'locked' => isset($_GET['zar'])]);
 });
 
-$router->post('/belepes', static function () use ($users, $redirect): string {
+$router->post('/belepes', static function () use ($users, $throttle, $clientIp, $redirect): string {
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/belepes');
+    }
+    $key = 'cust:' . $clientIp();
+    if ($throttle->blocked($key)) {
+        return $redirect('/belepes?zar=1');
     }
     if ($users !== null) {
         $user = $users->findByEmail(trim((string) ($_POST['email'] ?? '')));
         if ($user !== null && password_verify((string) ($_POST['password'] ?? ''), $user['password'])) {
+            $throttle->clear($key);
             Auth::loginUser($user);
             return $redirect('/fiokom');
         }
     }
+    $throttle->registerFailure($key);
     return $redirect('/belepes?hiba=1');
 });
 
@@ -697,7 +734,7 @@ $finalizeInvoice = static function (string $token) use ($axel, $orders): void {
 };
 
 /** Rendelés-visszaigazoló e-mail a vevőnek, és értesítés a shopnak. */
-$orderEmail = static function (array $order) use ($config): void {
+$orderEmail = static function (array $order) use ($config, $mailer): void {
     $email = (string) ($order['customer']['email'] ?? '');
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         return;
@@ -724,22 +761,16 @@ $orderEmail = static function (array $order) use ($config): void {
     $body .= "Hamarosan felvesszük veled a kapcsolatot a szállítás egyeztetéséhez.\n\n"
         . "Üdvözlettel:\n{$appName}\n";
 
-    $fromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
-    $from = mb_encode_mimeheader($appName, 'UTF-8') . ' <rendeles@' . $fromHost . '>';
-    $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
-        . 'From: ' . $from . "\r\nReply-To: " . (string) ($config['contact']['email'] ?? '');
-    @mail($email, mb_encode_mimeheader("Rendelés visszaigazolása - {$number}", 'UTF-8'), $body, $headers);
+    $contactEmail = (string) ($config['contact']['email'] ?? '');
+    $mailer->send($email, "Rendelés visszaigazolása - {$number}", $body, ['reply_to' => $contactEmail]);
 
     // Értesítés a shopnak (ha van érvényes cím).
-    $shop = (string) ($config['contact']['email'] ?? '');
-    if (filter_var($shop, FILTER_VALIDATE_EMAIL)) {
+    if (filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
         $adminBody = "Új rendelés érkezett.\n\nRendelésszám: {$number}\n"
             . 'Vevő: ' . (string) ($order['customer']['name'] ?? '') . " <{$email}>\n"
             . 'Telefon: ' . (string) ($order['customer']['phone'] ?? '') . "\n"
             . "Fizetési mód: {$method}\nVégösszeg: {$grossFmt}\n\nTételek:\n{$lines}";
-        $adminHeaders = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
-            . 'From: ' . $from . "\r\nReply-To: " . $email;
-        @mail($shop, mb_encode_mimeheader("Új rendelés - {$number}", 'UTF-8'), $adminBody, $adminHeaders);
+        $mailer->send($contactEmail, "Új rendelés - {$number}", $adminBody, ['reply_to' => $email]);
     }
 };
 
@@ -921,13 +952,18 @@ $router->get('/admin/login', static function () use ($config, $redirect): string
     return View::render('admin/login', [
         'title' => 'Belépés',
         'error' => isset($_GET['hiba']),
+        'locked' => isset($_GET['zar']),
         'installed' => (bool) $config['installed'],
     ], '');
 });
 
-$router->post('/admin/login', static function () use ($config, $adminPw, $users, $redirect): string {
+$router->post('/admin/login', static function () use ($config, $adminPw, $users, $throttle, $clientIp, $redirect): string {
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/login');
+    }
+    $key = 'admin:' . $clientIp();
+    if ($throttle->blocked($key)) {
+        return $redirect('/admin/login?zar=1');
     }
     if ($config['installed'] && $users !== null) {
         $email = trim((string) ($_POST['email'] ?? ''));
@@ -935,15 +971,19 @@ $router->post('/admin/login', static function () use ($config, $adminPw, $users,
         $user = $users->findByEmail($email);
         if ($user !== null && password_verify($password, $user['password'])
             && in_array($user['role'], ['admin', 'editor'], true)) {
+            $throttle->clear($key);
             Auth::loginUser($user);
             return $redirect('/admin');
         }
+        $throttle->registerFailure($key);
         return $redirect('/admin/login?hiba=1');
     }
     // Telepítés előtti, egyszerű jelszavas belépés.
     if (Auth::attemptLegacy((string) ($_POST['password'] ?? ''), $adminPw)) {
+        $throttle->clear($key);
         return $redirect('/admin');
     }
+    $throttle->registerFailure($key);
     return $redirect('/admin/login?hiba=1');
 });
 
@@ -1145,7 +1185,7 @@ $router->post('/admin/hirlevel/feliratkozo/torles', static function () use ($gua
     return $redirect('/admin/hirlevel');
 });
 
-$router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscribers, $templates, $settings, $config, $redirect): string {
+$router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscribers, $templates, $settings, $config, $mailer, $redirect): string {
     $guard();
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/hirlevel');
@@ -1178,8 +1218,6 @@ $router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscri
 
     $recipients = $subscribers->active();
     $base = rtrim((string) $config['app']['url'], '/');
-    $subjectEnc = mb_encode_mimeheader($subject, 'UTF-8');
-    $fromHeader = mb_encode_mimeheader($fromName, 'UTF-8') . ' <' . $fromEmail . '>';
     $sent = 0;
 
     foreach ($recipients as $r) {
@@ -1190,11 +1228,13 @@ $router->post('/admin/hirlevel/kuldes', static function () use ($guard, $subscri
             . '<p style="font-size:12px;color:#888">Ezt az üzenetet azért kapod, mert feliratkoztál a(z) '
             . htmlspecialchars($fromName, ENT_QUOTES) . ' hírlevelére.<br>'
             . '<a href="' . htmlspecialchars($unsub, ENT_QUOTES) . '" style="color:#888">Leiratkozás</a></p></div>';
-        $headers = "MIME-Version: 1.0\r\n"
-            . "Content-Type: text/html; charset=UTF-8\r\n"
-            . 'From: ' . $fromHeader . "\r\n"
-            . 'List-Unsubscribe: <' . $unsub . '>';
-        if (@mail((string) $r['email'], $subjectEnc, $html, $headers)) {
+        $okSent = $mailer->send((string) $r['email'], $subject, $html, [
+            'html' => true,
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+            'list_unsubscribe' => $unsub,
+        ]);
+        if ($okSent) {
             $sent++;
         }
     }
@@ -1639,4 +1679,13 @@ $router->post('/admin/terkep/torles', static function () use ($guard, $pois, $re
     return $redirect('/admin/terkep');
 });
 
-echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+try {
+    echo $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+} catch (\Throwable $e) {
+    if (!empty($config['app']['debug'])) {
+        throw $e; // fejlesztéskor lássuk a hibát
+    }
+    error_log('[NetTrade] Kezeletlen hiba: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    http_response_code(500);
+    echo View::render('errors/500', ['title' => 'Hiba történt']);
+}

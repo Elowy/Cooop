@@ -43,6 +43,19 @@ $config = [
         'exchange_dir' => getenv('AXEL_DIR') ?: dirname(__DIR__) . '/storage/axel',
     ],
 
+    // E-mail küldés. Élesben SMTP ajánlott a megbízható kézbesítésért
+    // (saját feladó-domain, SPF/DKIM). Üres host esetén a PHP mail()-t használja.
+    'mail' => [
+        'transport'  => getenv('MAIL_TRANSPORT') ?: 'mail',   // mail | smtp
+        'host'       => getenv('MAIL_HOST') ?: '',
+        'port'       => getenv('MAIL_PORT') ?: '',
+        'user'       => getenv('MAIL_USER') ?: '',
+        'pass'       => getenv('MAIL_PASS') ?: '',
+        'secure'     => getenv('MAIL_SECURE') ?: 'tls',        // tls | ssl | (üres)
+        'from_email' => getenv('MAIL_FROM') ?: '',             // üresen: no-reply@<domain>
+        'from_name'  => getenv('MAIL_FROM_NAME') ?: '',        // üresen: az app neve
+    ],
+
     // Webshop / pénztár.
     'shop' => [
         'payment'    => getenv('PAYMENT_GATEWAY') ?: 'mock',    // mock | simplepay | barion | stripe
