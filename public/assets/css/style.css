@@ -539,6 +539,50 @@ h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.15; color: var(--text); }
 }
 
 /* ==========================================================================
+   Vásárlói fiók, belépés/regisztráció és webshop-szűrők
+   ========================================================================== */
+
+/* Fejléc fiók-link */
+.account-link { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-weight: 500; padding: 8px 12px; transition: color .15s ease; }
+.account-link:hover { color: var(--text); }
+
+/* Belépés / regisztráció */
+.auth-wrap { max-width: 460px; }
+.auth-wrap h1.display { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 0 0 8px; }
+.auth-form { margin-top: 22px; }
+.auth-form .check { margin: 2px 0 18px; }
+.auth-alt { text-align: center; margin-top: 18px; color: var(--muted); }
+
+/* Fiók + rendeléstörténet */
+.account-wrap { max-width: 820px; }
+.account-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.account-head h1.display { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 0 0 4px; }
+.account-logout { margin: 0; }
+.account-sub { font-family: var(--serif); font-size: 1.3rem; margin: 34px 0 16px; }
+.order-list { display: flex; flex-direction: column; gap: 10px; }
+.order-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 16px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); transition: border-color .15s ease; }
+.order-row:hover { border-color: var(--line-gold); }
+.order-meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.order-meta strong { color: var(--text); }
+.order-meta small { color: var(--muted); }
+.order-total { color: var(--gold-2); font-family: var(--serif); white-space: nowrap; }
+
+/* Webshop szűrők (oldalsáv) */
+.shop-filters { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+.shop-filters .sidebar-title { margin-bottom: 14px; }
+.shop-filters .field { margin-bottom: 12px; }
+.shop-filters .field-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.shop-filters .field-row .field { margin-bottom: 0; }
+.shop-filters .check { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); margin: 6px 0 14px; }
+.filter-clear { display: block; text-align: center; margin-top: 10px; color: var(--muted); font-size: .85rem; }
+.filter-clear:hover { color: var(--gold-2); }
+
+@media (max-width: 680px) {
+    .order-row { grid-template-columns: 1fr auto; }
+    .order-total { grid-column: 2; text-align: right; }
+}
+
+/* ==========================================================================
    Kategóriák (a megadott termékstruktúra alapján)
    ========================================================================== */
 

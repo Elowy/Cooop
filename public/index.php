@@ -415,6 +415,95 @@ $router->get('/hirlevel/leiratkozas', static function () use ($subscribers): str
     ]);
 });
 
+/* ------------------------------------------------------------------ */
+/* Vásárlói fiók (regisztráció / belépés / rendeléstörténet)           */
+/* ------------------------------------------------------------------ */
+
+$router->get('/belepes', static function () use ($redirect): string {
+    if (Auth::user() !== null) {
+        return $redirect('/fiokom');
+    }
+    return View::render('auth/login', ['title' => 'Belépés', 'error' => isset($_GET['hiba'])]);
+});
+
+$router->post('/belepes', static function () use ($users, $redirect): string {
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/belepes');
+    }
+    if ($users !== null) {
+        $user = $users->findByEmail(trim((string) ($_POST['email'] ?? '')));
+        if ($user !== null && password_verify((string) ($_POST['password'] ?? ''), $user['password'])) {
+            Auth::loginUser($user);
+            return $redirect('/fiokom');
+        }
+    }
+    return $redirect('/belepes?hiba=1');
+});
+
+$router->get('/regisztracio', static function () use ($redirect): string {
+    if (Auth::user() !== null) {
+        return $redirect('/fiokom');
+    }
+    return View::render('auth/register', ['title' => 'Regisztráció', 'errors' => [], 'old' => []]);
+});
+
+$router->post('/regisztracio', static function () use ($users, $redirect): string {
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/regisztracio');
+    }
+    $val = static fn (string $k): string => trim((string) ($_POST[$k] ?? ''));
+    $name = $val('name');
+    $email = $val('email');
+    $password = (string) ($_POST['password'] ?? '');
+    $errors = [];
+    if ($name === '') {
+        $errors['name'] = 'A név megadása kötelező.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Érvényes e-mail cím szükséges.';
+    }
+    if (strlen($password) < 6) {
+        $errors['password'] = 'A jelszó legalább 6 karakter legyen.';
+    }
+    if (!isset($_POST['privacy'])) {
+        $errors['privacy'] = 'Az adatkezelési tájékoztató elfogadása kötelező.';
+    }
+    if (!$errors && $users === null) {
+        $errors['email'] = 'A regisztráció jelenleg nem elérhető.';
+    }
+    if (!$errors && $users !== null && $users->findByEmail($email) !== null) {
+        $errors['email'] = 'Ezzel az e-mail címmel már van fiók – jelentkezz be.';
+    }
+    if ($errors) {
+        return View::render('auth/register', ['title' => 'Regisztráció', 'errors' => $errors, 'old' => $_POST]);
+    }
+    $id = $users->create($name, $email, password_hash($password, PASSWORD_DEFAULT), 'customer');
+    $user = $users->find($id);
+    if ($user !== null) {
+        Auth::loginUser($user);
+    }
+    return $redirect('/fiokom');
+});
+
+$router->post('/kilepes', static function () use ($redirect): string {
+    if (Csrf::check($_POST['_csrf'] ?? null)) {
+        Auth::logout();
+    }
+    return $redirect('/');
+});
+
+$router->get('/fiokom', static function () use ($orders, $redirect): string {
+    $me = Auth::user();
+    if ($me === null) {
+        return $redirect('/belepes');
+    }
+    return View::render('account/index', [
+        'title' => 'Fiókom',
+        'me' => $me,
+        'orders' => $orders->forCustomer((int) $me['id'], (string) $me['email']),
+    ]);
+});
+
 $router->get('/webshop', static function () use ($axel, $cats, $productImages): string {
     $activeCat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
     $products = $axel->products();
@@ -426,6 +515,24 @@ $router->get('/webshop', static function () use ($axel, $cats, $productImages): 
         $path = $cats->path($activeCat);
     } else {
         $activeCat = '';
+    }
+
+    // Kereső + szűrők (név/cikkszám, ár-tartomány bruttóban, csak raktáron).
+    $q = trim((string) ($_GET['q'] ?? ''));
+    $min = ($_GET['min'] ?? '') !== '' ? max(0, (int) $_GET['min']) : null;
+    $max = ($_GET['max'] ?? '') !== '' ? max(0, (int) $_GET['max']) : null;
+    $inStockOnly = isset($_GET['keszlet']);
+    if ($q !== '') {
+        $products = array_filter($products, static fn ($p) => mb_stripos($p->name, $q) !== false || stripos($p->sku, $q) !== false);
+    }
+    if ($min !== null) {
+        $products = array_filter($products, static fn ($p) => $p->priceGross() >= $min);
+    }
+    if ($max !== null) {
+        $products = array_filter($products, static fn ($p) => $p->priceGross() <= $max);
+    }
+    if ($inStockOnly) {
+        $products = array_filter($products, static fn ($p) => $p->inStock());
     }
 
     // Rendezés (raktáron lévők előre, azon belül a választott szempont szerint).
@@ -453,6 +560,10 @@ $router->get('/webshop', static function () use ($axel, $cats, $productImages): 
         'activeCat' => $activeCat,
         'activePath' => $path,
         'sort' => $sort,
+        'q' => $q,
+        'min' => $min,
+        'max' => $max,
+        'inStockOnly' => $inStockOnly,
         'cats' => $cats,
         'images' => $productImages->all(),
     ]);
@@ -637,12 +748,13 @@ $router->get('/penztar', static function () use ($buildCart, $payment, $redirect
     if (!$cart['items']) {
         return $redirect('/kosar');
     }
+    $me = Auth::user();
     return View::render('shop/checkout', [
         'title' => 'Pénztár',
         'cart' => $cart,
         'paymentLabel' => $payment->label(),
         'errors' => [],
-        'old' => [],
+        'old' => $me !== null ? ['name' => $me['name'], 'email' => $me['email']] : [],
     ]);
 });
 
@@ -710,6 +822,7 @@ $router->post('/penztar', static function () use ($buildCart, $orders, $payment,
         'customer' => [
             'name' => $val('name'), 'email' => $val('email'), 'phone' => $val('phone'),
             'company' => $val('company'), 'tax_number' => $val('tax_number'), 'note' => $val('note'),
+            'user_id' => (int) (Auth::user()['id'] ?? 0),
         ],
         'billing' => ['zip' => $val('billing_zip'), 'city' => $val('billing_city'), 'address' => $val('billing_address')],
         'shipping' => $shipDiff
