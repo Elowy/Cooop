@@ -11,6 +11,7 @@ app/
   Core/         Router, View, Cart, Csrf, Auth
   Catalog/      Categories (kategóriafa)
   Integration/  AxelGateway (interfész) + Product, InvoiceResult, MockAxelGateway
+  Payment/      PaymentGateway (interfész) + MockPaymentGateway, BarionClient, BarionPaymentGateway
   Views/        layouts/, partials/, home, shop/, cart/, admin/, errors/
 config/         config.php, categories.php, catalog.php, config.local.php(.example)
 public/         webgyökér (index.php, .htaccess, web.config, assets/)
@@ -44,6 +45,10 @@ A `config/config.php` az alapértékeket adja; ezeket felülírhatod
   rendelések (placeholder), Axel-integráció állapot.
 - **Axel adapter**: a shop egyetlen interfészen (`App\Integration\AxelGateway`)
   beszél az Axellel; jelenleg `MockAxelGateway`, később `xml`/`rest` adapter.
+- **Fizetés**: a pénztár egyetlen interfészen (`App\Payment\PaymentGateway`) indít
+  fizetést. A vezérlőpult **Beállítások** oldalán megadott Barion POSKey + Payee
+  esetén éles/sandbox **Barion** bankkártyás fizetés (start → átirányítás →
+  callback/IPN állapot-egyeztetés); enélkül a beépített teszt-kapu.
 
 ## Telepítés
 
