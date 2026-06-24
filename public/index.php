@@ -18,6 +18,7 @@ spl_autoload_register(static function (string $class): void {
 });
 
 use App\Catalog\Categories;
+use App\Catalog\ProductImageStore;
 use App\Core\Auth;
 use App\Core\Cart;
 use App\Core\Csrf;
@@ -96,6 +97,7 @@ $references = new ReferenceStore($pdo);
 $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
+$productImages = new ProductImageStore($pdo);
 $subscribers = new SubscriberStore($pdo);
 $templates = new TemplateStore($pdo);
 $users = $pdo ? new UserRepository($pdo) : null;
@@ -413,7 +415,7 @@ $router->get('/hirlevel/leiratkozas', static function () use ($subscribers): str
     ]);
 });
 
-$router->get('/webshop', static function () use ($axel, $cats): string {
+$router->get('/webshop', static function () use ($axel, $cats, $productImages): string {
     $activeCat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
     $products = $axel->products();
     $path = [];
@@ -452,21 +454,29 @@ $router->get('/webshop', static function () use ($axel, $cats): string {
         'activePath' => $path,
         'sort' => $sort,
         'cats' => $cats,
+        'images' => $productImages->all(),
     ]);
 });
 
-$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo, $config): string {
+$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo, $productImages, $config): string {
     $product = $axel->findProduct($params['slug'] ?? '');
     if ($product === null) {
         http_response_code(404);
         return View::render('errors/404', ['title' => 'A termék nem található']);
     }
     $pseo = $productSeo->find($product->sku) ?? [];
+    $images = $productImages->find($product->sku);
+    // OG-kép: a kézi SEO-felülírás elsőbbséget élvez, különben az első termékkép.
+    $base = rtrim((string) ($config['app']['url'] ?? ''), '/');
+    $ogImage = trim((string) ($pseo['og_image'] ?? ''));
+    if ($ogImage === '' && $images) {
+        $ogImage = $base . '/uploads/products/' . $images[0];
+    }
     $meta = [
         'title' => (string) ($pseo['title'] ?? ''),
         'description' => trim((string) ($pseo['description'] ?? '')) !== '' ? (string) $pseo['description'] : $product->short,
         'keywords' => (string) ($pseo['keywords'] ?? ''),
-        'og_image' => (string) ($pseo['og_image'] ?? ''),
+        'og_image' => $ogImage,
         'og_type' => 'product',
         'product_price' => (string) $product->priceGross(),
         'product_currency' => (string) ($config['shop']['currency'] ?? 'HUF'),
@@ -502,11 +512,12 @@ $router->get('/termek/{slug}', static function (array $params) use ($axel, $cats
         'catPath' => $cats->path($product->category),
         'cats' => $cats,
         'related' => $related,
+        'images' => $images,
         'meta' => $meta,
     ]);
 });
 
-$router->get('/kosar', static function () use ($axel): string {
+$router->get('/kosar', static function () use ($axel, $productImages): string {
     $lines = [];
     $total = 0;
     foreach (Cart::items() as $sku => $qty) {
@@ -519,7 +530,7 @@ $router->get('/kosar', static function () use ($axel): string {
             }
         }
     }
-    return View::render('cart/index', ['title' => 'Kosár', 'lines' => $lines, 'total' => $total]);
+    return View::render('cart/index', ['title' => 'Kosár', 'lines' => $lines, 'total' => $total, 'images' => $productImages->all()]);
 });
 
 $router->post('/kosar/hozzaad', static function () use ($redirect, $wantsJson, $axel): string {
@@ -1242,6 +1253,89 @@ $router->post('/admin/termek-seo', static function () use ($guard, $productSeo, 
         $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Termék SEO mentve.'];
     }
     return $redirect('/admin/termekek');
+});
+
+$router->get('/admin/termek-kepek', static function () use ($adminView, $guard, $axel, $productImages): string {
+    $guard();
+    $sku = (string) ($_GET['sku'] ?? '');
+    $product = null;
+    foreach ($axel->products() as $p) {
+        if ($p->sku === $sku) {
+            $product = $p;
+            break;
+        }
+    }
+    if ($product === null) {
+        http_response_code(404);
+        return $adminView('admin/product-images', 'products', ['title' => 'Termékképek', 'product' => null, 'images' => []]);
+    }
+    return $adminView('admin/product-images', 'products', [
+        'title' => 'Képek · ' . $product->name,
+        'product' => $product,
+        'images' => $productImages->find($sku),
+    ]);
+});
+
+$router->post('/admin/termek-kepek/feltoltes', static function () use ($guard, $productImages, $uploadImage, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    $back = '/admin/termek-kepek?sku=' . urlencode($sku);
+    // Túl nagy feltöltésnél a PHP eldobja a teljes $_POST-ot (post_max_size).
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött fájl(ok) túl nagy(ok) a szerver korlátjához képest – tölts fel kisebb képet.'];
+        return $redirect($sku !== '' ? $back : '/admin/termekek');
+    }
+    if (!Csrf::check($_POST['_csrf'] ?? null) || $sku === '') {
+        return $redirect('/admin/termekek');
+    }
+    $uploaded = 0;
+    $errored = false;
+    $files = $_FILES['images'] ?? null;
+    if (is_array($files) && isset($files['name']) && is_array($files['name'])) {
+        for ($i = 0, $n = count($files['name']); $i < $n; $i++) {
+            if (((int) ($files['error'][$i] ?? UPLOAD_ERR_NO_FILE)) === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $one = [
+                'name' => $files['name'][$i] ?? '', 'type' => $files['type'][$i] ?? '',
+                'tmp_name' => $files['tmp_name'][$i] ?? '', 'error' => $files['error'][$i] ?? 1,
+                'size' => $files['size'][$i] ?? 0,
+            ];
+            $name = $uploadImage($one, dirname(__DIR__) . '/public/uploads/products');
+            if ($name !== null) {
+                $productImages->add($sku, $name);
+                $uploaded++;
+            } else {
+                $errored = true;
+            }
+        }
+    }
+    $_SESSION['_flash_admin'] = $uploaded > 0
+        ? ['type' => 'ok', 'text' => "{$uploaded} kép feltöltve." . ($errored ? ' (Néhány kimaradt – csak JPG/PNG/WEBP, max 16 MB.)' : '')]
+        : ['type' => 'error', 'text' => 'Nem sikerült kép feltöltése – JPG/PNG/WEBP, max 16 MB legyen.'];
+    return $redirect($back);
+});
+
+$router->post('/admin/termek-kepek/torles', static function () use ($guard, $productImages, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    if (Csrf::check($_POST['_csrf'] ?? null) && $sku !== '') {
+        $file = basename((string) ($_POST['file'] ?? ''));
+        if ($file !== '' && in_array($file, $productImages->find($sku), true)) {
+            $productImages->remove($sku, $file);
+            @unlink(dirname(__DIR__) . '/public/uploads/products/' . $file);
+        }
+    }
+    return $redirect('/admin/termek-kepek?sku=' . urlencode($sku));
+});
+
+$router->post('/admin/termek-kepek/elsodleges', static function () use ($guard, $productImages, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    if (Csrf::check($_POST['_csrf'] ?? null) && $sku !== '') {
+        $productImages->makePrimary($sku, basename((string) ($_POST['file'] ?? '')));
+    }
+    return $redirect('/admin/termek-kepek?sku=' . urlencode($sku));
 });
 
 $router->get('/admin/referenciak', static function () use ($adminView, $guard, $references): string {

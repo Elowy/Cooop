@@ -11,8 +11,10 @@ use App\Integration\Product;
 /** @var string[] $activePath */
 /** @var string $sort */
 /** @var Categories $cats */
+/** @var array<string, string[]> $images */
 /** @var array<string, mixed> $config */
 
+$images = $images ?? [];
 $title = $activeCat !== '' ? $cats->name($activeCat) : 'Termékeink';
 $LOW = 15; // e készletszint alatt „már csak X" sürgetést mutatunk
 
@@ -91,9 +93,10 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                 <p class="empty">Ebben a kategóriában jelenleg nincs termék.</p>
             <?php else: ?>
                 <div class="card-grid product-grid">
-                    <?php foreach ($products as $p): ?>
+                    <?php foreach ($products as $p): $pImg = $images[$p->sku][0] ?? null; ?>
                         <article class="card product-card reveal">
-                            <a class="product-media" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
+                            <a class="product-media<?= $pImg ? ' has-image' : '' ?>" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
+                                <?php if ($pImg): ?><img src="/uploads/products/<?= View::e($pImg) ?>" alt="<?= View::e($p->name) ?>" loading="lazy"><?php endif; ?>
                                 <?php if (!$p->inStock()): ?>
                                     <span class="badge badge--out">Elfogyott</span>
                                 <?php elseif ($p->stock <= $LOW): ?>

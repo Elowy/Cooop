@@ -88,6 +88,11 @@ final class Schema
                 og_image VARCHAR(500) NOT NULL DEFAULT ''
             )$suffix",
 
+            "CREATE TABLE IF NOT EXISTS product_images (
+                sku VARCHAR(64) PRIMARY KEY,
+                images $txt
+            )$suffix",
+
             "CREATE TABLE IF NOT EXISTS subscribers (
                 id $id,
                 email VARCHAR(255) NOT NULL UNIQUE,

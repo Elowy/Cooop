@@ -22,3 +22,6 @@ config/db.php
 .idea/
 .vscode/
 *.swp
+
+# Helyi smoke-teszt router (nem deploy)
+/.smoke-router.php

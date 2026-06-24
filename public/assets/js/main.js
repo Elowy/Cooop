@@ -216,6 +216,19 @@
         });
     });
 
+    // Termékoldal galéria: bélyegkép kattintásra kicseréli a fő képet
+    var galleryMain = document.getElementById('gallery-main-img');
+    if (galleryMain) {
+        document.querySelectorAll('[data-gallery-thumb]').forEach(function (thumb) {
+            thumb.addEventListener('click', function () {
+                var src = thumb.getAttribute('data-gallery-thumb');
+                if (src) { galleryMain.src = src; }
+                document.querySelectorAll('.gallery-thumb').forEach(function (t) { t.classList.remove('is-active'); });
+                thumb.classList.add('is-active');
+            });
+        });
+    }
+
     // Szám-számláló (statisztika)
     var animateCount = function (el) {
         if (el.dataset.counted) { return; }
