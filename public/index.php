@@ -574,6 +574,53 @@ $finalizeInvoice = static function (string $token) use ($axel, $orders): void {
     ]]);
 };
 
+/** Rendelés-visszaigazoló e-mail a vevőnek, és értesítés a shopnak. */
+$orderEmail = static function (array $order) use ($config): void {
+    $email = (string) ($order['customer']['email'] ?? '');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return;
+    }
+    $appName = (string) $config['app']['name'];
+    $number = (string) ($order['number'] ?? '');
+    $method = (string) ($order['payment']['method'] ?? '');
+    $money = static fn (int $n): string => number_format($n, 0, ',', ' ') . ' Ft';
+    $grossFmt = $money((int) ($order['totals']['gross'] ?? 0));
+
+    $lines = '';
+    foreach ($order['items'] ?? [] as $it) {
+        $lines .= '- ' . (string) $it['name'] . ' x ' . (int) $it['qty'] . ' ' . (string) $it['unit']
+            . ' = ' . $money((int) $it['subtotal']) . "\n";
+    }
+
+    $body = 'Kedves ' . (string) ($order['customer']['name'] ?? '') . "!\n\n"
+        . "Köszönjük a rendelésed a(z) {$appName} webáruházban.\n\n"
+        . "Rendelésszám: {$number}\n\nTételek:\n{$lines}\nVégösszeg (bruttó): {$grossFmt}\n\n";
+    $body .= $method === 'transfer'
+        ? "Fizetési mód: banki átutalás. Kérjük, utald a {$grossFmt} összeget a közleményben "
+            . "a(z) {$number} rendelésszámmal; a számlaszámot külön jelezzük.\n\n"
+        : "Fizetési mód: bankkártya - a fizetésed rögzítettük.\n\n";
+    $body .= "Hamarosan felvesszük veled a kapcsolatot a szállítás egyeztetéséhez.\n\n"
+        . "Üdvözlettel:\n{$appName}\n";
+
+    $fromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
+    $from = mb_encode_mimeheader($appName, 'UTF-8') . ' <rendeles@' . $fromHost . '>';
+    $headers = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
+        . 'From: ' . $from . "\r\nReply-To: " . (string) ($config['contact']['email'] ?? '');
+    @mail($email, mb_encode_mimeheader("Rendelés visszaigazolása - {$number}", 'UTF-8'), $body, $headers);
+
+    // Értesítés a shopnak (ha van érvényes cím).
+    $shop = (string) ($config['contact']['email'] ?? '');
+    if (filter_var($shop, FILTER_VALIDATE_EMAIL)) {
+        $adminBody = "Új rendelés érkezett.\n\nRendelésszám: {$number}\n"
+            . 'Vevő: ' . (string) ($order['customer']['name'] ?? '') . " <{$email}>\n"
+            . 'Telefon: ' . (string) ($order['customer']['phone'] ?? '') . "\n"
+            . "Fizetési mód: {$method}\nVégösszeg: {$grossFmt}\n\nTételek:\n{$lines}";
+        $adminHeaders = "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n"
+            . 'From: ' . $from . "\r\nReply-To: " . $email;
+        @mail($shop, mb_encode_mimeheader("Új rendelés - {$number}", 'UTF-8'), $adminBody, $adminHeaders);
+    }
+};
+
 $router->get('/penztar', static function () use ($buildCart, $payment, $redirect): string {
     $cart = $buildCart();
     if (!$cart['items']) {
@@ -588,7 +635,7 @@ $router->get('/penztar', static function () use ($buildCart, $payment, $redirect
     ]);
 });
 
-$router->post('/penztar', static function () use ($buildCart, $orders, $payment, $finalizeInvoice, $redirect): string {
+$router->post('/penztar', static function () use ($buildCart, $orders, $payment, $finalizeInvoice, $orderEmail, $redirect): string {
     $cart = $buildCart();
     if (!$cart['items']) {
         return $redirect('/kosar');
@@ -665,6 +712,7 @@ $router->post('/penztar', static function () use ($buildCart, $orders, $payment,
 
     if ($method === 'transfer') {
         $finalizeInvoice($token);
+        $orderEmail($order);
         Cart::clear();
         return $redirect('/rendeles/' . $token);
     }
@@ -683,7 +731,7 @@ $router->get('/fizetes/{token}', static function (array $params) use ($orders, $
     return View::render('shop/payment', ['title' => 'Fizetés', 'order' => $order, 'failed' => isset($_GET['hiba'])]);
 });
 
-$router->post('/fizetes/{token}', static function (array $params) use ($orders, $finalizeInvoice, $redirect): string {
+$router->post('/fizetes/{token}', static function (array $params) use ($orders, $finalizeInvoice, $orderEmail, $redirect): string {
     $token = $params['token'] ?? '';
     $order = $orders->find($token);
     if ($order === null || !Csrf::check($_POST['_csrf'] ?? null)) {
@@ -693,11 +741,14 @@ $router->post('/fizetes/{token}', static function (array $params) use ($orders, 
         return $redirect('/rendeles/' . $token);
     }
     if (($_POST['result'] ?? '') === 'success') {
-        $orders->update($token, [
+        $paid = $orders->update($token, [
             'status' => 'paid',
             'payment' => ['status' => 'paid', 'paid_at' => date('c')],
         ]);
         $finalizeInvoice($token);
+        if ($paid !== null) {
+            $orderEmail($paid);
+        }
         Cart::clear();
         return $redirect('/rendeles/' . $token);
     }

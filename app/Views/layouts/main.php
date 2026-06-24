@@ -58,7 +58,7 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
     <meta property="product:price:currency" content="<?= View::e((string) ($meta['product_currency'] ?? 'HUF')) ?>">
     <meta property="og:availability" content="<?= View::e((string) ($meta['product_availability'] ?? '')) ?>">
     <?php endif; ?>
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="<?= View::e(View::asset('/assets/css/style.css')) ?>">
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
     <?php if ($gaId !== '' && $cookieConsent === 'all'): ?>
     <script async src="https://www.googletagmanager.com/gtag/js?id=<?= View::e($gaId) ?>"></script>
@@ -81,6 +81,6 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
 <?php include dirname(__DIR__) . '/partials/newsletter.php'; ?>
 <?php include dirname(__DIR__) . '/partials/footer.php'; ?>
 
-<script src="/assets/js/main.js" defer></script>
+<script src="<?= View::e(View::asset('/assets/js/main.js')) ?>" defer></script>
 </body>
 </html>
