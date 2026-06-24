@@ -40,7 +40,8 @@ $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?
 $ogType = trim((string) ($meta['og_type'] ?? '')) ?: 'website';
 
 $gaId = trim((string) ($seo['ga_id'] ?? ''));
-$cookieConsent = $_COOKIE['nt_consent'] ?? '';
+$fbPixel = trim((string) ($seo['fb_pixel'] ?? ''));
+$consent = \App\Core\Consent::parse($_COOKIE['nt_consent'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="hu">
@@ -68,11 +69,15 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
     <?php endif; ?>
     <link rel="stylesheet" href="<?= View::e(View::asset('/assets/css/style.css')) ?>">
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
-    <?php if ($gaId !== '' && $cookieConsent === 'all'): ?>
+    <?php if ($gaId !== '' && $consent['analytics']): ?>
     <script async src="https://www.googletagmanager.com/gtag/js?id=<?= View::e($gaId) ?>"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','<?= View::e($gaId) ?>');</script>
     <?php endif; ?>
+    <?php if ($fbPixel !== '' && $consent['marketing']): ?>
+    <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','<?= View::e($fbPixel) ?>');fbq('track','PageView');</script>
+    <?php endif; ?>
     <?php if ($gaId !== ''): ?><script>window.NT_GA=<?= json_encode($gaId, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;</script><?php endif; ?>
+    <?php if ($fbPixel !== ''): ?><script>window.NT_FBQ=<?= json_encode($fbPixel, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;</script><?php endif; ?>
 </head>
 <body>
 <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar" data-scroll-progress></span></div>
@@ -85,7 +90,7 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
 <button class="to-top" data-to-top aria-label="Vissza a tetejére">↑ Vissza a tetejére</button>
 
 <?php include dirname(__DIR__) . '/partials/contact-widget.php'; ?>
-<?php if ($cookieConsent === ''): include dirname(__DIR__) . '/partials/cookie-wall.php'; endif; ?>
+<?php include dirname(__DIR__) . '/partials/cookie-wall.php'; ?>
 <?php include dirname(__DIR__) . '/partials/newsletter.php'; ?>
 <?php include dirname(__DIR__) . '/partials/footer.php'; ?>
 

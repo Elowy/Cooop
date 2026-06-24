@@ -1,4 +1,8 @@
-<div class="cookie-wall" data-cookie-wall>
+<?php
+/** @var array{set: bool, necessary: bool, analytics: bool, marketing: bool} $consent */
+$consent = $consent ?? ['set' => false, 'necessary' => true, 'analytics' => false, 'marketing' => false];
+?>
+<div class="cookie-wall<?= !empty($consent['set']) ? ' is-dismissed' : '' ?>" data-cookie-wall<?= !empty($consent['set']) ? ' data-consent-set="1"' : '' ?>>
     <div class="cookie-card">
         <div class="cookie-scene" aria-hidden="true">
             <svg viewBox="0 0 360 140" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
@@ -42,10 +46,40 @@
 
         <div class="cookie-body">
             <h3>Sütiket használunk 🌱</h3>
-            <p>Az oldal működéséhez szükséges sütiket, és — a hozzájárulásoddal — forgalommérési (Google Analytics) sütiket használunk. Részletek az <a href="/adatkezeles">adatkezelési tájékoztatóban</a>.</p>
+            <p>A működéshez szükséges sütiket mindig használunk. A forgalommérési és marketing sütikhez a te hozzájárulásodat kérjük — kategóriánként eldöntheted, mit engedélyezel. Részletek az <a href="/adatkezeles">adatkezelési tájékoztatóban</a>.</p>
+
+            <div class="cookie-prefs" data-cookie-prefs hidden>
+                <label class="cookie-cat is-locked">
+                    <span class="cookie-cat-info">
+                        <span class="cookie-cat-name">Szükséges</span>
+                        <span class="cookie-cat-desc">A bejelentkezéshez, kosárhoz és a biztonsághoz nélkülözhetetlen. Mindig aktív.</span>
+                    </span>
+                    <input type="checkbox" checked disabled aria-label="Szükséges sütik (mindig aktív)">
+                    <span class="cookie-switch" aria-hidden="true"></span>
+                </label>
+                <label class="cookie-cat">
+                    <span class="cookie-cat-info">
+                        <span class="cookie-cat-name">Statisztika</span>
+                        <span class="cookie-cat-desc">Google Analytics – névtelen forgalommérés, hogy lássuk, mi működik jól az oldalon.</span>
+                    </span>
+                    <input type="checkbox" data-cookie-cat="analytics"<?= !empty($consent['analytics']) ? ' checked' : '' ?> aria-label="Statisztika sütik engedélyezése">
+                    <span class="cookie-switch" aria-hidden="true"></span>
+                </label>
+                <label class="cookie-cat">
+                    <span class="cookie-cat-info">
+                        <span class="cookie-cat-name">Marketing</span>
+                        <span class="cookie-cat-desc">Közösségi és hirdetési sütik (pl. Facebook), a releváns ajánlatok megjelenítéséhez.</span>
+                    </span>
+                    <input type="checkbox" data-cookie-cat="marketing"<?= !empty($consent['marketing']) ? ' checked' : '' ?> aria-label="Marketing sütik engedélyezése">
+                    <span class="cookie-switch" aria-hidden="true"></span>
+                </label>
+            </div>
+
             <div class="cookie-actions">
-                <button type="button" class="btn btn--gold" data-cookie-accept="all">Elfogadom</button>
+                <button type="button" class="btn btn--gold" data-cookie-accept="all">Összes elfogadása</button>
                 <button type="button" class="btn btn--outline" data-cookie-accept="necessary">Csak a szükségesek</button>
+                <button type="button" class="btn btn--ghost" data-cookie-prefs-toggle>Beállítások</button>
+                <button type="button" class="btn btn--gold" data-cookie-save hidden>Kiválasztottak mentése</button>
             </div>
         </div>
     </div>

@@ -1488,6 +1488,7 @@ $router->get('/admin/seo', static function () use ($adminView, $guard, $settings
             'seo_keywords' => (string) ($s['seo_keywords'] ?? ''),
             'seo_og_image' => (string) ($s['seo_og_image'] ?? ''),
             'ga_id' => (string) ($s['ga_id'] ?? ''),
+            'fb_pixel' => (string) ($s['fb_pixel'] ?? ''),
         ],
     ]);
 });
@@ -1501,6 +1502,7 @@ $router->post('/admin/seo', static function () use ($guard, $settings, $redirect
             'seo_keywords' => trim((string) ($_POST['seo_keywords'] ?? '')),
             'seo_og_image' => trim((string) ($_POST['seo_og_image'] ?? '')),
             'ga_id' => trim((string) ($_POST['ga_id'] ?? '')),
+            'fb_pixel' => trim((string) ($_POST['fb_pixel'] ?? '')),
         ]);
         $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'SEO beállítások mentve.'];
     }

@@ -30,7 +30,12 @@ use App\Core\View;
         <div class="field">
             <label>Google Analytics azonosító (Measurement ID)</label>
             <input name="ga_id" value="<?= View::e($values['ga_id']) ?>" placeholder="G-XXXXXXXXXX">
-            <p class="note" style="margin-top:6px">Csak akkor töltődik be, ha a látogató elfogadta a sütiket.</p>
+            <p class="note" style="margin-top:6px">Csak a <strong>Statisztika</strong> süti-kategória elfogadása esetén töltődik be.</p>
+        </div>
+        <div class="field">
+            <label>Facebook Pixel azonosító</label>
+            <input name="fb_pixel" value="<?= View::e($values['fb_pixel']) ?>" placeholder="123456789012345">
+            <p class="note" style="margin-top:6px">Csak a <strong>Marketing</strong> süti-kategória elfogadása esetén töltődik be.</p>
         </div>
         <button type="submit" class="btn btn--gold">Mentés</button>
     </form>

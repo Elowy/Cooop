@@ -173,6 +173,24 @@ eq('huf formázás', '1' . "\u{00A0}" . '234' . "\u{00A0}Ft", View::huf(1234));
 eq('e escape-eli a HTML-t', '&lt;b&gt;', View::e('<b>'));
 ok('asset cache-busting ?v=', str_contains(View::asset('/assets/css/style.css'), '?v='));
 
+echo "Consent\n";
+$cEmpty = \App\Core\Consent::parse('');
+ok('üres süti: nincs hozzájárulás (set=false)', $cEmpty['set'] === false);
+ok('üres süti: szükséges mindig igaz', $cEmpty['necessary'] === true);
+ok('üres süti: analytics/marketing hamis', !$cEmpty['analytics'] && !$cEmpty['marketing']);
+$cAll = \App\Core\Consent::parse('all');
+ok('örökölt "all": minden kategória igaz', $cAll['set'] && $cAll['analytics'] && $cAll['marketing']);
+$cNec = \App\Core\Consent::parse('necessary');
+ok('"necessary": csak szükséges', $cNec['set'] && !$cNec['analytics'] && !$cNec['marketing']);
+$cAna = \App\Core\Consent::parse('necessary-analytics');
+ok('"necessary-analytics": csak statisztika', $cAna['analytics'] && !$cAna['marketing']);
+$cMar = \App\Core\Consent::parse('necessary-marketing');
+ok('"necessary-marketing": csak marketing', !$cMar['analytics'] && $cMar['marketing']);
+eq('encode(true,false) → necessary-analytics', 'necessary-analytics', \App\Core\Consent::encode(true, false));
+eq('encode(false,false) → necessary', 'necessary', \App\Core\Consent::encode(false, false));
+eq('encode(true,true) → minden', 'necessary-analytics-marketing', \App\Core\Consent::encode(true, true));
+eq('parse∘encode oda-vissza', true, \App\Core\Consent::parse(\App\Core\Consent::encode(true, true))['marketing']);
+
 // Takarítás
 array_map('unlink', glob($tmp . '/*') ?: []);
 @rmdir($tmp);
