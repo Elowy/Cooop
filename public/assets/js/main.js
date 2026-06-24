@@ -163,6 +163,55 @@
         });
     }
 
+    // Tevékenység-kártyák: részletek megnyitása ablakban (külön oldal helyett)
+    var serviceModal = document.querySelector('[data-service-modal]');
+    if (serviceModal) {
+        var serviceTarget = serviceModal.querySelector('[data-service-target]');
+        var serviceCloseBtn = serviceModal.querySelector('.service-modal-close');
+        var lastServiceTrigger = null;
+
+        var openServiceModal = function (slug, trigger) {
+            var tpl = document.querySelector('[data-service-content="' + (window.CSS && CSS.escape ? CSS.escape(slug) : slug) + '"]');
+            if (!tpl || !serviceTarget) { return false; }
+            serviceTarget.innerHTML = '';
+            serviceTarget.appendChild(tpl.content.cloneNode(true));
+            serviceModal.hidden = false;
+            // reflow után az animációhoz
+            void serviceModal.offsetWidth;
+            serviceModal.classList.add('is-open');
+            document.body.classList.add('modal-open');
+            lastServiceTrigger = trigger || null;
+            if (serviceCloseBtn) { serviceCloseBtn.focus(); }
+            serviceTarget.scrollTop = 0;
+            return true;
+        };
+        var closeServiceModal = function () {
+            serviceModal.classList.remove('is-open');
+            document.body.classList.remove('modal-open');
+            setTimeout(function () {
+                serviceModal.hidden = true;
+                if (serviceTarget) { serviceTarget.innerHTML = ''; }
+            }, 250);
+            if (lastServiceTrigger) { lastServiceTrigger.focus(); lastServiceTrigger = null; }
+        };
+
+        document.querySelectorAll('[data-service-open]').forEach(function (card) {
+            card.addEventListener('click', function (e) {
+                var slug = card.getAttribute('data-service-open');
+                // JS bekapcsolva: ablakban nyitjuk, nem külön oldalon.
+                if (openServiceModal(slug, card)) { e.preventDefault(); }
+            });
+        });
+        serviceModal.querySelectorAll('[data-service-close]').forEach(function (el) {
+            el.addEventListener('click', closeServiceModal);
+        });
+        document.addEventListener('keydown', function (e) {
+            if ((e.key === 'Escape' || e.key === 'Esc') && !serviceModal.hidden) {
+                closeServiceModal();
+            }
+        });
+    }
+
     // Lebegő kapcsolati gomb
     var fab = document.querySelector('[data-fab]');
     var fabToggle = document.querySelector('[data-fab-toggle]');

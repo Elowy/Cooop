@@ -1,10 +1,12 @@
 <?php
 
 use App\Core\Csrf;
+use App\Core\Markdown;
 use App\Core\View;
 
 /** @var array<string, mixed> $config */
 /** @var array<int, array<string, mixed>> $topCats */
+/** @var array<int, array<string, mixed>> $services */
 /** @var array<int, array<string, mixed>> $references */
 /** @var array<int, array<string, mixed>> $leaders */
 /** @var array<int, array<string, mixed>> $pois */
@@ -62,6 +64,61 @@ $stats = [
         </div>
     </div>
 </section>
+
+<?php if (!empty($services)): ?>
+<section class="section" id="tevekenysegek">
+    <div class="container">
+        <header class="section-head reveal">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Tevékenységeink</p>
+            <h2 class="display">Amivel foglalkozunk</h2>
+            <p class="section-sub">Kattints egy területre a részletekért — az ablakban azonnal megnyílik.</p>
+        </header>
+
+        <div class="card-grid service-grid">
+            <?php foreach ($services as $svc): ?>
+                <?php
+                $slug = (string) ($svc['slug'] ?? '');
+                $img = trim((string) ($svc['image'] ?? ''));
+                $icon = trim((string) ($svc['icon'] ?? '')) !== '' ? (string) $svc['icon'] : 'packaging';
+                $title = (string) ($svc['title'] ?? '');
+                ?>
+                <article class="card service-card reveal">
+                    <a class="service-card-link" href="/szolgaltatasok/<?= View::e($slug) ?>" data-service-open="<?= View::e($slug) ?>">
+                        <span class="service-card-media">
+                            <?php if ($img !== ''): ?>
+                                <img src="<?= View::e($img) ?>" alt="<?= View::e($title) ?>" loading="lazy">
+                            <?php else: ?>
+                                <span class="card-icon" data-icon="<?= View::e($icon) ?>"></span>
+                            <?php endif; ?>
+                        </span>
+                        <span class="service-card-body">
+                            <span class="service-card-title"><?= View::e($title) ?></span>
+                            <?php if (!empty($svc['summary'])): ?><span class="service-card-sum"><?= View::e((string) $svc['summary']) ?></span><?php endif; ?>
+                            <span class="card-link">Részletek →</span>
+                        </span>
+                    </a>
+                    <template data-service-content="<?= View::e($slug) ?>">
+                        <article class="service-detail">
+                            <?php if ($img !== ''): ?><img class="service-detail-img" src="<?= View::e($img) ?>" alt="<?= View::e($title) ?>"><?php endif; ?>
+                            <p class="eyebrow"><span class="eyebrow-dot"></span> Tevékenység</p>
+                            <h2 class="display"><?= View::e($title) ?></h2>
+                            <div class="legal-doc"><?= Markdown::toHtml((string) ($svc['body'] ?? '')) ?></div>
+                        </article>
+                    </template>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<div class="service-modal" data-service-modal hidden>
+    <div class="service-modal-backdrop" data-service-close></div>
+    <div class="service-modal-dialog" role="dialog" aria-modal="true" aria-label="Tevékenység részletei">
+        <button type="button" class="service-modal-close" data-service-close aria-label="Bezárás">&times;</button>
+        <div class="service-modal-content" data-service-target></div>
+    </div>
+</div>
+<?php endif; ?>
 
 <section class="section" id="kategoriak">
     <div class="container">

@@ -48,6 +48,15 @@ $icons = [
         </div>
 
         <div class="field">
+            <label>Kép URL-je (a főoldali kártyán és a részletek-ablakban jelenik meg)</label>
+            <input name="image" type="url" value="<?= View::e((string) ($service['image'] ?? '')) ?>" placeholder="https://… vagy /assets/img/…">
+            <p class="note" style="margin-top:6px">Üresen hagyva a kiválasztott ikon jelenik meg a kártyán.</p>
+            <?php if (!empty($service['image'])): ?>
+                <img src="<?= View::e((string) $service['image']) ?>" alt="" style="margin-top:10px;max-height:120px;border-radius:10px;border:1px solid var(--line)">
+            <?php endif; ?>
+        </div>
+
+        <div class="field">
             <label>Rövid összefoglaló (a kártyán és a menüben látszik)</label>
             <textarea name="summary" rows="2"><?= View::e((string) ($service['summary'] ?? '')) ?></textarea>
         </div>

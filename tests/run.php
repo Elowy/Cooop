@@ -147,6 +147,10 @@ eq('menu() a publikáltakat sorrendben', ['Első', 'Második'], array_column($sv
 ok('findBySlug megtalál', $svcStore->findBySlug('elso') !== null);
 ok('findBySlug publishedOnly rejti', $svcStore->findBySlug('rejtett', true) === null);
 eq('slugify fallback', 'szolgaltatas', ServiceStore::slugify('!!!'));
+$sImgId = $svcStore->save(['title' => 'Képes', 'image' => 'https://pelda.hu/kep.jpg', 'sort' => 4, 'published' => 1]);
+eq('image mező mentés/visszaolvasás', 'https://pelda.hu/kep.jpg', $svcStore->find($sImgId)['image']);
+eq('image alapértelmezés üres', '', $svcStore->findBySlug('elso')['image']);
+$svcStore->delete($sImgId);
 $svcStore->delete($sId3);
 eq('törlés után 2 marad', 2, count($svcStore->all()));
 

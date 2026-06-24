@@ -127,6 +127,7 @@ final class Schema
                 slug VARCHAR(190) NOT NULL UNIQUE,
                 title VARCHAR(255) NOT NULL,
                 icon VARCHAR(40) NOT NULL DEFAULT '',
+                image VARCHAR(500) NOT NULL DEFAULT '',
                 summary $txt,
                 body $txt,
                 sort INT NOT NULL DEFAULT 0,
@@ -151,6 +152,7 @@ final class Schema
     {
         self::addColumn($pdo, $driver, 'refs', 'url', "VARCHAR(500) NOT NULL DEFAULT ''");
         self::addColumn($pdo, $driver, 'refs', 'featured', 'INT NOT NULL DEFAULT 0');
+        self::addColumn($pdo, $driver, 'services', 'image', "VARCHAR(500) NOT NULL DEFAULT ''");
     }
 
     private static function addColumn(PDO $pdo, string $driver, string $table, string $col, string $definition): void
