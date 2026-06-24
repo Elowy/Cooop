@@ -26,6 +26,7 @@ $contact = $config['contact'];
             <h4>Oldal</h4>
             <ul>
                 <li><a href="/webshop">Webshop</a></li>
+                <li><a href="/szolgaltatasok">Tevékenységek</a></li>
                 <li><a href="/#kategoriak">Kategóriák</a></li>
                 <li><a href="/#referenciak">Referenciák</a></li>
                 <li><a href="/blog">Blog</a></li>

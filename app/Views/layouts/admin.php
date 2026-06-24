@@ -17,6 +17,7 @@ $nav = [
     'messages'    => ['/admin/uzenetek', 'Üzenetek', 'mail'],
     'newsletter'  => ['/admin/hirlevel', 'Hírlevél', 'send'],
     'blog'        => ['/admin/blog', 'Blog', 'post'],
+    'services_admin' => ['/admin/szolgaltatasok', 'Tevékenységek', 'layers'],
     'references'  => ['/admin/referenciak', 'Referenciák', 'star'],
     'leaders'     => ['/admin/vezetok', 'Vezetők', 'person'],
     'map'         => ['/admin/terkep', 'Térkép', 'pin'],

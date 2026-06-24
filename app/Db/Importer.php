@@ -3,6 +3,7 @@
 namespace App\Db;
 
 use App\Blog\BlogStore;
+use App\Service\ServiceStore;
 use App\Leader\LeaderStore;
 use App\Map\PoiStore;
 use App\Message\MessageStore;
@@ -121,6 +122,17 @@ final class Importer
                 foreach (array_reverse((new BlogStore())->all()) as $post) {
                     unset($post['id']);
                     $db->save($post);
+                }
+            }
+        });
+
+        // Tevékenységek (fájl-módban a config/services.php-ból töltődnek fel)
+        self::guard(static function () use ($pdo): void {
+            $db = new ServiceStore($pdo);
+            if (count($db->all()) === 0) {
+                foreach ((new ServiceStore())->all() as $service) {
+                    unset($service['id']);
+                    $db->save($service);
                 }
             }
         });
