@@ -925,6 +925,24 @@ a.panel-link:hover { color: var(--gold-2); }
 .cookie-body p { color: var(--muted); font-size: .92rem; margin: 0 0 16px; }
 .cookie-body a { color: var(--gold-2); }
 .cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.cookie-wall.is-dismissed { display: none; }
+
+/* Süti – kategória-kapcsolók */
+.btn--ghost { background: transparent; border: 1px solid transparent; color: var(--muted); }
+.btn--ghost:hover { color: var(--gold-2); border-color: var(--line); }
+.cookie-prefs { display: flex; flex-direction: column; gap: 12px; margin: 2px 0 18px; border-top: 1px solid var(--line); padding-top: 16px; }
+.cookie-cat { display: flex; align-items: flex-start; gap: 14px; cursor: pointer; margin: 0; }
+.cookie-cat.is-locked { cursor: default; }
+.cookie-cat-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.cookie-cat-name { font-weight: 600; font-size: .95rem; color: var(--text); }
+.cookie-cat-desc { color: var(--muted); font-size: .82rem; line-height: 1.4; }
+.cookie-cat input { position: absolute; opacity: 0; width: 0; height: 0; }
+.cookie-switch { position: relative; flex: 0 0 auto; width: 42px; height: 24px; margin-top: 2px; border-radius: 999px; background: var(--line); transition: background .2s ease; }
+.cookie-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s ease; }
+.cookie-cat input:checked + .cookie-switch { background: var(--gold); }
+.cookie-cat input:checked + .cookie-switch::after { transform: translateX(18px); }
+.cookie-cat input:disabled + .cookie-switch { opacity: .55; }
+.cookie-cat input:focus-visible + .cookie-switch { outline: 2px solid var(--gold-2); outline-offset: 2px; }
 
 .cw-sapling { transform-box: fill-box; transform-origin: 50% 100%; animation: cwGrow 3.4s ease-in-out infinite; }
 .cw-planter { transform-box: fill-box; transform-origin: 50% 100%; animation: cwBob 1.6s ease-in-out infinite alternate; }

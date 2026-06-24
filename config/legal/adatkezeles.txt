@@ -30,11 +30,17 @@ Jogsértés esetén a Nemzeti Adatvédelmi és Információszabadság Hatóságh
 
 ## Sütik (Cookie) kezelése
 
-Weboldalunkon funkcionális sütik kerülnek alkalmazásra, melyek támogatják az oldal működését. Ezek munkamenet-sütik, amelyek érvényessége lejár az oldal bezárásakor. Bármely böngészőben letilthatók vagy törölhetők.
+Weboldalunk sütiket használ. Az első látogatáskor megjelenő süti-sávon **kategóriánként** rendelkezhetsz a hozzájárulásodról, és a döntésedet bármikor módosíthatod a lábléc **„Cookie-beállítások"** hivatkozására kattintva. A sütik a következő kategóriákba sorolódnak:
+
+- **Szükséges** – az oldal alapvető működéséhez (bejelentkezés, kosár, biztonság, a süti-hozzájárulás eltárolása) nélkülözhetetlen. Ezek mindig aktívak, hozzájárulás nélkül is, és nem kapcsolhatók ki.
+- **Statisztika** – névtelen forgalommérés (Google Analytics), amely segít megérteni a látogatók viselkedését. Csak a hozzájárulásoddal töltődik be.
+- **Marketing** – közösségi és hirdetési sütik (pl. Facebook Pixel) a releváns tartalmak és ajánlatok megjelenítéséhez. Csak a hozzájárulásoddal töltődik be.
+
+A hozzájárulásodat az `nt_consent` nevű sütiben tároljuk (érvényesség: 180 nap). A sütik a böngésződben bármikor letilthatók vagy törölhetők.
 
 ## Google Analytics
 
-Az oldal teljesítményének mérésére Google Analytics szolgáltatást használnak statisztikai adatok gyűjtésére. Az adatok nem tartalmaznak személyes információkat, csak munkameneteket azonosítanak.
+A **Statisztika** kategória elfogadása esetén az oldal teljesítményének mérésére a Google Analytics szolgáltatást használjuk statisztikai adatok gyűjtésére. Az adatok nem tartalmaznak közvetlen személyes információkat, csak munkameneteket azonosítanak. A statisztikai sütik betöltése kizárólag a hozzájárulásod után történik meg; visszavonás esetén a böngésződből a következő oldalbetöltéskor szűnnek meg.
 
 ## Megrendelés során kezelt adatok
 

@@ -72,6 +72,7 @@ $youtube = $safeUrl((string) ($seo['social_youtube'] ?? ''));
             <a href="/aszf">ÁSZF</a>
             <a href="/adatkezeles">Adatkezelési tájékoztató</a>
             <a href="/oldalterkep">Oldaltérkép</a>
+            <a href="#" data-cookie-open>Cookie-beállítások</a>
         </nav>
     </div>
 

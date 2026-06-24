@@ -70,26 +70,95 @@
         });
     }
 
-    // Cookie hozzájárulás (soft wall)
+    // Süti-hozzájárulás (kategória-alapú)
     var cookieWall = document.querySelector('[data-cookie-wall]');
     if (cookieWall) {
+        var cookiePrefs = cookieWall.querySelector('[data-cookie-prefs]');
+        var cookieSave = cookieWall.querySelector('[data-cookie-save]');
+        var cookiePrefsToggle = cookieWall.querySelector('[data-cookie-prefs-toggle]');
+
+        var setConsentCookie = function (value) {
+            document.cookie = 'nt_consent=' + value + ';path=/;max-age=' + (60 * 60 * 24 * 180) + ';samesite=lax';
+        };
+        var encodeConsent = function (analytics, marketing) {
+            var t = ['necessary'];
+            if (analytics) { t.push('analytics'); }
+            if (marketing) { t.push('marketing'); }
+            return t.join('-');
+        };
+        var loadGa = function () {
+            if (!window.NT_GA || window.__ntGa) { return; }
+            window.__ntGa = true;
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.NT_GA;
+            document.head.appendChild(s);
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+            window.gtag('js', new Date());
+            window.gtag('config', window.NT_GA);
+        };
+        var loadFbq = function () {
+            if (!window.NT_FBQ || window.__ntFbq) { return; }
+            window.__ntFbq = true;
+            !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+            window.fbq('init', window.NT_FBQ);
+            window.fbq('track', 'PageView');
+        };
+        // A frissen adott hozzájárulást azonnal érvényesítjük; a megvont
+        // kategóriák a böngésző-tárból a következő oldalbetöltéskor tűnnek el.
+        var applyConsent = function (analytics, marketing) {
+            if (analytics) { loadGa(); }
+            if (marketing) { loadFbq(); }
+        };
+        var closeWall = function () {
+            cookieWall.classList.add('is-hidden');
+            setTimeout(function () {
+                cookieWall.classList.add('is-dismissed');
+                cookieWall.classList.remove('is-hidden');
+            }, 300);
+        };
+        var catChecked = function (cat) {
+            var el = cookieWall.querySelector('[data-cookie-cat="' + cat + '"]');
+            return !!(el && el.checked);
+        };
+        var openPrefs = function () {
+            if (cookiePrefs) { cookiePrefs.hidden = false; }
+            if (cookieSave) { cookieSave.hidden = false; }
+            if (cookiePrefsToggle) { cookiePrefsToggle.hidden = true; }
+        };
+
+        if (cookiePrefsToggle) {
+            cookiePrefsToggle.addEventListener('click', openPrefs);
+        }
+
+        // Gyors választás: összes / csak a szükségesek.
         cookieWall.querySelectorAll('[data-cookie-accept]').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                var v = btn.getAttribute('data-cookie-accept');
-                document.cookie = 'nt_consent=' + v + ';path=/;max-age=' + (60 * 60 * 24 * 180) + ';samesite=lax';
-                cookieWall.classList.add('is-hidden');
-                setTimeout(function () { if (cookieWall.parentNode) { cookieWall.parentNode.removeChild(cookieWall); } }, 300);
-                if (v === 'all' && window.NT_GA && !window.__ntGa) {
-                    window.__ntGa = true;
-                    var s = document.createElement('script');
-                    s.async = true;
-                    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.NT_GA;
-                    document.head.appendChild(s);
-                    window.dataLayer = window.dataLayer || [];
-                    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
-                    window.gtag('js', new Date());
-                    window.gtag('config', window.NT_GA);
-                }
+                var all = btn.getAttribute('data-cookie-accept') === 'all';
+                setConsentCookie(encodeConsent(all, all));
+                applyConsent(all, all);
+                closeWall();
+            });
+        });
+
+        // Granuláris mentés a kapcsolók alapján.
+        if (cookieSave) {
+            cookieSave.addEventListener('click', function () {
+                var a = catChecked('analytics');
+                var m = catChecked('marketing');
+                setConsentCookie(encodeConsent(a, m));
+                applyConsent(a, m);
+                closeWall();
+            });
+        }
+
+        // Lábléc / bárhol: "Cookie-beállítások" – a panel újranyitása.
+        document.querySelectorAll('[data-cookie-open]').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                cookieWall.classList.remove('is-dismissed', 'is-hidden');
+                openPrefs();
             });
         });
     }
