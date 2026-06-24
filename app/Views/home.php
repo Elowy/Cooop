@@ -213,6 +213,18 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
 <?php endif; ?>
 
 <?php if (!empty($references)): ?>
+<?php
+// Alapból csak a kiemelt referenciák látszanak; a többi összecsukva, gombbal nyitható.
+$featuredRefs = array_values(array_filter($references, static fn ($r) => !empty($r['featured'])));
+$restRefs = array_values(array_filter($references, static fn ($r) => empty($r['featured'])));
+// Ha egyik sincs kiemelve, ne legyen üres a szekció: mutassuk mindet (nincs összecsukás).
+if ($featuredRefs === []) {
+    $featuredRefs = $references;
+    $restRefs = [];
+}
+$orderedRefs = array_merge($featuredRefs, $restRefs);
+$featuredCount = count($featuredRefs);
+?>
 <section class="section" id="referenciak">
     <div class="container">
         <header class="section-head reveal">
@@ -220,9 +232,9 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
             <h2 class="display">Akiknek dolgozunk</h2>
             <p class="section-sub">Válogatás partnereink és referenciáink közül – kattints a részletekért.</p>
         </header>
-        <div class="reference-grid">
-            <?php foreach ($references as $ref): ?>
-                <a class="reference-card reveal<?= !empty($ref['featured']) ? ' reference-card--featured' : '' ?>" href="/referencia/<?= (int) $ref['id'] ?>" data-ref-open="<?= (int) $ref['id'] ?>">
+        <div class="reference-grid" data-ref-grid>
+            <?php foreach ($orderedRefs as $idx => $ref): $collapsed = $idx >= $featuredCount; ?>
+                <a class="reference-card <?= $collapsed ? 'is-collapsed' : 'reveal' ?><?= !empty($ref['featured']) ? ' reference-card--featured' : '' ?>" href="/referencia/<?= (int) $ref['id'] ?>" data-ref-open="<?= (int) $ref['id'] ?>">
                     <?php if (!empty($ref['featured'])): ?><span class="reference-badge">★ Kiemelt</span><?php endif; ?>
                     <span class="reference-logo">
                         <?php if (!empty($ref['logo'])): ?>
@@ -238,6 +250,13 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
                 </a>
             <?php endforeach; ?>
         </div>
+        <?php if ($restRefs !== []): ?>
+            <div class="reference-more reveal">
+                <button type="button" class="btn btn--outline" data-ref-toggle aria-expanded="false"
+                        data-more="További <?= count($restRefs) ?> referencia megjelenítése"
+                        data-less="Kevesebb mutatása">További <?= count($restRefs) ?> referencia megjelenítése</button>
+            </div>
+        <?php endif; ?>
     </div>
 
     <div class="modal" id="reference-modal" data-modal hidden>

@@ -266,6 +266,18 @@
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !refModal.hidden) { closeRef(); } });
     }
 
+    // Referenciák: a nem kiemeltek ki/be nyitása egyben
+    var refToggle = document.querySelector('[data-ref-toggle]');
+    var refGrid = document.querySelector('[data-ref-grid]');
+    if (refToggle && refGrid) {
+        refToggle.addEventListener('click', function () {
+            var open = refGrid.classList.toggle('is-open');
+            refToggle.setAttribute('aria-expanded', String(open));
+            var label = refToggle.getAttribute(open ? 'data-less' : 'data-more');
+            if (label) { refToggle.textContent = label; }
+        });
+    }
+
     // Pénztár: szállítási mezők ki/be
     var shipToggle = document.querySelector('[data-ship-toggle]');
     var shipFields = document.querySelector('[data-ship-fields]');

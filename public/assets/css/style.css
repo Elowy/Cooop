@@ -959,6 +959,9 @@ a.panel-link:hover { color: var(--gold-2); }
 .reference-card:hover { border-color: var(--line-gold); transform: translateY(-4px); color: var(--text); }
 .reference-card--featured { border-color: var(--gold); background: linear-gradient(180deg, var(--gold-soft), var(--surface) 62%); box-shadow: 0 0 0 1px var(--gold-soft), 0 14px 36px rgba(0, 0, 0, .35); }
 .reference-card--featured:hover { border-color: var(--gold-2); box-shadow: 0 0 0 1px var(--line-gold), 0 18px 44px rgba(0, 0, 0, .42); }
+.reference-card.is-collapsed { display: none; }
+.reference-grid.is-open .reference-card.is-collapsed { display: flex; }
+.reference-more { text-align: center; margin-top: 26px; }
 .reference-badge { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: .66rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #1c1709; background: linear-gradient(135deg, var(--gold-2), var(--gold)); box-shadow: 0 4px 12px rgba(203, 161, 78, .35); }
 .reference-detail--featured .reference-detail-logo { box-shadow: 0 0 0 2px var(--gold); }
 .reference-detail .reference-badge { position: static; margin-bottom: 10px; }
