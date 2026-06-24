@@ -51,11 +51,24 @@ $transfer = $method === 'transfer';
         <p class="note">
             Számlázás:
             <?php if (!empty($order['invoice']['ok'])): ?>
-                kész — számla: <strong><?= View::e((string) $order['invoice']['number']) ?></strong>.
+                elkészült — számlaszám: <strong><?= View::e((string) $order['invoice']['number']) ?></strong>.
             <?php else: ?>
-                az Axel Pro bekötése után automatikusan elkészül (NAV-jelentéssel együtt).
+                a számlát e-mailben küldjük a megadott címre.
             <?php endif; ?>
         </p>
+
+        <div class="next-steps">
+            <h2>Mi történik most?</h2>
+            <ol>
+                <li>Visszaigazoló e-mailt küldünk a rendelés részleteivel.</li>
+                <?php if ($transfer): ?>
+                    <li>Az utalás beérkezése után feldolgozzuk és előkészítjük a rendelést.</li>
+                <?php else: ?>
+                    <li>A fizetés visszaigazolása után előkészítjük a rendelést.</li>
+                <?php endif; ?>
+                <li>Felvesszük veled a kapcsolatot a szállítás vagy a személyes átvétel egyeztetéséhez.</li>
+            </ol>
+        </div>
 
         <p class="center-cta"><a href="/webshop" class="btn btn--outline">Vissza a webshopba</a></p>
     </div>

@@ -157,6 +157,65 @@
         });
     }
 
+    // Webshop rendezés: választáskor automatikus beküldés (no-JS esetén marad a „Rendez" gomb)
+    document.querySelectorAll('select[data-autosubmit]').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            if (sel.form) { sel.form.submit(); }
+        });
+    });
+
+    // Kosárba rakás AJAX-szal: a vásárló az oldalon marad, buborék + kosár-jelvény frissül
+    var toastTimer = null;
+    var showToast = function (text) {
+        var toast = document.querySelector('[data-toast]');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('data-toast', '');
+            toast.setAttribute('role', 'status');
+            toast.setAttribute('aria-live', 'polite');
+            document.body.appendChild(toast);
+        }
+        toast.textContent = text;
+        void toast.offsetWidth; // reflow a belépő animációhoz
+        toast.classList.add('is-visible');
+        if (toastTimer) { window.clearTimeout(toastTimer); }
+        toastTimer = window.setTimeout(function () { toast.classList.remove('is-visible'); }, 2600);
+    };
+    var updateCartBadge = function (count) {
+        document.querySelectorAll('[data-cart-badge]').forEach(function (b) {
+            b.textContent = String(count);
+            b.hidden = count <= 0;
+        });
+        document.querySelectorAll('[data-cart-link]').forEach(function (l) {
+            l.classList.toggle('has-items', count > 0);
+        });
+    };
+    document.querySelectorAll('form.add-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!window.fetch) { return; } // fetch hiányában marad a hagyományos beküldés
+            e.preventDefault();
+            var btn = form.querySelector('button[type="submit"]');
+            if (btn) { btn.disabled = true; }
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                if (data && data.ok) {
+                    updateCartBadge(data.count);
+                    showToast((data.name || 'Termék') + ' a kosárban');
+                } else {
+                    showToast('A kosárba helyezés nem sikerült.');
+                }
+                if (btn) { btn.disabled = false; }
+            }).catch(function () {
+                form.submit(); // hálózati hiba: vissza a normál beküldésre
+            });
+        });
+    });
+
     // Szám-számláló (statisztika)
     var animateCount = function (el) {
         if (el.dataset.counted) { return; }

@@ -13,6 +13,12 @@ $err = static fn (string $k): string => isset($errors[$k])
     ? '<p class="field-err">' . View::e($errors[$k]) . '</p>' : '';
 $checked = static fn (string $k): string => isset($old[$k]) ? ' checked' : '';
 $pm = (string) ($old['payment_method'] ?? 'card');
+
+$netTotal = 0;
+foreach ($cart['items'] as $it) {
+    $netTotal += (int) ($it['price_net'] ?? 0) * (int) $it['qty'];
+}
+$vatTotal = (int) $cart['total'] - $netTotal;
 ?>
 <section class="section section--clear-top">
     <div class="container">
@@ -79,11 +85,19 @@ $pm = (string) ($old['payment_method'] ?? 'card');
                             </li>
                         <?php endforeach; ?>
                     </ul>
+                    <div class="summary-subtotals">
+                        <div class="cart-line"><span>Nettó összesen</span><span><?= View::huf($netTotal) ?></span></div>
+                        <div class="cart-line"><span>ÁFA</span><span><?= View::huf($vatTotal) ?></span></div>
+                    </div>
                     <div class="summary-total">
                         <span>Végösszeg (bruttó)</span>
                         <strong class="display"><?= View::huf((int) $cart['total']) ?></strong>
                     </div>
                     <button type="submit" class="btn btn--gold btn--lg btn--block">Megrendelés elküldése</button>
+                    <p class="secure-note">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                        Biztonságos, titkosított kapcsolat
+                    </p>
                     <a href="/kosar" class="summary-back">← Vissza a kosárhoz</a>
                 </div>
             </aside>

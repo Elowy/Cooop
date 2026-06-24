@@ -5,6 +5,12 @@ use App\Core\View;
 
 /** @var array<int, array{product: \App\Integration\Product, qty: int, subtotal: int}> $lines */
 /** @var int $total */
+
+$netTotal = 0;
+foreach ($lines as $line) {
+    $netTotal += $line['product']->priceNet * $line['qty'];
+}
+$vatTotal = $total - $netTotal;
 ?>
 <section class="section section--clear-top">
     <div class="container cart-wrap">
@@ -41,12 +47,18 @@ use App\Core\View;
             </div>
 
             <div class="cart-summary">
-                <div class="cart-total">
-                    <span>Végösszeg (bruttó)</span>
-                    <strong class="display"><?= View::huf($total) ?></strong>
+                <div class="cart-totals">
+                    <div class="cart-line"><span>Nettó összesen</span><span><?= View::huf($netTotal) ?></span></div>
+                    <div class="cart-line"><span>ÁFA</span><span><?= View::huf($vatTotal) ?></span></div>
+                    <div class="cart-total"><span>Végösszeg (bruttó)</span><strong class="display"><?= View::huf($total) ?></strong></div>
                 </div>
-                <a href="/penztar" class="btn btn--gold btn--lg">Tovább a pénztárhoz</a>
-                <p class="note">A fizetés jelenleg teszt módban van; az éles fizetés és az Axel Pro számlázás bekötése a következő kör.</p>
+                <a href="/penztar" class="btn btn--gold btn--lg btn--block">Tovább a pénztárhoz</a>
+                <a href="/webshop" class="cart-continue">← Vásárlás folytatása</a>
+                <ul class="trust-row">
+                    <li>Biztonságos fizetés</li>
+                    <li>Számla és garancia</li>
+                    <li>Gyors kiszállítás</li>
+                </ul>
             </div>
         <?php endif; ?>
     </div>

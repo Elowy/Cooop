@@ -145,7 +145,8 @@ $buildCart = static function () use ($axel): array {
                 $total += $sub;
                 $items[] = [
                     'sku' => $p->sku, 'name' => $p->name, 'unit' => $p->unit,
-                    'qty' => $qty, 'price_gross' => $p->priceGross(), 'subtotal' => $sub,
+                    'qty' => $qty, 'price_net' => $p->priceNet, 'vat' => $p->vat,
+                    'price_gross' => $p->priceGross(), 'subtotal' => $sub,
                     'stock' => $p->stock,
                 ];
                 break;
@@ -159,6 +160,12 @@ $buildCart = static function () use ($axel): array {
 $redirect = static function (string $to): string {
     header('Location: ' . $to, true, 303);
     exit;
+};
+
+/** Igaz, ha a kérés fetch/XHR (JSON-választ várunk, nem átirányítást). */
+$wantsJson = static function (): bool {
+    return ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest'
+        || str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
 };
 
 $router = new Router();
@@ -272,6 +279,48 @@ $router->get('/adatkezeles', static fn (): string => View::render('legal', [
     'title' => 'Adatkezelési tájékoztató', 'heading' => 'Adatkezelési tájékoztató', 'mdFile' => 'adatkezeles.txt',
 ]));
 
+/* ------------------------------------------------------------------ */
+/* SEO – sitemap és robots (dinamikus, a katalógusból)                  */
+/* ------------------------------------------------------------------ */
+
+$router->get('/sitemap.xml', static function () use ($axel, $cats, $config): string {
+    header('Content-Type: application/xml; charset=UTF-8');
+    $base = rtrim((string) $config['app']['url'], '/');
+    $esc = static fn (string $u): string => htmlspecialchars($u, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    $rows = [['/', '1.0'], ['/webshop', '0.9']];
+    foreach ($cats->all() as $key => $node) {
+        if ($node['children'] === []) { // csak levél-kategóriák
+            $rows[] = ['/webshop?kat=' . urlencode((string) $key), '0.5'];
+        }
+    }
+    foreach ($axel->products() as $p) {
+        $rows[] = ['/termek/' . rawurlencode($p->slug), '0.7'];
+    }
+    $rows[] = ['/aszf', '0.3'];
+    $rows[] = ['/adatkezeles', '0.3'];
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    foreach ($rows as [$loc, $priority]) {
+        $xml .= '  <url><loc>' . $esc($base . $loc) . '</loc>'
+            . '<changefreq>weekly</changefreq><priority>' . $priority . '</priority></url>' . "\n";
+    }
+    return $xml . '</urlset>' . "\n";
+});
+
+$router->get('/robots.txt', static function () use ($config): string {
+    header('Content-Type: text/plain; charset=UTF-8');
+    $base = rtrim((string) $config['app']['url'], '/');
+    return "User-agent: *\n"
+        . "Allow: /\n"
+        . "Disallow: /admin\n"
+        . "Disallow: /telepito\n"
+        . "Disallow: /penztar\n"
+        . "Disallow: /fizetes\n"
+        . "Disallow: /kosar\n\n"
+        . "Sitemap: {$base}/sitemap.xml\n";
+});
+
 $router->get('/kapcsolat', static function () use ($redirect): string {
     return $redirect('/#kapcsolat');
 });
@@ -377,17 +426,36 @@ $router->get('/webshop', static function () use ($axel, $cats): string {
         $activeCat = '';
     }
 
+    // Rendezés (raktáron lévők előre, azon belül a választott szempont szerint).
+    $sort = (string) ($_GET['rendezes'] ?? '');
+    $products = array_values($products);
+    $byStock = static fn ($a, $b): int => ($b->inStock() <=> $a->inStock());
+    switch ($sort) {
+        case 'ar-fel':
+            usort($products, static fn ($a, $b): int => $byStock($a, $b) ?: ($a->priceGross() <=> $b->priceGross()));
+            break;
+        case 'ar-le':
+            usort($products, static fn ($a, $b): int => $byStock($a, $b) ?: ($b->priceGross() <=> $a->priceGross()));
+            break;
+        case 'nev':
+            usort($products, static fn ($a, $b): int => $byStock($a, $b) ?: strnatcasecmp($a->name, $b->name));
+            break;
+        default:
+            $sort = '';
+    }
+
     return View::render('shop/index', [
         'title' => $activeCat !== '' ? $cats->name($activeCat) : 'Webshop',
         'products' => $products,
         'catsTree' => $cats->tree(),
         'activeCat' => $activeCat,
         'activePath' => $path,
+        'sort' => $sort,
         'cats' => $cats,
     ]);
 });
 
-$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo): string {
+$router->get('/termek/{slug}', static function (array $params) use ($axel, $cats, $productSeo, $config): string {
     $product = $axel->findProduct($params['slug'] ?? '');
     if ($product === null) {
         http_response_code(404);
@@ -399,12 +467,41 @@ $router->get('/termek/{slug}', static function (array $params) use ($axel, $cats
         'description' => trim((string) ($pseo['description'] ?? '')) !== '' ? (string) $pseo['description'] : $product->short,
         'keywords' => (string) ($pseo['keywords'] ?? ''),
         'og_image' => (string) ($pseo['og_image'] ?? ''),
+        'og_type' => 'product',
+        'product_price' => (string) $product->priceGross(),
+        'product_currency' => (string) ($config['shop']['currency'] ?? 'HUF'),
+        'product_availability' => $product->inStock() ? 'in stock' : 'out of stock',
     ];
+
+    // Kapcsolódó termékek: előbb azonos kategóriából, majd a szülő-ágból, max 4.
+    $all = $axel->products();
+    $related = [];
+    $collect = static function (array $catKeys) use ($all, $product, &$related): void {
+        foreach ($all as $p) {
+            if (count($related) >= 4) {
+                break;
+            }
+            if ($p->sku === $product->sku || in_array($p, $related, true)) {
+                continue;
+            }
+            if (in_array($p->category, $catKeys, true)) {
+                $related[] = $p;
+            }
+        }
+    };
+    $collect([$product->category]);
+    if (count($related) < 4) {
+        $path = $cats->path($product->category);
+        $parentKey = count($path) >= 2 ? $path[count($path) - 2] : ($path[0] ?? $product->category);
+        $collect($cats->branch($parentKey));
+    }
+
     return View::render('shop/show', [
         'title' => $product->name,
         'product' => $product,
         'catPath' => $cats->path($product->category),
         'cats' => $cats,
+        'related' => $related,
         'meta' => $meta,
     ]);
 });
@@ -425,9 +522,24 @@ $router->get('/kosar', static function () use ($axel): string {
     return View::render('cart/index', ['title' => 'Kosár', 'lines' => $lines, 'total' => $total]);
 });
 
-$router->post('/kosar/hozzaad', static function () use ($redirect): string {
+$router->post('/kosar/hozzaad', static function () use ($redirect, $wantsJson, $axel): string {
+    $ok = false;
+    $name = '';
     if (Csrf::check($_POST['_csrf'] ?? null) && isset($_POST['sku'])) {
-        Cart::add((string) $_POST['sku'], max(1, (int) ($_POST['qty'] ?? 1)));
+        $sku = (string) $_POST['sku'];
+        Cart::add($sku, max(1, (int) ($_POST['qty'] ?? 1)));
+        $ok = true;
+        foreach ($axel->products() as $p) {
+            if ($p->sku === $sku) {
+                $name = $p->name;
+                break;
+            }
+        }
+    }
+    // Fetch/XHR esetén marad az oldalon a vásárló: JSON-t adunk (kosár-jelvény + buborék).
+    if ($wantsJson()) {
+        header('Content-Type: application/json; charset=UTF-8');
+        return (string) json_encode(['ok' => $ok, 'count' => Cart::count(), 'name' => $name], JSON_UNESCAPED_UNICODE);
     }
     return $redirect('/kosar');
 });

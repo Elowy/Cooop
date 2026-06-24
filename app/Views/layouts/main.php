@@ -29,6 +29,7 @@ $metaDesc = trim((string) ($meta['description'] ?? '')) ?: (trim((string) ($seo[
 $metaKeywords = trim((string) ($meta['keywords'] ?? '')) ?: trim((string) ($seo['seo_keywords'] ?? ''));
 $ogImage = trim((string) ($meta['og_image'] ?? '')) ?: trim((string) ($seo['seo_og_image'] ?? ''));
 $ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?? '/');
+$ogType = trim((string) ($meta['og_type'] ?? '')) ?: 'website';
 
 $gaId = trim((string) ($seo['ga_id'] ?? ''));
 $cookieConsent = $_COOKIE['nt_consent'] ?? '';
@@ -44,7 +45,7 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
     <meta name="description" content="<?= View::e($metaDesc) ?>">
     <?php if ($metaKeywords !== ''): ?><meta name="keywords" content="<?= View::e($metaKeywords) ?>">
     <?php endif; ?>
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="<?= View::e($ogType) ?>">
     <meta property="og:site_name" content="<?= View::e($appName) ?>">
     <meta property="og:title" content="<?= View::e($pageTitle) ?>">
     <meta property="og:description" content="<?= View::e($metaDesc) ?>">
@@ -52,6 +53,11 @@ $cookieConsent = $_COOKIE['nt_consent'] ?? '';
     <?php if ($ogImage !== ''): ?><meta property="og:image" content="<?= View::e($ogImage) ?>">
     <?php endif; ?>
     <meta name="twitter:card" content="<?= $ogImage !== '' ? 'summary_large_image' : 'summary' ?>">
+    <?php if ($ogType === 'product'): ?>
+    <meta property="product:price:amount" content="<?= View::e((string) ($meta['product_price'] ?? '')) ?>">
+    <meta property="product:price:currency" content="<?= View::e((string) ($meta['product_currency'] ?? 'HUF')) ?>">
+    <meta property="og:availability" content="<?= View::e((string) ($meta['product_availability'] ?? '')) ?>">
+    <?php endif; ?>
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
     <?php if ($gaId !== '' && $cookieConsent === 'all'): ?>

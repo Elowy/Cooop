@@ -313,6 +313,7 @@ h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.15; color: var(--text); }
     font-size: .72rem; font-weight: 600; padding: 4px 9px; border-radius: 999px;
 }
 .badge--out { background: rgba(255, 255, 255, .06); color: var(--muted); border-color: var(--line); }
+.badge--low { background: rgba(224, 162, 60, .16); color: #e8b765; border-color: #6e4b2f; }
 .add-form { margin: 0; }
 .btn--block { width: 100%; }
 .btn:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
@@ -385,6 +386,118 @@ h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.15; color: var(--text); }
     .cart-sub { grid-column: 1 / 2; }
     .cart-summary { align-items: stretch; text-align: left; }
     .cart-total { justify-content: space-between; }
+}
+
+/* ==========================================================================
+   Webshop – profibb vásárlási élmény (rendezés, bizalom, AJAX)
+   ========================================================================== */
+
+/* Csak képernyőolvasónak látható felirat */
+.vh {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Rendezősáv */
+.shop-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.result-count { color: var(--muted); margin: 0; font-size: .9rem; }
+.sort-form { display: flex; align-items: center; gap: 10px; margin: 0; }
+.sort-label { color: var(--muted); font-size: .85rem; }
+.sort-select {
+    padding: 9px 30px 9px 12px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); color: var(--text); font-size: .9rem; cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239a9c8d' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 9px center; background-size: 15px;
+}
+.sort-select:focus { outline: none; border-color: var(--gold); }
+.js .sort-go { display: none; }
+
+/* Termékkártya: nettó ár + mennyiség-sor */
+.price-net { color: var(--muted); font-size: .78rem; margin: -10px 0 14px; }
+.add-form--card { display: flex; align-items: stretch; gap: 8px; }
+.qty-mini { display: flex; margin: 0; }
+.qty-mini input {
+    width: 58px; padding: 9px 8px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); color: var(--text); font-size: .95rem; text-align: center;
+}
+.qty-mini input:focus { outline: none; border-color: var(--gold); }
+.add-form--card .btn { flex: 1; }
+
+/* Termékoldal: bizalmi sáv */
+.assurance { list-style: none; margin: 6px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+.assurance li { display: flex; align-items: flex-start; gap: 11px; font-size: .86rem; color: var(--muted); line-height: 1.45; }
+.assurance svg { width: 22px; height: 22px; flex: 0 0 auto; color: var(--gold-2); margin-top: 1px; }
+.assurance strong { color: var(--text); font-weight: 600; }
+.assurance a { color: var(--gold-2); }
+
+/* Termékoldal: specifikációs táblázat */
+.detail-specs { margin-top: 56px; }
+.detail-specs h2, .related h2 { font-family: var(--serif); font-size: 1.4rem; margin: 0 0 18px; }
+.spec-table { width: 100%; border-collapse: collapse; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.spec-table th, .spec-table td { text-align: left; padding: 13px 18px; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.spec-table tr:last-child th, .spec-table tr:last-child td { border-bottom: 0; }
+.spec-table th { color: var(--muted); font-weight: 500; width: 40%; background: var(--surface); }
+.spec-table td { color: var(--text); }
+.detail-specs .note { margin-top: 12px; }
+
+/* Termékoldal: kapcsolódó termékek */
+.related { margin-top: 56px; }
+.related-grid { grid-template-columns: repeat(4, 1fr); }
+.related-grid .product-media { height: 130px; }
+.related-grid .product-card h3 { font-size: .98rem; }
+
+/* Kosár / pénztár: összegbontás + bizalom */
+.cart-totals { width: 100%; max-width: 340px; }
+.cart-line { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: .92rem; padding: 5px 0; }
+.summary-subtotals { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 2px; }
+.summary-subtotals .cart-line { padding: 4px 0; }
+.cart-continue { display: inline-block; margin-top: 12px; color: var(--muted); font-size: .9rem; }
+.cart-continue:hover { color: var(--gold-2); }
+.trust-row { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 18px 0 0; padding: 16px 0 0; border-top: 1px solid var(--line); }
+.trust-row li { color: var(--muted); font-size: .82rem; display: flex; align-items: center; gap: 7px; }
+.trust-row li::before { content: "✓"; color: var(--gold-2); font-weight: 700; }
+.secure-note { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: .82rem; margin: 12px 0 0; }
+.secure-note svg { width: 17px; height: 17px; color: var(--gold-2); }
+
+/* Fizetőoldal */
+.eyebrow--center { justify-content: center; }
+.pay-lock { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: var(--gold-soft); border: 1px solid var(--line-gold); }
+.pay-lock svg { width: 26px; height: 26px; color: var(--gold-2); }
+.pay-card { text-align: center; }
+.pay-summary { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0; }
+.pay-summary div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 22px; min-width: 150px; }
+.pay-summary span { display: block; color: var(--muted); font-size: .78rem; margin-bottom: 4px; }
+.pay-summary strong { font-size: 1.15rem; }
+.pay-actions { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto; }
+.pay-note { color: #75776a; font-size: .82rem; margin: 22px auto 0; max-width: 44ch; }
+
+/* Visszaigazolás: következő lépések */
+.next-steps { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; margin: 24px 0; }
+.next-steps h2 { font-size: 1.1rem; margin: 0 0 12px; }
+.next-steps ol { margin: 0; padding-left: 20px; color: var(--muted); }
+.next-steps li { padding: 4px 0; }
+
+/* Kosárba rakás visszajelző buborék */
+.toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 16px);
+    z-index: 90; max-width: calc(100% - 32px);
+    background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: #1c1709;
+    font-weight: 600; font-size: .92rem; padding: 13px 22px; border-radius: 999px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+}
+.toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .toast { transition: opacity .25s ease; } }
+
+@media (max-width: 900px) {
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+    .assurance { grid-template-columns: 1fr; }
+    .shop-toolbar { align-items: stretch; }
+    .sort-form { width: 100%; }
+    .sort-select { flex: 1; }
 }
 
 /* ==========================================================================
