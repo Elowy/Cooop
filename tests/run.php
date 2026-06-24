@@ -19,6 +19,7 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+use App\Blog\BlogStore;
 use App\Catalog\Categories;
 use App\Catalog\ProductImageStore;
 use App\Core\Cart;
@@ -112,6 +113,27 @@ $imgStore->remove('SKU1', 'a.png');
 eq('remove töröl', ['b.png'], $imgStore->find('SKU1'));
 $imgStore->save('SKU1', []);
 eq('üres mentés törli a kulcsot', [], $imgStore->find('SKU1'));
+
+echo "BlogStore::slugify\n";
+eq('ékezet + szóköz', 'export-csomagolas', BlogStore::slugify('Export Csomagolás'));
+eq('többszörös elválasztó összevon', 'a-b', BlogStore::slugify('  a---b!!  '));
+eq('üres bemenet → bejegyzes', 'bejegyzes', BlogStore::slugify('!!!'));
+
+echo "BlogStore (fájl mód)\n";
+$blogStore = new BlogStore(null, $tmp . '/blog.json', $tmp . '/noseed.php');
+$bId1 = $blogStore->save(['title' => 'Első bejegyzés', 'body' => 'Tartalom', 'published' => 1]);
+ok('mentés pozitív id-t ad', $bId1 > 0);
+eq('slug a címből generálódik', 'elso-bejegyzes', $blogStore->find($bId1)['slug']);
+$bId2 = $blogStore->save(['title' => 'Első bejegyzés', 'published' => 0]);
+eq('ütköző slug -2 utótaggal', 'elso-bejegyzes-2', $blogStore->find($bId2)['slug']);
+eq('all() minden bejegyzést hoz', 2, count($blogStore->all()));
+eq('all(true) csak a publikáltat', 1, count($blogStore->all(true)));
+ok('findBySlug megtalál', $blogStore->findBySlug('elso-bejegyzes') !== null);
+ok('findBySlug publishedOnly rejti a vázlatot', $blogStore->findBySlug('elso-bejegyzes-2', true) === null);
+$blogStore->save(['id' => $bId2, 'title' => 'Első bejegyzés', 'published' => 1]);
+eq('publikálás után 2 látszik', 2, count($blogStore->all(true)));
+$blogStore->delete($bId1);
+eq('törlés után 1 marad', 1, count($blogStore->all()));
 
 echo "LoginThrottle\n";
 $throttle = new LoginThrottle($tmp . '/login.json', 3, 60);

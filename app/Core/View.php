@@ -52,6 +52,21 @@ final class View
         return number_format($amount, 0, ',', "\u{00A0}") . "\u{00A0}Ft";
     }
 
+    /** ISO dátum magyar formában, pl. "2026-05-05" → "2026. május 5." */
+    public static function dateHu(string $iso): string
+    {
+        $ts = strtotime($iso);
+        if ($ts === false) {
+            return '';
+        }
+        $months = [
+            1 => 'január', 2 => 'február', 3 => 'március', 4 => 'április',
+            5 => 'május', 6 => 'június', 7 => 'július', 8 => 'augusztus',
+            9 => 'szeptember', 10 => 'október', 11 => 'november', 12 => 'december',
+        ];
+        return date('Y', $ts) . '. ' . $months[(int) date('n', $ts)] . ' ' . date('j', $ts) . '.';
+    }
+
     /**
      * Statikus asset URL cache-busting verzióval (?v=fájl-mtime). Így a böngésző
      * sokáig cache-elheti a fájlt, de deploy/módosítás után azonnal újratölti.

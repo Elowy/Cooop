@@ -11,6 +11,7 @@ $nav = [
     '/#rolunk'      => 'Rólunk',
     '/#terkep'      => 'Térkép',
     '/#referenciak' => 'Referenciák',
+    '/blog'         => 'Blog',
     '/#kapcsolat'   => 'Kapcsolat',
 ];
 $cartCount = Cart::count();
