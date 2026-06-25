@@ -25,6 +25,7 @@ $nav = [
     'users'       => ['/admin/felhasznalok', 'Felhasználók', 'users'],
     'settings'    => ['/admin/beallitasok', 'Beállítások', 'gear'],
     'seo'         => ['/admin/seo', 'SEO', 'search'],
+    'grant'       => ['/admin/palyazat', 'Pályázat', 'post'],
 ];
 ?>
 <!DOCTYPE html>

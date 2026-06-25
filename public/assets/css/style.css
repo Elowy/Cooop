@@ -917,6 +917,14 @@ a.panel-link:hover { color: var(--gold-2); }
 .legal-doc li { margin: .3em 0; }
 .legal-doc hr { border: 0; border-top: 1px solid var(--line); margin: 1.8em 0; }
 
+/* Pályázati közzététel (infoblokk + adat-táblázat) */
+.grant-infoblock { width: 100%; max-width: 860px; height: auto; display: block; border-radius: 14px; border: 1px solid var(--line); background: #fff; margin: 0 0 30px; }
+.grant-table { width: 100%; border-collapse: collapse; margin: 0 0 1.8em; }
+.grant-table th, .grant-table td { text-align: left; padding: 11px 14px; border: 1px solid var(--line); vertical-align: top; }
+.grant-table th { width: 42%; color: var(--text); font-weight: 600; background: var(--surface); }
+.grant-table td { color: var(--muted); }
+@media (max-width: 560px) { .grant-table th { width: 46%; } }
+
 .footer-legal { display: flex; gap: 18px; flex-wrap: wrap; }
 .footer-legal a { color: var(--muted); font-size: .82rem; }
 .footer-legal a:hover { color: var(--gold-2); }
