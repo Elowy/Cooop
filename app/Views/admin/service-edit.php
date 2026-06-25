@@ -17,7 +17,7 @@ $icons = [
 <p class="breadcrumb"><a href="/admin/szolgaltatasok">← Tevékenységek</a></p>
 
 <section class="panel" style="max-width:760px">
-    <form method="post" action="/admin/szolgaltatasok/mentes" class="form-card" style="background:transparent;border:0;padding:0">
+    <form method="post" action="/admin/szolgaltatasok/mentes" enctype="multipart/form-data" class="form-card" style="background:transparent;border:0;padding:0">
         <?= Csrf::field() ?>
         <?php if (!empty($service['id'])): ?><input type="hidden" name="id" value="<?= (int) $service['id'] ?>"><?php endif; ?>
 
@@ -48,12 +48,19 @@ $icons = [
         </div>
 
         <div class="field">
-            <label>Kép URL-je (a főoldali kártyán és a részletek-ablakban jelenik meg)</label>
-            <input name="image" type="url" value="<?= View::e((string) ($service['image'] ?? '')) ?>" placeholder="https://… vagy /assets/img/…">
-            <p class="note" style="margin-top:6px">Üresen hagyva a kiválasztott ikon jelenik meg a kártyán.</p>
+            <label>Kép (a főoldali kártyán és a részletek-ablakban jelenik meg)</label>
             <?php if (!empty($service['image'])): ?>
-                <img src="<?= View::e((string) $service['image']) ?>" alt="" style="margin-top:10px;max-height:120px;border-radius:10px;border:1px solid var(--line)">
+                <div style="margin-bottom:10px">
+                    <img src="<?= View::e((string) $service['image']) ?>" alt="" style="max-height:120px;border-radius:10px;border:1px solid var(--line);display:block">
+                    <label class="check" style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                        <input type="checkbox" name="image_remove" value="1">
+                        <span>Jelenlegi kép eltávolítása (mentéskor)</span>
+                    </label>
+                </div>
             <?php endif; ?>
+            <input name="image_file" type="file" accept="image/jpeg,image/png,image/webp">
+            <p class="note" style="margin-top:6px">Tölts fel képet (JPG / PNG / WEBP, max 16 MB) — vagy add meg URL-ként alább. Üresen a kiválasztott ikon jelenik meg a kártyán.</p>
+            <input name="image" type="text" value="<?= View::e((string) ($service['image'] ?? '')) ?>" placeholder="https://… vagy /uploads/…" style="margin-top:8px">
         </div>
 
         <div class="field">
