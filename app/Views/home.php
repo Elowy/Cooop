@@ -196,7 +196,17 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
 (function () {
     if (!window.L || !document.getElementById('map')) { return; }
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-    var map = L.map('map', { scrollWheelZoom: false }).setView([30, 10], 2);
+    // Statikus térkép: nem mozgatható/nagyítható, csak a pontok kattinthatók.
+    var map = L.map('map', {
+        scrollWheelZoom: false,
+        dragging: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        touchZoom: false,
+        zoomControl: false,
+        tap: false
+    }).setView([30, 10], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 18 }).addTo(map);
     var group = [];
     (window.NT_POIS || []).forEach(function (p) {
@@ -207,7 +217,12 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
         m.bindPopup(html);
         group.push(m);
     });
-    if (group.length) { map.fitBounds(L.featureGroup(group).getBounds(), { padding: [36, 36], maxZoom: 6 }); }
+    // Az összes pontra illesztés, hogy mind látszódjon. Kisebb képernyőn (alacsonyabb
+    // térkép) szorosabb padding, hogy a pontok kitöltsék a nézetet, ne maradjon üres hely.
+    if (group.length) {
+        var pad = window.matchMedia('(max-width: 680px)').matches ? 22 : 40;
+        map.fitBounds(L.featureGroup(group).getBounds(), { padding: [pad, pad], maxZoom: 6 });
+    }
 })();
 </script>
 <?php endif; ?>
@@ -217,10 +232,11 @@ window.NT_POIS = <?= json_encode(array_map(static fn ($p) => [
 // Alapból csak a kiemelt referenciák látszanak; a többi összecsukva, gombbal nyitható.
 $featuredRefs = array_values(array_filter($references, static fn ($r) => !empty($r['featured'])));
 $restRefs = array_values(array_filter($references, static fn ($r) => empty($r['featured'])));
-// Ha egyik sincs kiemelve, ne legyen üres a szekció: mutassuk mindet (nincs összecsukás).
+// Ha egyik sincs kiemelve, ne legyen végtelen lista (főleg mobilon): alapból
+// csak az első néhány látszik (egy desktop-sornyi), a többi a gombbal nyitható.
 if ($featuredRefs === []) {
-    $featuredRefs = $references;
-    $restRefs = [];
+    $featuredRefs = array_slice($references, 0, 6);
+    $restRefs = array_slice($references, 6);
 }
 $orderedRefs = array_merge($featuredRefs, $restRefs);
 $featuredCount = count($featuredRefs);

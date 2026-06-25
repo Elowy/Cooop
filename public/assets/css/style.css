@@ -896,6 +896,12 @@ a.panel-link:hover { color: var(--gold-2); }
 .to-top { position: fixed; left: 50%; bottom: 92px; transform: translate(-50%, 16px); z-index: 65; padding: 11px 20px; border-radius: 999px; border: 1px solid var(--line-gold); background: rgba(20, 21, 15, .92); color: var(--gold-2); font-weight: 600; font-size: .88rem; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease, border-color .15s; }
 .to-top.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 .to-top:hover { border-color: var(--gold); }
+/* Mobilon a középre lebegő pill helyett bal alsó sarok, hogy ne lógjon a tartalom
+   közepére (a kontakt-fab a jobb alsó sarokban marad — nem ütköznek). */
+@media (max-width: 680px) {
+    .to-top { left: 16px; right: auto; bottom: 16px; transform: translateY(14px); padding: 9px 15px; font-size: .82rem; }
+    .to-top.is-visible { transform: translateY(0); }
+}
 
 /* ==========================================================================
    Jogi oldalak, cookie soft wall (erdei faültetés)
@@ -1000,6 +1006,7 @@ a.panel-link:hover { color: var(--gold-2); }
 
 .world-map { height: 480px; width: 100%; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; z-index: 0; background: #14150f; }
 .world-map--admin { height: 360px; }
+@media (max-width: 680px) { .world-map { height: 320px; } }
 .leaflet-container { font-family: inherit; }
 
 .modal { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; }
@@ -1213,6 +1220,11 @@ body.modal-open { overflow: hidden; }
 .service-card-title { display: block; font-family: var(--serif); font-weight: 600; font-size: 1.12rem; margin: 0 0 8px; color: var(--text); }
 .service-card-sum { display: block; color: var(--muted); font-size: .92rem; margin: 0 0 16px; }
 .service-card-body .card-link { margin-top: auto; }
+/* Mobilon a teljes szélességű kártya médiarésze ne legyen nagy üres doboz. */
+@media (max-width: 680px) {
+    .service-card-media { aspect-ratio: auto; height: 132px; }
+    .service-card-media .card-icon { width: 56px; height: 56px; }
+}
 
 .service-modal { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; opacity: 0; transition: opacity .25s ease; }
 .service-modal[hidden] { display: none; }
