@@ -1982,17 +1982,45 @@ $router->get('/admin/szolgaltatasok/szerkesztes', static function () use ($admin
     ]);
 });
 
-$router->post('/admin/szolgaltatasok/mentes', static function () use ($guard, $services, $redirect): string {
+$router->post('/admin/szolgaltatasok/mentes', static function () use ($guard, $services, $uploadImage, $redirect): string {
     $guard();
+    // Üres $_POST, de volt törzs → a feltöltött kép meghaladta a szerver korlátját.
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött kép túl nagy a szerver korlátjához képest – tölts fel kisebbet. (A módosítások nem mentődtek.)'];
+        return $redirect('/admin/szolgaltatasok');
+    }
     if (!Csrf::check($_POST['_csrf'] ?? null)) {
         return $redirect('/admin/szolgaltatasok');
     }
     $id = (int) ($_POST['id'] ?? 0);
+
+    // Kép: URL/útvonal mező, opcionális eltávolítás; a feltöltött fájl (ha van) felülírja.
+    $image = trim((string) ($_POST['image'] ?? ''));
+    if (isset($_POST['image_remove'])) {
+        $image = '';
+    }
+    $imageError = null;
+    $fileErr = $_FILES['image_file']['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($fileErr !== UPLOAD_ERR_NO_FILE) {
+        if ($fileErr === UPLOAD_ERR_INI_SIZE || $fileErr === UPLOAD_ERR_FORM_SIZE) {
+            $imageError = 'A kép túl nagy – tölts fel kisebbet (max 16 MB).';
+        } elseif ($fileErr !== UPLOAD_ERR_OK) {
+            $imageError = 'A kép feltöltése megszakadt, próbáld újra.';
+        } else {
+            $uploaded = $uploadImage($_FILES['image_file'], dirname(__DIR__) . '/public/uploads/services');
+            if ($uploaded === null) {
+                $imageError = 'A kép nem menthető – JPG/PNG/WEBP, max 16 MB legyen.';
+            } else {
+                $image = '/uploads/services/' . $uploaded;
+            }
+        }
+    }
+
     $service = [
         'title' => trim((string) ($_POST['title'] ?? '')),
         'slug' => trim((string) ($_POST['slug'] ?? '')),
         'icon' => trim((string) ($_POST['icon'] ?? '')),
-        'image' => trim((string) ($_POST['image'] ?? '')),
+        'image' => $image,
         'summary' => trim((string) ($_POST['summary'] ?? '')),
         'body' => (string) ($_POST['body'] ?? ''),
         'sort' => (int) ($_POST['sort'] ?? 0),
@@ -2006,7 +2034,9 @@ $router->post('/admin/szolgaltatasok/mentes', static function () use ($guard, $s
         return $redirect('/admin/szolgaltatasok/szerkesztes' . ($id ? '?id=' . $id : ''));
     }
     $services->save($service);
-    $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Tevékenység mentve.'];
+    $_SESSION['_flash_admin'] = $imageError !== null
+        ? ['type' => 'error', 'text' => 'Adatok mentve, de: ' . $imageError]
+        : ['type' => 'ok', 'text' => 'Tevékenység mentve.'];
     return $redirect('/admin/szolgaltatasok');
 });
 
