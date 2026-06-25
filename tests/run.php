@@ -28,6 +28,8 @@ use App\Core\LoginThrottle;
 use App\Core\Mailer;
 use App\Core\View;
 use App\Integration\Product;
+use App\Integration\RestAxelGateway;
+use App\Integration\XmlAxelGateway;
 use App\Order\OrderStore;
 use App\Service\ServiceStore;
 
@@ -246,9 +248,82 @@ eq('start() a GatewayUrl-t adja', 'https://barion/pay/PID-9', $bGw->start($bStor
 eq('start() eltárolja a PaymentId-t', 'PID-9', $bStore->find($bTokenB)['payment']['payment_id']);
 eq('findByPaymentId visszatalál', $bTokenB, $bStore->findByPaymentId('PID-9')['token']);
 
-// Takarítás
-array_map('unlink', glob($tmp . '/*') ?: []);
-@rmdir($tmp);
+echo "XmlAxelGateway\n";
+$axelDir = $tmp . '/axel';
+@mkdir($axelDir, 0775, true);
+file_put_contents($axelDir . '/catalog.xml', '<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+  <product><sku>A-1</sku><slug>tegla</slug><category>ep</category><name>Tégla</name><unit>db</unit><priceNet>100</priceNet><vat>27</vat><stock>500</stock><icon>brick</icon><short>rövid</short></product>
+  <product><sku>B-2</sku><slug>homok</slug><category>ep</category><name>Homok</name><unit>m3</unit><price_net>9000</price_net><vat>27</vat><stock>0</stock><icon>sand</icon><short>s</short></product>
+</catalog>');
+$xmlGw = new XmlAxelGateway($axelDir);
+eq('XML: products() két terméket ad', 2, count($xmlGw->products()));
+eq('XML: findProduct slug szerint', 'Tégla', $xmlGw->findProduct('tegla')->name);
+eq('XML: priceNet beolvasva', 100, $xmlGw->findProduct('tegla')->priceNet);
+eq('XML: price_net (snake_case) is megy', 9000, $xmlGw->findProduct('homok')->priceNet);
+eq('XML: stockFor SKU szerint', 500, $xmlGw->stockFor('A-1'));
+ok('XML: ismeretlen slug → null', $xmlGw->findProduct('nincs') === null);
+ok('XML: ismeretlen SKU stock → null', $xmlGw->stockFor('NINCS') === null);
+eq('XML: hiányzó katalógus → üres', 0, count((new XmlAxelGateway($tmp . '/nincs'))->products()));
+
+$axelOrder = [
+    'token' => 'abc123', 'number' => 'NT-7', 'created' => '2026-06-25T10:00:00+02:00',
+    'customer' => ['name' => 'Teszt Elek', 'email' => 't@e.hu', 'phone' => '+3612', 'tax_number' => '123'],
+    'billing' => ['zip' => '2660', 'city' => 'Balassagyarmat', 'address' => 'Fő út 1'],
+    'shipping' => null,
+    'items' => [['sku' => 'A-1', 'name' => 'Tégla', 'unit' => 'db', 'qty' => 3, 'price_net' => 100, 'vat' => 27, 'price_gross' => 127, 'subtotal' => 381]],
+    'totals' => ['gross' => 381],
+];
+$xmlInv = $xmlGw->createInvoice($axelOrder);
+ok('XML: createInvoice ok=true', $xmlInv->ok);
+ok('XML: aszinkron – számlaszám nélkül', $xmlInv->invoiceNumber === null);
+$orderFile = $axelDir . '/orders/order-abc123.xml';
+ok('XML: rendelés-fájl létrejött', is_file($orderFile));
+$writtenXml = is_file($orderFile) ? (string) file_get_contents($orderFile) : '';
+ok('XML: rendelés-XML well-formed', simplexml_load_string($writtenXml) !== false);
+ok('XML: tartalmazza a vevőt', str_contains($writtenXml, '<name>Teszt Elek</name>'));
+ok('XML: tartalmazza a tételt', str_contains($writtenXml, '<sku>A-1</sku>') && str_contains($writtenXml, '<qty>3</qty>'));
+ok('XML: adatcsere-könyvtár nélkül → ok=false', !(new XmlAxelGateway(''))->createInvoice($axelOrder)->ok);
+
+echo "RestAxelGateway\n";
+$restHttp = static function (string $method, string $url, array $headers, ?string $body): array {
+    $GLOBALS['_rest_last'] = ['headers' => $headers, 'body' => $body];
+    if ($method === 'GET' && str_ends_with($url, '/products')) {
+        return ['status' => 200, 'body' => (string) json_encode([
+            ['sku' => 'A-1', 'slug' => 'tegla', 'category' => 'c', 'name' => 'Tégla', 'unit' => 'db', 'priceNet' => 100, 'vat' => 27, 'stock' => 500, 'icon' => 'brick', 'short' => 's'],
+            ['sku' => 'B-2', 'slug' => 'homok', 'category' => 'c', 'name' => 'Homok', 'unit' => 'm3', 'price_net' => 9000, 'vat' => 27, 'stock' => 0, 'icon' => 'sand', 'short' => 's'],
+        ])];
+    }
+    if ($method === 'GET' && str_contains($url, '/stock/')) {
+        return ['status' => 200, 'body' => (string) json_encode(['sku' => 'A-1', 'stock' => 42])];
+    }
+    if ($method === 'POST' && str_ends_with($url, '/invoices')) {
+        return ['status' => 200, 'body' => (string) json_encode(['ok' => true, 'invoiceNumber' => '2026-NT-0042', 'message' => 'OK'])];
+    }
+    return ['status' => 404, 'body' => ''];
+};
+$restGw = new RestAxelGateway('https://api.example/v1/', 'KEY123', $restHttp);
+eq('REST: products() két terméket ad', 2, count($restGw->products()));
+eq('REST: priceNet leképezve', 100, $restGw->findProduct('tegla')->priceNet);
+eq('REST: price_net (snake) is megy', 9000, $restGw->findProduct('homok')->priceNet);
+eq('REST: stockFor a /stock végpontból', 42, $restGw->stockFor('A-1'));
+ok('REST: X-Api-Key fejléc elküldve', in_array('X-Api-Key: KEY123', $GLOBALS['_rest_last']['headers'] ?? [], true));
+$restInv = $restGw->createInvoice($axelOrder);
+ok('REST: createInvoice ok=true', $restInv->ok);
+eq('REST: számlaszám a válaszból', '2026-NT-0042', $restInv->invoiceNumber);
+$restErr = new RestAxelGateway('https://api.example/v1', 'K', static fn ($m, $u, $h, $b): array => ['status' => 500, 'body' => '']);
+eq('REST: 500 → üres katalógus', 0, count($restErr->products()));
+ok('REST: 500 → createInvoice ok=false', !$restErr->createInvoice($axelOrder)->ok);
+ok('REST: üres api_url → createInvoice ok=false', !(new RestAxelGateway(''))->createInvoice($axelOrder)->ok);
+
+// Takarítás (rekurzív, hogy az almappák – pl. border, axel – se maradjanak)
+$rmrf = static function (string $path) use (&$rmrf): void {
+    foreach (glob($path . '/*') ?: [] as $f) {
+        is_dir($f) ? $rmrf($f) : @unlink($f);
+    }
+    @rmdir($path);
+};
+$rmrf($tmp);
 
 echo "\n";
 if ($failed === 0) {
