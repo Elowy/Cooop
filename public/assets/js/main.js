@@ -316,6 +316,11 @@
         document.querySelectorAll('[data-cart-badge]').forEach(function (b) {
             b.textContent = String(count);
             b.hidden = count <= 0;
+            if (count > 0 && !reduceMotion) {
+                b.classList.remove('is-bump');
+                void b.offsetWidth; // reflow, hogy az animáció újrainduljon
+                b.classList.add('is-bump');
+            }
         });
         document.querySelectorAll('[data-cart-link]').forEach(function (l) {
             l.classList.toggle('has-items', count > 0);
@@ -406,5 +411,33 @@
             });
         }, { threshold: 0.12 });
         reveals.forEach(function (el) { io.observe(el); });
+    }
+
+    // Tartalmi képek finom beúszása betöltéskor (a már betöltötteket nem érinti)
+    if (!reduceMotion) {
+        document.querySelectorAll('img[loading="lazy"]').forEach(function (img) {
+            if (img.complete && img.naturalWidth > 0) { return; }
+            img.classList.add('img-fade');
+            var done = function () { img.classList.add('is-loaded'); };
+            img.addEventListener('load', done, { once: true });
+            img.addEventListener('error', done, { once: true });
+        });
+    }
+
+    // Térkép-markerek megjelenése, amikor a lefedettség-térkép láthatóvá válik
+    var mapEl = document.getElementById('map');
+    if (mapEl) {
+        var revealMarkers = function () { mapEl.classList.add('markers-in'); };
+        if (reduceMotion || !('IntersectionObserver' in window)) {
+            revealMarkers();
+        } else {
+            var mapIo = new IntersectionObserver(function (entries, obs) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) { revealMarkers(); obs.unobserve(entry.target); }
+                });
+            }, { threshold: 0.25 });
+            mapIo.observe(mapEl);
+            window.setTimeout(revealMarkers, 2500); // biztonsági háló, ha nem tüzelne
+        }
     }
 })();

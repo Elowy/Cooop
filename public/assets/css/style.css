@@ -1256,3 +1256,94 @@ body.modal-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
     .service-modal, .service-modal-dialog { transition: none; }
 }
+
+/* ==========================================================================
+   Csiszolás & animációk (UI polish)
+   Minden új mozgás kikapcsol prefers-reduced-motion alatt (a blokk végén).
+   ========================================================================== */
+
+/* — Kép-zoom hoverre: csak ott, ahol valódi kép van — */
+.product-media.has-image img,
+.service-card-media img,
+.blog-card-media img,
+.reference-logo img {
+    transition: transform .5s cubic-bezier(.22, .61, .36, 1);
+}
+.product-card:hover .product-media.has-image img,
+.service-card:hover .service-card-media img,
+.blog-card:hover .blog-card-media img { transform: scale(1.06); }
+.reference-card:hover .reference-logo img { transform: scale(1.08); }
+
+/* — Üres médiadobozok mélysége (a glow a kép mögött van, csak ikonnál látszik) — */
+.product-media { background-image: radial-gradient(120% 85% at 50% 0%, rgba(203, 161, 78, .12), transparent 60%), linear-gradient(135deg, #1c1e15, #14150f); }
+.service-card-media { background-image: radial-gradient(120% 90% at 50% 0%, rgba(203, 161, 78, .16), transparent 62%); }
+.blog-card-mark { position: relative; }
+.blog-card-mark::before {
+    content: ""; position: absolute; width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(203, 161, 78, .18), transparent 70%);
+}
+
+/* — Arany gombok fény-csíkja hoverre — */
+.btn { position: relative; overflow: hidden; }
+.btn--gold::after {
+    content: ""; position: absolute; top: 0; left: -130%; width: 60%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+    transform: skewX(-18deg); pointer-events: none;
+}
+.btn--gold:hover::after { animation: btnShine .8s ease; }
+@keyframes btnShine { from { left: -130%; } to { left: 130%; } }
+
+/* — Navigáció animált arany aláhúzás — */
+.main-nav a { position: relative; }
+.main-nav a::after {
+    content: ""; position: absolute; left: 12px; right: 12px; bottom: 4px; height: 2px;
+    background: linear-gradient(90deg, var(--gold-2), var(--gold)); border-radius: 2px;
+    transform: scaleX(0); transform-origin: left; transition: transform .28s cubic-bezier(.22, .61, .36, 1);
+}
+.main-nav a:hover::after, .main-nav a:focus-visible::after { transform: scaleX(1); }
+.main-nav .btn::after { display: none; }
+
+/* — Egységes fókusz-gyűrű (billentyűzet) — */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--gold-2); outline-offset: 2px; border-radius: 6px;
+}
+
+/* — Hero belépő (staggered) — */
+@keyframes heroUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.hero-copy.hero-enter > * { animation: heroUp .8s cubic-bezier(.22, .61, .36, 1) backwards; }
+.hero-copy.hero-enter > :nth-child(1) { animation-delay: .08s; }
+.hero-copy.hero-enter > :nth-child(2) { animation-delay: .20s; }
+.hero-copy.hero-enter > :nth-child(3) { animation-delay: .34s; }
+.hero-copy.hero-enter > :nth-child(4) { animation-delay: .48s; }
+
+/* — Tartalmi képek finom beúszása (JS adja a class-t betöltéskor) — */
+.img-fade { opacity: 0; transition: opacity .6s ease; }
+.img-fade.is-loaded { opacity: 1; }
+
+/* — Térkép-markerek staggered megjelenése (csak a publikus #map-en) —
+   Alapból rejtve; a JS minden esetben felfedi (markers-in), így sosem ragadnak rejtve. */
+#map .leaflet-marker-icon { opacity: 0; }
+#map.markers-in .leaflet-marker-icon { opacity: 1; animation: markerIn .55s cubic-bezier(.22, .61, .36, 1) backwards; }
+#map.markers-in .leaflet-marker-icon:nth-of-type(2) { animation-delay: .08s; }
+#map.markers-in .leaflet-marker-icon:nth-of-type(3) { animation-delay: .16s; }
+#map.markers-in .leaflet-marker-icon:nth-of-type(4) { animation-delay: .24s; }
+#map.markers-in .leaflet-marker-icon:nth-of-type(5) { animation-delay: .32s; }
+#map.markers-in .leaflet-marker-icon:nth-of-type(n+6) { animation-delay: .40s; }
+@keyframes markerIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* — Kosár-jelvény rebbenése tételhozzáadáskor — */
+.cart-badge.is-bump { animation: badgePop .45s cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes badgePop { 0% { transform: scale(1); } 35% { transform: scale(1.5); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .product-media.has-image img, .service-card-media img, .blog-card-media img, .reference-logo img,
+    .product-card:hover .product-media.has-image img, .service-card:hover .service-card-media img,
+    .blog-card:hover .blog-card-media img, .reference-card:hover .reference-logo img { transition: none; transform: none; }
+    .btn--gold:hover::after { animation: none; }
+    .main-nav a::after { transition: none; }
+    .hero-copy.hero-enter > * { animation: none; }
+    .img-fade { opacity: 1; transition: none; }
+    #map.markers-in .leaflet-marker-icon { animation: none; }
+    .cart-badge.is-bump { animation: none; }
+}
