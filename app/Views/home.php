@@ -33,7 +33,7 @@ $stats = [
     <div class="hero-bg" data-parallax aria-hidden="true"><?= file_get_contents(dirname(__DIR__, 2) . '/public/assets/img/forest.svg') ?></div>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="container hero-inner">
-        <div class="hero-copy reveal">
+        <div class="hero-copy hero-enter">
             <p class="eyebrow"><span class="eyebrow-dot"></span> Az ügyfél sikere a mi sikerünk!</p>
             <h1 class="display">
                 Amit ránk bíznak,<br><span class="gold">azt biztonságban</span> szállítjuk.
