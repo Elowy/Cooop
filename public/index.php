@@ -424,7 +424,29 @@ $router->get('/szallitas', static fn (): string => View::render('page', [
     'mdFile' => 'szallitas.md',
 ]));
 
-$router->get('/oldalterkep', static function () use ($cats, $services, $blog): string {
+// Pályázati közzététel (kötelező nyilvánosság) – adminból szerkeszthető, csak akkor
+// érhető el, ha legalább az infoblokk-kép, a cím vagy a leírás ki van töltve.
+$router->get('/palyazat', static function () use ($settings): string {
+    $s = $settings->all();
+    $grant = [
+        'title' => (string) ($s['grant_title'] ?? ''),
+        'id' => (string) ($s['grant_id'] ?? ''),
+        'fund' => (string) ($s['grant_fund'] ?? ''),
+        'amount' => (string) ($s['grant_amount'] ?? ''),
+        'intensity' => (string) ($s['grant_intensity'] ?? ''),
+        'from' => (string) ($s['grant_from'] ?? ''),
+        'to' => (string) ($s['grant_to'] ?? ''),
+        'body' => (string) ($s['grant_body'] ?? ''),
+        'image' => (string) ($s['grant_image'] ?? ''),
+    ];
+    if ($grant['image'] === '' && trim($grant['title']) === '' && trim($grant['body']) === '') {
+        http_response_code(404);
+        return View::render('errors/404', ['title' => 'Nincs pályázati közzététel']);
+    }
+    return View::render('grant', ['title' => 'Pályázati közzététel', 'grant' => $grant]);
+});
+
+$router->get('/oldalterkep', static function () use ($cats, $services, $blog, $settings): string {
     $pages = [
         ['url' => '/', 'label' => 'Főoldal'],
         ['url' => '/webshop', 'label' => 'Webshop'],
@@ -452,6 +474,10 @@ $router->get('/oldalterkep', static function () use ($cats, $services, $blog): s
         ['url' => '/aszf', 'label' => 'ÁSZF'],
         ['url' => '/adatkezeles', 'label' => 'Adatkezelési tájékoztató'],
     ];
+    $gs = $settings->all();
+    if (trim((string) ($gs['grant_image'] ?? '')) !== '' || trim((string) ($gs['grant_title'] ?? '')) !== '' || trim((string) ($gs['grant_body'] ?? '')) !== '') {
+        $legal[] = ['url' => '/palyazat', 'label' => 'Pályázati közzététel'];
+    }
     return View::render('sitemap-page', [
         'title' => 'Oldaltérkép',
         'groups' => [
@@ -1609,6 +1635,72 @@ $router->post('/admin/seo', static function () use ($guard, $settings, $redirect
         $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'SEO beállítások mentve.'];
     }
     return $redirect('/admin/seo');
+});
+
+$router->get('/admin/palyazat', static function () use ($adminView, $guard, $settings): string {
+    $guard();
+    $s = $settings->all();
+    return $adminView('admin/grant', 'grant', [
+        'title' => 'Pályázati közzététel',
+        'values' => [
+            'grant_title' => (string) ($s['grant_title'] ?? ''),
+            'grant_id' => (string) ($s['grant_id'] ?? ''),
+            'grant_fund' => (string) ($s['grant_fund'] ?? ''),
+            'grant_amount' => (string) ($s['grant_amount'] ?? ''),
+            'grant_intensity' => (string) ($s['grant_intensity'] ?? ''),
+            'grant_from' => (string) ($s['grant_from'] ?? ''),
+            'grant_to' => (string) ($s['grant_to'] ?? ''),
+            'grant_body' => (string) ($s['grant_body'] ?? ''),
+            'grant_image' => (string) ($s['grant_image'] ?? ''),
+        ],
+    ]);
+});
+
+$router->post('/admin/palyazat', static function () use ($guard, $settings, $uploadImage, $redirect): string {
+    $guard();
+    if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $_SESSION['_flash_admin'] = ['type' => 'error', 'text' => 'A feltöltött infoblokk-kép túl nagy a szerver korlátjához képest – tölts fel kisebbet. (A módosítások nem mentődtek.)'];
+        return $redirect('/admin/palyazat');
+    }
+    if (!Csrf::check($_POST['_csrf'] ?? null)) {
+        return $redirect('/admin/palyazat');
+    }
+    // Infoblokk-kép: opcionális eltávolítás; a feltöltött fájl (ha van) felülírja.
+    $image = (string) $settings->get('grant_image', '');
+    if (isset($_POST['grant_image_remove'])) {
+        $image = '';
+    }
+    $imageError = null;
+    $fileErr = $_FILES['grant_image_file']['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($fileErr !== UPLOAD_ERR_NO_FILE) {
+        if ($fileErr === UPLOAD_ERR_INI_SIZE || $fileErr === UPLOAD_ERR_FORM_SIZE) {
+            $imageError = 'Az infoblokk-kép túl nagy – tölts fel kisebbet (max 16 MB).';
+        } elseif ($fileErr !== UPLOAD_ERR_OK) {
+            $imageError = 'A kép feltöltése megszakadt, próbáld újra.';
+        } else {
+            $uploaded = $uploadImage($_FILES['grant_image_file'], dirname(__DIR__) . '/public/uploads/grant');
+            if ($uploaded === null) {
+                $imageError = 'A kép nem menthető – JPG/PNG/WEBP, max 16 MB legyen.';
+            } else {
+                $image = '/uploads/grant/' . $uploaded;
+            }
+        }
+    }
+    $settings->saveMany([
+        'grant_title' => trim((string) ($_POST['grant_title'] ?? '')),
+        'grant_id' => trim((string) ($_POST['grant_id'] ?? '')),
+        'grant_fund' => trim((string) ($_POST['grant_fund'] ?? '')),
+        'grant_amount' => trim((string) ($_POST['grant_amount'] ?? '')),
+        'grant_intensity' => trim((string) ($_POST['grant_intensity'] ?? '')),
+        'grant_from' => trim((string) ($_POST['grant_from'] ?? '')),
+        'grant_to' => trim((string) ($_POST['grant_to'] ?? '')),
+        'grant_body' => (string) ($_POST['grant_body'] ?? ''),
+        'grant_image' => $image,
+    ]);
+    $_SESSION['_flash_admin'] = $imageError !== null
+        ? ['type' => 'error', 'text' => 'Adatok mentve, de: ' . $imageError]
+        : ['type' => 'ok', 'text' => 'Pályázati adatok mentve.'];
+    return $redirect('/admin/palyazat');
 });
 
 $router->get('/admin/termek-seo', static function () use ($adminView, $guard, $axel, $productSeo): string {

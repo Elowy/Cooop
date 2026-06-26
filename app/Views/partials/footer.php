@@ -9,6 +9,10 @@ $seo = $seo ?? [];
 $safeUrl = static fn (string $u): string => preg_match('#^https?://#i', trim($u)) === 1 ? trim($u) : '';
 $facebook = $safeUrl((string) ($seo['social_facebook'] ?? ''));
 $youtube = $safeUrl((string) ($seo['social_youtube'] ?? ''));
+// Pályázati közzététel linkje csak akkor, ha van mit megjeleníteni.
+$hasGrant = trim((string) ($seo['grant_image'] ?? '')) !== ''
+    || trim((string) ($seo['grant_title'] ?? '')) !== ''
+    || trim((string) ($seo['grant_body'] ?? '')) !== '';
 ?>
 <footer class="site-footer">
     <div class="container footer-grid">
@@ -71,6 +75,7 @@ $youtube = $safeUrl((string) ($seo['social_youtube'] ?? ''));
         <nav class="footer-legal">
             <a href="/aszf">ÁSZF</a>
             <a href="/adatkezeles">Adatkezelési tájékoztató</a>
+            <?php if ($hasGrant): ?><a href="/palyazat">Pályázati közzététel</a><?php endif; ?>
             <a href="/oldalterkep">Oldaltérkép</a>
             <a href="#" data-cookie-open>Cookie-beállítások</a>
         </nav>
