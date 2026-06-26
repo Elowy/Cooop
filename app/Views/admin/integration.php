@@ -8,7 +8,7 @@ use App\Core\View;
 <div class="admin-cols">
     <section class="panel">
         <header class="panel-head"><h2>Axel Pro kapcsolat</h2></header>
-        <p class="muted" style="margin-top:0">Itt állítható be, hogyan kapcsolódik a webshop az Axel Pro-hoz. Jelenleg a <strong>mock</strong> (teszt) adapter aktív; az <code>xml</code> és <code>rest</code> az éles bekötéskor lesz elérhető.</p>
+        <p class="muted" style="margin-top:0">Itt állítható be, hogyan kapcsolódik a webshop az Axel Pro-hoz. Mindhárom adapter elérhető: <strong>mock</strong> (teszt katalógus), <code>xml</code> (helyi mappás fájlcsere) és <code>rest</code> (HTTP API) — a kiválasztott mód mentés után azonnal aktív. A pontos adatcsere-formátum: <code>docs/axel-integration.md</code>.</p>
 
         <form method="post" action="/admin/integracio" class="form-card" style="background:transparent;border:0;padding:0">
             <?= Csrf::field() ?>
@@ -44,6 +44,6 @@ use App\Core\View;
             <li>Ütemezett, automatikus import/export a szerveren (figyelt mappa / parancssor)?</li>
             <li>A kiállított számla száma/PDF-je visszakérdezhető-e?</li>
         </ol>
-        <p class="note">A beállítások mentésre kerülnek; az éles XML/REST adapter ezeket fogja használni, amint elkészül.</p>
+        <p class="note">A beállítások azonnal érvénybe lépnek; a kiválasztott XML/REST adapter ezeket a mezőket használja. A pontos XML-séma és REST-végpontok: <code>docs/axel-integration.md</code>.</p>
     </section>
 </div>

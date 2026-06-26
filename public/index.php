@@ -85,13 +85,6 @@ session_set_cookie_params([
 ]);
 session_start();
 
-// Az Axel-kapu. A config 'gateway' alapján választunk megvalósítást; éles
-// bekötéskor az 'xml' (helyi mappás) vagy 'rest' adapter kerül a mock helyére.
-$axel = match ($config['axel']['gateway'] ?? 'mock') {
-    // 'xml' => new App\Integration\XmlAxelGateway($config['axel']['exchange_dir']),
-    default => new MockAxelGateway(),
-};
-
 // Kategóriafa (config/categories.php).
 $cats = new Categories();
 
@@ -126,6 +119,21 @@ $blog = new BlogStore($pdo);
 $services = new ServiceStore($pdo);
 $throttle = new LoginThrottle();
 $clientIp = static fn (): string => (string) ($_SERVER['REMOTE_ADDR'] ?? 'cli');
+
+// Az Axel-kapu. Elsődlegesen az adminban mentett 'axel_gateway' dönt (Axel
+// integráció oldal), különben a config alapértelmezése. A konkrét adapter
+// (mock | XML fájlcsere | REST API) a shop többi része számára átlátszó.
+$axelCfg = $config['axel'] ?? [];
+$axel = match ((string) $settings->get('axel_gateway', (string) ($axelCfg['gateway'] ?? 'mock'))) {
+    'xml' => new App\Integration\XmlAxelGateway(
+        (string) ($settings->get('axel_exchange_dir', '') ?: ($axelCfg['exchange_dir'] ?? ''))
+    ),
+    'rest' => new App\Integration\RestAxelGateway(
+        (string) $settings->get('axel_api_url', ''),
+        (string) $settings->get('axel_api_key', '')
+    ),
+    default => new MockAxelGateway(),
+};
 
 // E-mail küldő (SMTP, ha konfigurált; különben PHP mail()). Feladó-alapértékek.
 $mailFromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
