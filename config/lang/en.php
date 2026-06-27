@@ -220,4 +220,10 @@ return [
     'shop.place_order' => 'Place order',
     'shop.secure_note' => 'Secure, encrypted connection',
     'shop.back_to_cart' => 'Back to cart',
+
+    'blog.title' => 'News, tips and expert articles',
+    'blog.sub' => 'On packaging, pallet manufacturing and logistics – from experience.',
+    'blog.empty' => 'The first posts are coming soon.',
+    'blog.no_content' => 'This post has no content yet.',
+    'blog.more_posts' => 'More posts',
 ];

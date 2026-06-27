@@ -220,4 +220,10 @@ return [
     'shop.place_order' => 'Bestellung absenden',
     'shop.secure_note' => 'Sichere, verschlüsselte Verbindung',
     'shop.back_to_cart' => 'Zurück zum Warenkorb',
+
+    'blog.title' => 'News, Tipps und Fachartikel',
+    'blog.sub' => 'Über Verpackung, Palettenfertigung und Logistik – aus Erfahrung.',
+    'blog.empty' => 'Die ersten Beiträge folgen in Kürze.',
+    'blog.no_content' => 'Dieser Beitrag hat noch keinen Inhalt.',
+    'blog.more_posts' => 'Weitere Beiträge',
 ];

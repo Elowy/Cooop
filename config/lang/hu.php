@@ -246,4 +246,11 @@ return [
     'shop.place_order' => 'Megrendelés elküldése',
     'shop.secure_note' => 'Biztonságos, titkosított kapcsolat',
     'shop.back_to_cart' => 'Vissza a kosárhoz',
+
+    // Blog
+    'blog.title' => 'Hírek, tippek, szakmai cikkek',
+    'blog.sub' => 'Csomagolásról, raklapgyártásról és logisztikáról – tapasztalatból.',
+    'blog.empty' => 'Hamarosan érkeznek az első bejegyzések.',
+    'blog.no_content' => 'Ehhez a bejegyzéshez még nincs tartalom.',
+    'blog.more_posts' => 'További bejegyzések',
 ];
