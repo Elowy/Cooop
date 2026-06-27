@@ -24,7 +24,7 @@ $min = $min ?? null;
 $max = $max ?? null;
 $inStockOnly = $inStockOnly ?? false;
 $hasFilter = $q !== '' || $min !== null || $max !== null || $inStockOnly;
-$title = $activeCat !== '' ? $cats->name($activeCat) : 'Termékeink';
+$title = $activeCat !== '' ? $cats->name($activeCat) : t('shop.products_title');
 $LOW = 15; // e készletszint alatt „már csak X" sürgetést mutatunk
 
 /** Oldalsáv kategóriafa – csak az aktív ág kibontva (accordion). */
@@ -54,42 +54,42 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
 <section class="page-hero page-hero--shop">
     <div class="hero-glow" aria-hidden="true"></div>
     <div class="container">
-        <p class="eyebrow"><span class="eyebrow-dot"></span> Webshop</p>
+        <p class="eyebrow"><span class="eyebrow-dot"></span> <?= View::e(t('nav.shop')) ?></p>
         <h1 class="display"><?= View::e($title) ?></h1>
-        <p class="section-sub">Az árak bruttó, az ÁFÁ-t tartalmazó árak. Raktáron lévő termékek gyors kiszállítással.</p>
+        <p class="section-sub"><?= View::e(t('shop.hero_sub')) ?></p>
     </div>
 </section>
 
 <section class="section section--flush-top">
     <div class="container shop-layout">
         <aside class="shop-sidebar">
-            <h2 class="sidebar-title">Kategóriák</h2>
-            <a href="/webshop" class="cat-all<?= $activeCat === '' ? ' is-current' : '' ?>">Összes termék</a>
+            <h2 class="sidebar-title"><?= View::e(t('nav.categories')) ?></h2>
+            <a href="/webshop" class="cat-all<?= $activeCat === '' ? ' is-current' : '' ?>"><?= View::e(t('shop.all_products')) ?></a>
             <?php $renderTree($catsTree); ?>
 
             <form method="get" action="/webshop" class="shop-filters">
-                <h2 class="sidebar-title">Keresés és szűrés</h2>
+                <h2 class="sidebar-title"><?= View::e(t('shop.search_filter')) ?></h2>
                 <?php if ($activeCat !== ''): ?><input type="hidden" name="kat" value="<?= View::e($activeCat) ?>"><?php endif; ?>
                 <?php if ($sort !== ''): ?><input type="hidden" name="rendezes" value="<?= View::e($sort) ?>"><?php endif; ?>
                 <div class="field">
-                    <label for="f-q">Kulcsszó</label>
-                    <input id="f-q" type="search" name="q" value="<?= View::e($q) ?>" placeholder="Név vagy cikkszám">
+                    <label for="f-q"><?= View::e(t('shop.keyword')) ?></label>
+                    <input id="f-q" type="search" name="q" value="<?= View::e($q) ?>" placeholder="<?= View::e(t('shop.keyword_ph')) ?>">
                 </div>
                 <div class="field-row">
-                    <div class="field"><label for="f-min">Ár min.</label><input id="f-min" type="number" name="min" min="0" inputmode="numeric" value="<?= $min !== null ? (int) $min : '' ?>"></div>
-                    <div class="field"><label for="f-max">Ár max.</label><input id="f-max" type="number" name="max" min="0" inputmode="numeric" value="<?= $max !== null ? (int) $max : '' ?>"></div>
+                    <div class="field"><label for="f-min"><?= View::e(t('shop.price_min')) ?></label><input id="f-min" type="number" name="min" min="0" inputmode="numeric" value="<?= $min !== null ? (int) $min : '' ?>"></div>
+                    <div class="field"><label for="f-max"><?= View::e(t('shop.price_max')) ?></label><input id="f-max" type="number" name="max" min="0" inputmode="numeric" value="<?= $max !== null ? (int) $max : '' ?>"></div>
                 </div>
-                <label class="check"><input type="checkbox" name="keszlet" value="1"<?= $inStockOnly ? ' checked' : '' ?>> Csak raktáron lévő</label>
-                <button type="submit" class="btn btn--gold btn--sm btn--block">Szűrés</button>
+                <label class="check"><input type="checkbox" name="keszlet" value="1"<?= $inStockOnly ? ' checked' : '' ?>> <?= View::e(t('shop.in_stock_only')) ?></label>
+                <button type="submit" class="btn btn--gold btn--sm btn--block"><?= View::e(t('shop.filter')) ?></button>
                 <?php if ($hasFilter): ?>
-                    <a href="/webshop<?= $activeCat !== '' ? '?kat=' . urlencode($activeCat) : '' ?>" class="filter-clear">Szűrők törlése</a>
+                    <a href="/webshop<?= $activeCat !== '' ? '?kat=' . urlencode($activeCat) : '' ?>" class="filter-clear"><?= View::e(t('shop.clear_filters')) ?></a>
                 <?php endif; ?>
             </form>
         </aside>
 
         <div class="shop-main">
             <nav class="breadcrumb" aria-label="Morzsamenü">
-                <a href="/webshop">Webshop</a>
+                <a href="/webshop"><?= View::e(t('nav.shop')) ?></a>
                 <?php foreach ($activePath as $i => $key): ?>
                     <span class="sep">/</span>
                     <?php if ($i === count($activePath) - 1): ?>
@@ -101,7 +101,7 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
             </nav>
 
             <div class="shop-toolbar">
-                <p class="result-count"><?= count($products) ?> termék</p>
+                <p class="result-count"><?= View::e(t('shop.result_count', ['n' => count($products)])) ?></p>
                 <?php if ($products): ?>
                     <form method="get" action="/webshop" class="sort-form">
                         <?php if ($activeCat !== ''): ?><input type="hidden" name="kat" value="<?= View::e($activeCat) ?>"><?php endif; ?>
@@ -109,22 +109,22 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                         <?php if ($min !== null): ?><input type="hidden" name="min" value="<?= (int) $min ?>"><?php endif; ?>
                         <?php if ($max !== null): ?><input type="hidden" name="max" value="<?= (int) $max ?>"><?php endif; ?>
                         <?php if ($inStockOnly): ?><input type="hidden" name="keszlet" value="1"><?php endif; ?>
-                        <label class="sort-label" for="sort-select">Rendezés</label>
+                        <label class="sort-label" for="sort-select"><?= View::e(t('shop.sort')) ?></label>
                         <select id="sort-select" name="rendezes" class="sort-select" data-autosubmit>
-                            <option value=""<?= $sort === '' ? ' selected' : '' ?>>Alapértelmezett</option>
-                            <option value="ar-fel"<?= $sort === 'ar-fel' ? ' selected' : '' ?>>Ár szerint növekvő</option>
-                            <option value="ar-le"<?= $sort === 'ar-le' ? ' selected' : '' ?>>Ár szerint csökkenő</option>
-                            <option value="nev"<?= $sort === 'nev' ? ' selected' : '' ?>>Név szerint (A–Z)</option>
+                            <option value=""<?= $sort === '' ? ' selected' : '' ?>><?= View::e(t('shop.sort_default')) ?></option>
+                            <option value="ar-fel"<?= $sort === 'ar-fel' ? ' selected' : '' ?>><?= View::e(t('shop.sort_price_asc')) ?></option>
+                            <option value="ar-le"<?= $sort === 'ar-le' ? ' selected' : '' ?>><?= View::e(t('shop.sort_price_desc')) ?></option>
+                            <option value="nev"<?= $sort === 'nev' ? ' selected' : '' ?>><?= View::e(t('shop.sort_name')) ?></option>
                         </select>
-                        <button type="submit" class="btn btn--outline btn--sm sort-go">Rendez</button>
+                        <button type="submit" class="btn btn--outline btn--sm sort-go"><?= View::e(t('shop.sort_go')) ?></button>
                     </form>
                 <?php endif; ?>
             </div>
 
             <?php if (!$products): ?>
                 <p class="empty">
-                    <?= $hasFilter ? 'Nincs a szűrésnek megfelelő termék.' : 'Ebben a kategóriában jelenleg nincs termék.' ?>
-                    <?php if ($hasFilter): ?><a href="/webshop<?= $activeCat !== '' ? '?kat=' . urlencode($activeCat) : '' ?>">Szűrők törlése</a><?php endif; ?>
+                    <?= View::e($hasFilter ? t('shop.empty_filter') : t('shop.empty_cat')) ?>
+                    <?php if ($hasFilter): ?><a href="/webshop<?= $activeCat !== '' ? '?kat=' . urlencode($activeCat) : '' ?>"><?= View::e(t('shop.clear_filters')) ?></a><?php endif; ?>
                 </p>
             <?php else: ?>
                 <div class="card-grid product-grid">
@@ -133,29 +133,29 @@ $renderTree = function (array $nodes) use (&$renderTree, $activeCat, $activePath
                             <a class="product-media<?= $pImg ? ' has-image' : '' ?>" href="/termek/<?= View::e($p->slug) ?>" data-icon="<?= View::e($p->icon) ?>" aria-label="<?= View::e($p->name) ?>">
                                 <?php if ($pImg): ?><img src="/uploads/products/<?= View::e($pImg) ?>" alt="<?= View::e($p->name) ?>" loading="lazy"><?php endif; ?>
                                 <?php if (!$p->inStock()): ?>
-                                    <span class="badge badge--out">Elfogyott</span>
+                                    <span class="badge badge--out"><?= View::e(t('shop.out_of_stock')) ?></span>
                                 <?php elseif ($p->stock <= $LOW): ?>
-                                    <span class="badge badge--low">Már csak <?= (int) $p->stock ?> <?= View::e($p->unit) ?></span>
+                                    <span class="badge badge--low"><?= View::e(t('shop.only_left', ['n' => (int) $p->stock, 'unit' => $p->unit])) ?></span>
                                 <?php else: ?>
-                                    <span class="badge">Raktáron</span>
+                                    <span class="badge"><?= View::e(t('shop.in_stock')) ?></span>
                                 <?php endif; ?>
                             </a>
                             <h3><a href="/termek/<?= View::e($p->slug) ?>"><?= View::e($p->name) ?></a></h3>
                             <p><?= View::e($p->short) ?></p>
                             <div class="price-row">
                                 <span class="price"><?= View::huf($p->priceGross()) ?></span>
-                                <span class="price-unit">/ <?= View::e($p->unit) ?> · bruttó</span>
+                                <span class="price-unit">/ <?= View::e($p->unit) ?> · <?= View::e(t('shop.gross')) ?></span>
                             </div>
-                            <p class="price-net">nettó <?= View::huf($p->priceNet) ?> + <?= (int) $p->vat ?>% áfa</p>
+                            <p class="price-net"><?= View::e(t('shop.net')) ?> <?= View::huf($p->priceNet) ?> + <?= (int) $p->vat ?>% <?= View::e(t('shop.vat')) ?></p>
                             <form method="post" action="/kosar/hozzaad" class="add-form add-form--card">
                                 <?= Csrf::field() ?>
                                 <input type="hidden" name="sku" value="<?= View::e($p->sku) ?>">
                                 <label class="qty-mini">
-                                    <span class="vh">Mennyiség (<?= View::e($p->unit) ?>)</span>
+                                    <span class="vh"><?= View::e(t('shop.quantity')) ?> (<?= View::e($p->unit) ?>)</span>
                                     <input type="number" name="qty" value="1" min="1" max="<?= max(1, (int) $p->stock) ?>" inputmode="numeric"<?= $p->inStock() ? '' : ' disabled' ?>>
                                 </label>
                                 <button type="submit" class="btn btn--gold btn--sm"<?= $p->inStock() ? '' : ' disabled' ?>>
-                                    Kosárba
+                                    <?= View::e(t('shop.add_to_cart_short')) ?>
                                 </button>
                             </form>
                         </article>
