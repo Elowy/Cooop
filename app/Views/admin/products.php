@@ -57,6 +57,7 @@ use App\Integration\Product;
                     <td class="ta-r adm-actions">
                         <a class="btn btn--outline btn--sm" href="/admin/termek-kepek?sku=<?= View::e($p->sku) ?>">Képek</a>
                         <a class="btn btn--outline btn--sm" href="/admin/termek-seo?sku=<?= View::e($p->sku) ?>">SEO</a>
+                        <a class="btn btn--outline btn--sm" href="/admin/termek-forditasok?sku=<?= View::e($p->sku) ?>">Fordítás</a>
                     </td>
                 </tr>
             <?php endforeach; endif; ?>
