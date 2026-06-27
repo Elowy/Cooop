@@ -1846,13 +1846,13 @@ $router->post('/admin/termek-kepek/elsodleges', static function () use ($guard, 
 
 $router->get('/admin/referenciak', static function () use ($adminView, $guard, $references): string {
     $guard();
-    return $adminView('admin/references', 'references', ['title' => 'Referenciák', 'references' => $references->all()]);
+    return $adminView('admin/references', 'references', ['title' => 'Referenciák', 'references' => $references->all(true)]);
 });
 
 $router->get('/admin/referenciak/szerkesztes', static function () use ($adminView, $guard, $references): string {
     $guard();
     $id = (int) ($_GET['id'] ?? 0);
-    $ref = $id > 0 ? $references->find($id) : null;
+    $ref = $id > 0 ? $references->find($id, true) : null;
     return $adminView('admin/reference-edit', 'references', [
         'title' => $ref ? 'Referencia szerkesztése' : 'Új referencia',
         'ref' => $ref,
@@ -1869,7 +1869,7 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
         return $redirect('/admin/referenciak');
     }
     $id = (int) ($_POST['id'] ?? 0);
-    $existing = $id > 0 ? $references->find($id) : null;
+    $existing = $id > 0 ? $references->find($id, true) : null;
     $ref = [
         'name' => trim((string) ($_POST['name'] ?? '')),
         'short' => trim((string) ($_POST['short'] ?? '')),
@@ -1877,6 +1877,7 @@ $router->post('/admin/referenciak/mentes', static function () use ($guard, $refe
         'url' => $safeUrl((string) ($_POST['url'] ?? '')),
         'featured' => isset($_POST['featured']) ? 1 : 0,
         'logo' => $existing['logo'] ?? '',
+        'i18n' => is_array($_POST['i18n'] ?? null) ? $_POST['i18n'] : [],
     ];
     if ($id > 0) {
         $ref['id'] = $id;
@@ -1996,13 +1997,13 @@ $router->post('/admin/referenciak/torles', static function () use ($guard, $refe
 
 $router->get('/admin/blog', static function () use ($adminView, $guard, $blog): string {
     $guard();
-    return $adminView('admin/blog', 'blog', ['title' => 'Blog', 'posts' => $blog->all()]);
+    return $adminView('admin/blog', 'blog', ['title' => 'Blog', 'posts' => $blog->all(false, true)]);
 });
 
 $router->get('/admin/blog/szerkesztes', static function () use ($adminView, $guard, $blog): string {
     $guard();
     $id = (int) ($_GET['id'] ?? 0);
-    $post = $id > 0 ? $blog->find($id) : null;
+    $post = $id > 0 ? $blog->find($id, true) : null;
     return $adminView('admin/blog-edit', 'blog', [
         'title' => $post ? 'Bejegyzés szerkesztése' : 'Új bejegyzés',
         'post' => $post,
@@ -2029,6 +2030,7 @@ $router->post('/admin/blog/mentes', static function () use ($guard, $blog, $uplo
         'author' => trim((string) ($_POST['author'] ?? '')),
         'published' => isset($_POST['published']) ? 1 : 0,
         'cover' => (string) ($existing['cover'] ?? ''),
+        'i18n' => is_array($_POST['i18n'] ?? null) ? $_POST['i18n'] : [],
     ];
     if ($id > 0) {
         $post['id'] = $id;

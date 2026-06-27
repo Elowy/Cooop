@@ -14,6 +14,9 @@ use PDO;
  */
 final class ServiceStore
 {
+    /** Nyelvenként fordítható mezők. */
+    private const I18N_FIELDS = ['title', 'summary', 'body'];
+
     private ?PDO $pdo;
     private string $file;
     private string $seedFile;
@@ -53,7 +56,7 @@ final class ServiceStore
         }
         // A storefront a látogató nyelvén kapja a fordított mezőket; az admin a raw-t kéri.
         if (!$raw) {
-            $out = array_map([self::class, 'localize'], $out);
+            $out = array_map(static fn ($r) => \App\Core\Lang::overlay($r, self::I18N_FIELDS), $out);
         }
         return $out;
     }
@@ -86,7 +89,7 @@ final class ServiceStore
                 }
             }
         }
-        return ($row !== null && !$raw) ? self::localize($row) : $row;
+        return ($row !== null && !$raw) ? \App\Core\Lang::overlay($row, self::I18N_FIELDS) : $row;
     }
 
     public function findBySlug(string $slug, bool $publishedOnly = false, bool $raw = false): ?array
@@ -106,7 +109,7 @@ final class ServiceStore
         $base = self::slugify(trim((string) ($service['slug'] ?? '')) !== '' ? (string) $service['slug'] : $title);
         $slug = $this->uniqueSlug($base, $id > 0 ? $id : null);
 
-        $i18n = self::cleanI18n($service['i18n'] ?? null, ['title', 'summary', 'body']);
+        $i18n = \App\Core\Lang::cleanI18n($service['i18n'] ?? null, self::I18N_FIELDS);
         $row = [
             'slug' => $slug,
             'title' => $title,
@@ -221,67 +224,8 @@ final class ServiceStore
             'sort' => (int) ($r['sort'] ?? 0),
             'published' => (int) ($r['published'] ?? 0),
             'created' => (string) ($r['created_at'] ?? ''),
-            'i18n' => self::decodeI18n($r['i18n'] ?? null),
+            'i18n' => \App\Core\Lang::decodeI18n($r['i18n'] ?? null),
         ];
-    }
-
-    /** A raw rekord lefordított mezőkkel a látogató nyelvén (HU vagy hiány → változatlan). */
-    private static function localize(array $row): array
-    {
-        $loc = \App\Core\Lang::locale();
-        if ($loc === 'hu' || empty($row['i18n'][$loc]) || !is_array($row['i18n'][$loc])) {
-            return $row;
-        }
-        foreach (['title', 'summary', 'body'] as $f) {
-            $v = $row['i18n'][$loc][$f] ?? '';
-            if (is_string($v) && trim($v) !== '') {
-                $row[$f] = $v;
-            }
-        }
-        return $row;
-    }
-
-    /** @return array<string, array<string, string>> */
-    private static function decodeI18n(mixed $value): array
-    {
-        if (is_array($value)) {
-            return $value;
-        }
-        if (is_string($value) && $value !== '') {
-            $decoded = json_decode($value, true);
-            return is_array($decoded) ? $decoded : [];
-        }
-        return [];
-    }
-
-    /**
-     * Csak az ismert (nem magyar) nyelvek és a megadott mezők, üres értékek nélkül.
-     *
-     * @param string[] $fields
-     * @return array<string, array<string, string>>
-     */
-    private static function cleanI18n(mixed $input, array $fields): array
-    {
-        if (!is_array($input)) {
-            return [];
-        }
-        $out = [];
-        foreach (array_keys(\App\Core\Lang::available()) as $code) {
-            if ($code === 'hu' || empty($input[$code]) || !is_array($input[$code])) {
-                continue;
-            }
-            $vals = [];
-            foreach ($fields as $f) {
-                $v = trim((string) ($input[$code][$f] ?? ''));
-                if ($v !== '') {
-                    $vals[$f] = $v;
-                }
-            }
-            if ($vals !== []) {
-                $out[$code] = $vals;
-            }
-        }
-        return $out;
     }
 
     /** @return array<int, array<string, mixed>> */

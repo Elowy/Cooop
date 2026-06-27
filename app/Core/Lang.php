@@ -80,6 +80,75 @@ namespace App\Core {
             }
             return $dir . $filename;
         }
+
+        /* ---- Tartalom-lokalizáció (DB-rekordok nyelvenkénti mezői) ---- */
+
+        /** Tárolt érték (JSON string vagy tömb) → fordítás-tömb. */
+        public static function decodeI18n(mixed $value): array
+        {
+            if (is_array($value)) {
+                return $value;
+            }
+            if (is_string($value) && $value !== '') {
+                $decoded = json_decode($value, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return [];
+        }
+
+        /**
+         * A raw rekord adott mezőit a látogató nyelvére fordítja; magyar vagy
+         * hiányzó fordítás esetén a mező változatlan marad (fallback).
+         *
+         * @param array<string, mixed> $row  Tartalmaz egy 'i18n' kulcsot.
+         * @param string[] $fields
+         * @return array<string, mixed>
+         */
+        public static function overlay(array $row, array $fields): array
+        {
+            $loc = self::$locale;
+            if ($loc === 'hu' || empty($row['i18n'][$loc]) || !is_array($row['i18n'][$loc])) {
+                return $row;
+            }
+            foreach ($fields as $field) {
+                $value = $row['i18n'][$loc][$field] ?? '';
+                if (is_string($value) && trim($value) !== '') {
+                    $row[$field] = $value;
+                }
+            }
+            return $row;
+        }
+
+        /**
+         * Admin mentéshez: csak az ismert, nem magyar nyelvek és a megadott
+         * mezők, üres értékek nélkül.
+         *
+         * @param string[] $fields
+         * @return array<string, array<string, string>>
+         */
+        public static function cleanI18n(mixed $input, array $fields): array
+        {
+            if (!is_array($input)) {
+                return [];
+            }
+            $out = [];
+            foreach (array_keys(self::AVAILABLE) as $code) {
+                if ($code === 'hu' || empty($input[$code]) || !is_array($input[$code])) {
+                    continue;
+                }
+                $vals = [];
+                foreach ($fields as $field) {
+                    $value = trim((string) ($input[$code][$field] ?? ''));
+                    if ($value !== '') {
+                        $vals[$field] = $value;
+                    }
+                }
+                if ($vals !== []) {
+                    $out[$code] = $vals;
+                }
+            }
+            return $out;
+        }
     }
 }
 

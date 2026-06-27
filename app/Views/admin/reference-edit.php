@@ -5,6 +5,8 @@ use App\Core\View;
 
 /** @var array<string, mixed>|null $ref */
 $ref = $ref ?? [];
+$i18n = is_array($ref['i18n'] ?? null) ? $ref['i18n'] : [];
+$tr = static fn (string $lang, string $field): string => View::e((string) ($i18n[$lang][$field] ?? ''));
 ?>
 <p class="breadcrumb"><a href="/admin/referenciak">← Referenciák</a></p>
 
@@ -46,6 +48,27 @@ $ref = $ref ?? [];
             <label>Bővebb leírás (kattintáskor jelenik meg)</label>
             <textarea name="long" rows="7"><?= View::e((string) ($ref['long'] ?? '')) ?></textarea>
         </div>
+
+        <details class="i18n-box"<?= $i18n !== [] ? ' open' : '' ?>>
+            <summary>Fordítások (EN / DE) — üresen a magyar jelenik meg</summary>
+            <?php foreach (['en' => 'Angol (EN)', 'de' => 'Német (DE)'] as $lang => $label): ?>
+                <fieldset class="i18n-lang">
+                    <legend><?= View::e($label) ?></legend>
+                    <div class="field">
+                        <label>Név</label>
+                        <input name="i18n[<?= $lang ?>][name]" value="<?= $tr($lang, 'name') ?>">
+                    </div>
+                    <div class="field">
+                        <label>Rövid leírás</label>
+                        <input name="i18n[<?= $lang ?>][short]" value="<?= $tr($lang, 'short') ?>">
+                    </div>
+                    <div class="field">
+                        <label>Bővebb leírás</label>
+                        <textarea name="i18n[<?= $lang ?>][long]" rows="5"><?= $tr($lang, 'long') ?></textarea>
+                    </div>
+                </fieldset>
+            <?php endforeach; ?>
+        </details>
 
         <button type="submit" class="btn btn--gold">Mentés</button>
         <a href="/admin/referenciak" class="btn btn--outline">Mégse</a>

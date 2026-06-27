@@ -5,6 +5,8 @@ use App\Core\View;
 
 /** @var array<string, mixed>|null $post */
 $post = $post ?? [];
+$i18n = is_array($post['i18n'] ?? null) ? $post['i18n'] : [];
+$tr = static fn (string $lang, string $field): string => View::e((string) ($i18n[$lang][$field] ?? ''));
 ?>
 <p class="breadcrumb"><a href="/admin/blog">← Blog</a></p>
 
@@ -47,6 +49,27 @@ $post = $post ?? [];
             <label>Tartalom (Markdown: # címsor, **félkövér**, - lista, üres sor = új bekezdés)</label>
             <textarea name="body" rows="16" style="font-family:var(--sans)"><?= View::e((string) ($post['body'] ?? '')) ?></textarea>
         </div>
+
+        <details class="i18n-box"<?= $i18n !== [] ? ' open' : '' ?>>
+            <summary>Fordítások (EN / DE) — üresen a magyar jelenik meg</summary>
+            <?php foreach (['en' => 'Angol (EN)', 'de' => 'Német (DE)'] as $lang => $label): ?>
+                <fieldset class="i18n-lang">
+                    <legend><?= View::e($label) ?></legend>
+                    <div class="field">
+                        <label>Cím</label>
+                        <input name="i18n[<?= $lang ?>][title]" value="<?= $tr($lang, 'title') ?>">
+                    </div>
+                    <div class="field">
+                        <label>Kivonat</label>
+                        <textarea name="i18n[<?= $lang ?>][excerpt]" rows="2"><?= $tr($lang, 'excerpt') ?></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Tartalom (Markdown)</label>
+                        <textarea name="i18n[<?= $lang ?>][body]" rows="8" style="font-family:var(--sans)"><?= $tr($lang, 'body') ?></textarea>
+                    </div>
+                </fieldset>
+            <?php endforeach; ?>
+        </details>
 
         <label class="check" style="display:flex;align-items:center;gap:9px;margin-bottom:16px">
             <input type="checkbox" name="published" value="1"<?= (int) ($post['published'] ?? 1) === 1 ? ' checked' : '' ?>>

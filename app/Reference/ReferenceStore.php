@@ -13,6 +13,9 @@ use PDO;
  */
 final class ReferenceStore
 {
+    /** Nyelvenként fordítható mezők. */
+    private const I18N_FIELDS = ['name', 'short', 'long'];
+
     private ?PDO $pdo;
     private string $file;
     private string $seedFile;
@@ -25,27 +28,31 @@ final class ReferenceStore
     }
 
     /** @return array<int, array<string, mixed>> */
-    public function all(): array
+    public function all(bool $raw = false): array
     {
         if ($this->pdo) {
             $out = [];
-            $rows = $this->pdo->query('SELECT id, name, logo, short_text, long_text, url, featured FROM refs ORDER BY featured DESC, id');
+            $rows = $this->pdo->query('SELECT id, name, logo, short_text, long_text, url, featured, i18n FROM refs ORDER BY featured DESC, id');
             foreach ($rows as $r) {
                 $out[] = [
                     'id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'],
                     'short' => (string) $r['short_text'], 'long' => (string) $r['long_text'],
                     'url' => (string) ($r['url'] ?? ''), 'featured' => (int) ($r['featured'] ?? 0),
+                    'i18n' => \App\Core\Lang::decodeI18n($r['i18n'] ?? null),
                 ];
             }
-            return $out;
-        }
-        if (!is_file($this->file)) {
+        } elseif (!is_file($this->file)) {
             $seed = $this->seed();
             $this->persist($seed);
-            return self::sort($seed);
+            $out = self::sort($seed);
+        } else {
+            $data = json_decode((string) file_get_contents($this->file), true);
+            $out = is_array($data) ? self::sort($data) : [];
         }
-        $data = json_decode((string) file_get_contents($this->file), true);
-        return is_array($data) ? self::sort($data) : [];
+        if (!$raw) {
+            $out = array_map(static fn ($r) => \App\Core\Lang::overlay($r, self::I18N_FIELDS), $out);
+        }
+        return $out;
     }
 
     /** Kiemeltek előre, azon belül id szerint. */
@@ -59,34 +66,40 @@ final class ReferenceStore
         return $refs;
     }
 
-    public function find(int $id): ?array
+    public function find(int $id, bool $raw = false): ?array
     {
+        $row = null;
         if ($this->pdo) {
-            $stmt = $this->pdo->prepare('SELECT id, name, logo, short_text, long_text, url, featured FROM refs WHERE id = ?');
+            $stmt = $this->pdo->prepare('SELECT id, name, logo, short_text, long_text, url, featured, i18n FROM refs WHERE id = ?');
             $stmt->execute([$id]);
             $r = $stmt->fetch();
-            return $r ? ['id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'], 'short' => (string) $r['short_text'], 'long' => (string) $r['long_text'], 'url' => (string) ($r['url'] ?? ''), 'featured' => (int) ($r['featured'] ?? 0)] : null;
-        }
-        foreach ($this->all() as $ref) {
-            if ((int) $ref['id'] === $id) {
-                return $ref;
+            $row = $r ? ['id' => (int) $r['id'], 'name' => $r['name'], 'logo' => $r['logo'], 'short' => (string) $r['short_text'], 'long' => (string) $r['long_text'], 'url' => (string) ($r['url'] ?? ''), 'featured' => (int) ($r['featured'] ?? 0), 'i18n' => \App\Core\Lang::decodeI18n($r['i18n'] ?? null)] : null;
+        } else {
+            foreach ($this->all(true) as $ref) {
+                if ((int) $ref['id'] === $id) {
+                    $row = $ref;
+                    break;
+                }
             }
         }
-        return null;
+        return ($row !== null && !$raw) ? \App\Core\Lang::overlay($row, self::I18N_FIELDS) : $row;
     }
 
     public function save(array $ref): int
     {
+        $i18n = \App\Core\Lang::cleanI18n($ref['i18n'] ?? null, self::I18N_FIELDS);
         if ($this->pdo) {
+            $i18nJson = $i18n === [] ? null : json_encode($i18n, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if (!empty($ref['id'])) {
-                $this->pdo->prepare('UPDATE refs SET name=?, logo=?, short_text=?, long_text=?, url=?, featured=? WHERE id=?')
-                    ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', $ref['url'] ?? '', (int) ($ref['featured'] ?? 0), (int) $ref['id']]);
+                $this->pdo->prepare('UPDATE refs SET name=?, logo=?, short_text=?, long_text=?, url=?, featured=?, i18n=? WHERE id=?')
+                    ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', $ref['url'] ?? '', (int) ($ref['featured'] ?? 0), $i18nJson, (int) $ref['id']]);
                 return (int) $ref['id'];
             }
-            $this->pdo->prepare('INSERT INTO refs (name, logo, short_text, long_text, url, featured, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-                ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', $ref['url'] ?? '', (int) ($ref['featured'] ?? 0), date('c')]);
+            $this->pdo->prepare('INSERT INTO refs (name, logo, short_text, long_text, url, featured, created_at, i18n) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+                ->execute([$ref['name'] ?? '', $ref['logo'] ?? '', $ref['short'] ?? '', $ref['long'] ?? '', $ref['url'] ?? '', (int) ($ref['featured'] ?? 0), date('c'), $i18nJson]);
             return (int) $this->pdo->lastInsertId();
         }
+        $ref['i18n'] = $i18n;
         return $this->fileSave($ref);
     }
 

@@ -14,6 +14,9 @@ use PDO;
  */
 final class BlogStore
 {
+    /** Nyelvenként fordítható mezők. */
+    private const I18N_FIELDS = ['title', 'excerpt', 'body'];
+
     private ?PDO $pdo;
     private string $file;
     private string $seedFile;
@@ -28,11 +31,11 @@ final class BlogStore
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function all(bool $publishedOnly = false): array
+    public function all(bool $publishedOnly = false, bool $raw = false): array
     {
         if ($this->pdo) {
             $out = [];
-            $rows = $this->pdo->query('SELECT id, slug, title, excerpt, body, cover, author, published, created_at FROM posts ORDER BY created_at DESC, id DESC');
+            $rows = $this->pdo->query('SELECT id, slug, title, excerpt, body, cover, author, published, created_at, i18n FROM posts ORDER BY created_at DESC, id DESC');
             foreach ($rows as $r) {
                 $out[] = self::mapRow($r);
             }
@@ -51,28 +54,34 @@ final class BlogStore
         if ($publishedOnly) {
             $out = array_values(array_filter($out, static fn ($p) => (int) ($p['published'] ?? 0) === 1));
         }
+        if (!$raw) {
+            $out = array_map(static fn ($r) => \App\Core\Lang::overlay($r, self::I18N_FIELDS), $out);
+        }
         return $out;
     }
 
-    public function find(int $id): ?array
+    public function find(int $id, bool $raw = false): ?array
     {
+        $row = null;
         if ($this->pdo) {
-            $stmt = $this->pdo->prepare('SELECT id, slug, title, excerpt, body, cover, author, published, created_at FROM posts WHERE id = ?');
+            $stmt = $this->pdo->prepare('SELECT id, slug, title, excerpt, body, cover, author, published, created_at, i18n FROM posts WHERE id = ?');
             $stmt->execute([$id]);
             $r = $stmt->fetch();
-            return $r ? self::mapRow($r) : null;
-        }
-        foreach ($this->all() as $p) {
-            if ((int) $p['id'] === $id) {
-                return $p;
+            $row = $r ? self::mapRow($r) : null;
+        } else {
+            foreach ($this->all(false, true) as $p) {
+                if ((int) $p['id'] === $id) {
+                    $row = $p;
+                    break;
+                }
             }
         }
-        return null;
+        return ($row !== null && !$raw) ? \App\Core\Lang::overlay($row, self::I18N_FIELDS) : $row;
     }
 
-    public function findBySlug(string $slug, bool $publishedOnly = false): ?array
+    public function findBySlug(string $slug, bool $publishedOnly = false, bool $raw = false): ?array
     {
-        foreach ($this->all($publishedOnly) as $p) {
+        foreach ($this->all($publishedOnly, $raw) as $p) {
             if ((string) $p['slug'] === $slug) {
                 return $p;
             }
@@ -87,6 +96,7 @@ final class BlogStore
         $base = self::slugify(trim((string) ($post['slug'] ?? '')) !== '' ? (string) $post['slug'] : $title);
         $slug = $this->uniqueSlug($base, $id > 0 ? $id : null);
 
+        $i18n = \App\Core\Lang::cleanI18n($post['i18n'] ?? null, self::I18N_FIELDS);
         $row = [
             'slug' => $slug,
             'title' => $title,
@@ -95,16 +105,18 @@ final class BlogStore
             'cover' => (string) ($post['cover'] ?? ''),
             'author' => trim((string) ($post['author'] ?? '')),
             'published' => (int) ($post['published'] ?? 0) === 1 ? 1 : 0,
+            'i18n' => $i18n,
         ];
 
         if ($this->pdo) {
+            $i18nJson = $i18n === [] ? null : json_encode($i18n, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($id > 0) {
-                $this->pdo->prepare('UPDATE posts SET slug=?, title=?, excerpt=?, body=?, cover=?, author=?, published=? WHERE id=?')
-                    ->execute([$row['slug'], $row['title'], $row['excerpt'], $row['body'], $row['cover'], $row['author'], $row['published'], $id]);
+                $this->pdo->prepare('UPDATE posts SET slug=?, title=?, excerpt=?, body=?, cover=?, author=?, published=?, i18n=? WHERE id=?')
+                    ->execute([$row['slug'], $row['title'], $row['excerpt'], $row['body'], $row['cover'], $row['author'], $row['published'], $i18nJson, $id]);
                 return $id;
             }
-            $this->pdo->prepare('INSERT INTO posts (slug, title, excerpt, body, cover, author, published, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-                ->execute([$row['slug'], $row['title'], $row['excerpt'], $row['body'], $row['cover'], $row['author'], $row['published'], date('c')]);
+            $this->pdo->prepare('INSERT INTO posts (slug, title, excerpt, body, cover, author, published, created_at, i18n) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+                ->execute([$row['slug'], $row['title'], $row['excerpt'], $row['body'], $row['cover'], $row['author'], $row['published'], date('c'), $i18nJson]);
             return (int) $this->pdo->lastInsertId();
         }
         return $this->fileSave($id, $row);
@@ -197,6 +209,7 @@ final class BlogStore
             'author' => (string) ($r['author'] ?? ''),
             'published' => (int) ($r['published'] ?? 0),
             'created' => (string) ($r['created_at'] ?? ''),
+            'i18n' => \App\Core\Lang::decodeI18n($r['i18n'] ?? null),
         ];
     }
 
