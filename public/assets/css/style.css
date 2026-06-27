@@ -1359,3 +1359,12 @@ select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
 }
 /* Hosszabb fordított címkék ne törjenek meg a fejlécben (pl. „Sign in"). */
 .account-link span, .cart-link span { white-space: nowrap; }
+
+/* — Admin: tartalom-fordítás (EN/DE) doboz — */
+.i18n-box { margin: 0 0 18px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.02); }
+.i18n-box > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; color: var(--gold-2); list-style: none; }
+.i18n-box > summary::-webkit-details-marker { display: none; }
+.i18n-box > summary::before { content: "▸ "; }
+.i18n-box[open] > summary::before { content: "▾ "; }
+.i18n-lang { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 14px 16px; }
+.i18n-lang legend { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 0 6px; }

@@ -28,11 +28,11 @@ final class ServiceStore
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function all(bool $publishedOnly = false): array
+    public function all(bool $publishedOnly = false, bool $raw = false): array
     {
         if ($this->pdo) {
             $out = [];
-            $rows = $this->pdo->query('SELECT id, slug, title, icon, image, summary, body, sort, published, created_at FROM services ORDER BY sort, id');
+            $rows = $this->pdo->query('SELECT id, slug, title, icon, image, summary, body, sort, published, created_at, i18n FROM services ORDER BY sort, id');
             foreach ($rows as $r) {
                 $out[] = self::mapRow($r);
             }
@@ -51,6 +51,10 @@ final class ServiceStore
         if ($publishedOnly) {
             $out = array_values(array_filter($out, static fn ($s) => (int) ($s['published'] ?? 0) === 1));
         }
+        // A storefront a látogató nyelvén kapja a fordított mezőket; az admin a raw-t kéri.
+        if (!$raw) {
+            $out = array_map([self::class, 'localize'], $out);
+        }
         return $out;
     }
 
@@ -66,25 +70,28 @@ final class ServiceStore
         );
     }
 
-    public function find(int $id): ?array
+    public function find(int $id, bool $raw = false): ?array
     {
+        $row = null;
         if ($this->pdo) {
-            $stmt = $this->pdo->prepare('SELECT id, slug, title, icon, image, summary, body, sort, published, created_at FROM services WHERE id = ?');
+            $stmt = $this->pdo->prepare('SELECT id, slug, title, icon, image, summary, body, sort, published, created_at, i18n FROM services WHERE id = ?');
             $stmt->execute([$id]);
             $r = $stmt->fetch();
-            return $r ? self::mapRow($r) : null;
-        }
-        foreach ($this->all() as $s) {
-            if ((int) $s['id'] === $id) {
-                return $s;
+            $row = $r ? self::mapRow($r) : null;
+        } else {
+            foreach ($this->all(false, true) as $s) {
+                if ((int) $s['id'] === $id) {
+                    $row = $s;
+                    break;
+                }
             }
         }
-        return null;
+        return ($row !== null && !$raw) ? self::localize($row) : $row;
     }
 
-    public function findBySlug(string $slug, bool $publishedOnly = false): ?array
+    public function findBySlug(string $slug, bool $publishedOnly = false, bool $raw = false): ?array
     {
-        foreach ($this->all($publishedOnly) as $s) {
+        foreach ($this->all($publishedOnly, $raw) as $s) {
             if ((string) $s['slug'] === $slug) {
                 return $s;
             }
@@ -99,6 +106,7 @@ final class ServiceStore
         $base = self::slugify(trim((string) ($service['slug'] ?? '')) !== '' ? (string) $service['slug'] : $title);
         $slug = $this->uniqueSlug($base, $id > 0 ? $id : null);
 
+        $i18n = self::cleanI18n($service['i18n'] ?? null, ['title', 'summary', 'body']);
         $row = [
             'slug' => $slug,
             'title' => $title,
@@ -108,16 +116,18 @@ final class ServiceStore
             'body' => (string) ($service['body'] ?? ''),
             'sort' => (int) ($service['sort'] ?? 0),
             'published' => (int) ($service['published'] ?? 0) === 1 ? 1 : 0,
+            'i18n' => $i18n,
         ];
 
         if ($this->pdo) {
+            $i18nJson = $i18n === [] ? null : json_encode($i18n, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($id > 0) {
-                $this->pdo->prepare('UPDATE services SET slug=?, title=?, icon=?, image=?, summary=?, body=?, sort=?, published=? WHERE id=?')
-                    ->execute([$row['slug'], $row['title'], $row['icon'], $row['image'], $row['summary'], $row['body'], $row['sort'], $row['published'], $id]);
+                $this->pdo->prepare('UPDATE services SET slug=?, title=?, icon=?, image=?, summary=?, body=?, sort=?, published=?, i18n=? WHERE id=?')
+                    ->execute([$row['slug'], $row['title'], $row['icon'], $row['image'], $row['summary'], $row['body'], $row['sort'], $row['published'], $i18nJson, $id]);
                 return $id;
             }
-            $this->pdo->prepare('INSERT INTO services (slug, title, icon, image, summary, body, sort, published, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-                ->execute([$row['slug'], $row['title'], $row['icon'], $row['image'], $row['summary'], $row['body'], $row['sort'], $row['published'], date('c')]);
+            $this->pdo->prepare('INSERT INTO services (slug, title, icon, image, summary, body, sort, published, created_at, i18n) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+                ->execute([$row['slug'], $row['title'], $row['icon'], $row['image'], $row['summary'], $row['body'], $row['sort'], $row['published'], date('c'), $i18nJson]);
             return (int) $this->pdo->lastInsertId();
         }
         return $this->fileSave($id, $row);
@@ -211,7 +221,67 @@ final class ServiceStore
             'sort' => (int) ($r['sort'] ?? 0),
             'published' => (int) ($r['published'] ?? 0),
             'created' => (string) ($r['created_at'] ?? ''),
+            'i18n' => self::decodeI18n($r['i18n'] ?? null),
         ];
+    }
+
+    /** A raw rekord lefordított mezőkkel a látogató nyelvén (HU vagy hiány → változatlan). */
+    private static function localize(array $row): array
+    {
+        $loc = \App\Core\Lang::locale();
+        if ($loc === 'hu' || empty($row['i18n'][$loc]) || !is_array($row['i18n'][$loc])) {
+            return $row;
+        }
+        foreach (['title', 'summary', 'body'] as $f) {
+            $v = $row['i18n'][$loc][$f] ?? '';
+            if (is_string($v) && trim($v) !== '') {
+                $row[$f] = $v;
+            }
+        }
+        return $row;
+    }
+
+    /** @return array<string, array<string, string>> */
+    private static function decodeI18n(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
+    }
+
+    /**
+     * Csak az ismert (nem magyar) nyelvek és a megadott mezők, üres értékek nélkül.
+     *
+     * @param string[] $fields
+     * @return array<string, array<string, string>>
+     */
+    private static function cleanI18n(mixed $input, array $fields): array
+    {
+        if (!is_array($input)) {
+            return [];
+        }
+        $out = [];
+        foreach (array_keys(\App\Core\Lang::available()) as $code) {
+            if ($code === 'hu' || empty($input[$code]) || !is_array($input[$code])) {
+                continue;
+            }
+            $vals = [];
+            foreach ($fields as $f) {
+                $v = trim((string) ($input[$code][$f] ?? ''));
+                if ($v !== '') {
+                    $vals[$f] = $v;
+                }
+            }
+            if ($vals !== []) {
+                $out[$code] = $vals;
+            }
+        }
+        return $out;
     }
 
     /** @return array<int, array<string, mixed>> */

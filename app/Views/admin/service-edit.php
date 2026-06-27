@@ -6,6 +6,8 @@ use App\Core\View;
 /** @var array<string, mixed>|null $service */
 $service = $service ?? [];
 $curIcon = trim((string) ($service['icon'] ?? '')) !== '' ? (string) $service['icon'] : 'packaging';
+$i18n = is_array($service['i18n'] ?? null) ? $service['i18n'] : [];
+$tr = static fn (string $lang, string $field): string => View::e((string) ($i18n[$lang][$field] ?? ''));
 
 // Választható kártya-ikonok (a public/assets/css/style.css data-icon készletéből).
 $icons = [
@@ -72,6 +74,27 @@ $icons = [
             <label>Tartalom (Markdown: # címsor, **félkövér**, - lista, üres sor = új bekezdés)</label>
             <textarea name="body" rows="16" style="font-family:var(--sans)"><?= View::e((string) ($service['body'] ?? '')) ?></textarea>
         </div>
+
+        <details class="i18n-box"<?= $i18n !== [] ? ' open' : '' ?>>
+            <summary>Fordítások (EN / DE) — üresen a magyar jelenik meg</summary>
+            <?php foreach (['en' => 'Angol (EN)', 'de' => 'Német (DE)'] as $lang => $label): ?>
+                <fieldset class="i18n-lang">
+                    <legend><?= View::e($label) ?></legend>
+                    <div class="field">
+                        <label>Cím</label>
+                        <input name="i18n[<?= $lang ?>][title]" value="<?= $tr($lang, 'title') ?>">
+                    </div>
+                    <div class="field">
+                        <label>Rövid összefoglaló</label>
+                        <textarea name="i18n[<?= $lang ?>][summary]" rows="2"><?= $tr($lang, 'summary') ?></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Tartalom (Markdown)</label>
+                        <textarea name="i18n[<?= $lang ?>][body]" rows="8" style="font-family:var(--sans)"><?= $tr($lang, 'body') ?></textarea>
+                    </div>
+                </fieldset>
+            <?php endforeach; ?>
+        </details>
 
         <label class="check" style="display:flex;align-items:center;gap:9px;margin-bottom:16px">
             <input type="checkbox" name="published" value="1"<?= (int) ($service['published'] ?? 1) === 1 ? ' checked' : '' ?>>

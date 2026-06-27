@@ -2085,13 +2085,13 @@ $router->post('/admin/blog/torles', static function () use ($guard, $blog, $redi
 
 $router->get('/admin/szolgaltatasok', static function () use ($adminView, $guard, $services): string {
     $guard();
-    return $adminView('admin/services', 'services_admin', ['title' => 'Tevékenységek', 'services' => $services->all()]);
+    return $adminView('admin/services', 'services_admin', ['title' => 'Tevékenységek', 'services' => $services->all(false, true)]);
 });
 
 $router->get('/admin/szolgaltatasok/szerkesztes', static function () use ($adminView, $guard, $services): string {
     $guard();
     $id = (int) ($_GET['id'] ?? 0);
-    $service = $id > 0 ? $services->find($id) : null;
+    $service = $id > 0 ? $services->find($id, true) : null;
     return $adminView('admin/service-edit', 'services_admin', [
         'title' => $service ? 'Tevékenység szerkesztése' : 'Új tevékenység',
         'service' => $service,
@@ -2141,6 +2141,7 @@ $router->post('/admin/szolgaltatasok/mentes', static function () use ($guard, $s
         'body' => (string) ($_POST['body'] ?? ''),
         'sort' => (int) ($_POST['sort'] ?? 0),
         'published' => isset($_POST['published']) ? 1 : 0,
+        'i18n' => is_array($_POST['i18n'] ?? null) ? $_POST['i18n'] : [],
     ];
     if ($id > 0) {
         $service['id'] = $id;
