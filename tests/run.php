@@ -335,6 +335,25 @@ eq('Lang: file() lokalizált változat', $langDir . '/doc.en.md', \App\Core\Lang
 \App\Core\Lang::init('hu', $langDir);
 eq('Lang: file() HU → eredeti fájl', $langDir . '/doc.md', \App\Core\Lang::file($langDir, 'doc.md'));
 
+echo "LocalizingAxelGateway (termékfordítás)\n";
+$catFile = $tmp . '/catalog.php';
+file_put_contents($catFile, "<?php return [['sku'=>'T-1','slug'=>'tegla','category'=>'c','name'=>'Tégla','unit'=>'db','price_net'=>100,'vat'=>27,'stock'=>5,'icon'=>'brick','short'=>'magyar rövid']];");
+$piFile = $tmp . '/product_i18n.json';
+$piStore = new \App\Catalog\ProductI18nStore(null, $piFile);
+$piStore->save('T-1', ['en' => ['name' => 'Brick', 'short' => 'EN short'], 'de' => ['short' => ' ']]);
+eq('ProductI18n: tárolt EN név', 'Brick', $piStore->find('T-1')['en']['name'] ?? null);
+ok('ProductI18n: üres DE érték kihagyva', !isset($piStore->find('T-1')['de']));
+$locGw = new \App\Integration\LocalizingAxelGateway(new \App\Integration\MockAxelGateway($catFile), $piStore);
+\App\Core\Lang::init('en', $langDir);
+$enP = $locGw->findProduct('tegla');
+eq('Termék EN név fordítva', 'Brick', $enP?->name);
+eq('Termék EN rövid fordítva', 'EN short', $enP?->short);
+eq('Termék EN ára változatlan (127 bruttó)', 127, $enP?->priceGross());
+\App\Core\Lang::init('de', $langDir);
+eq('Termék DE (nincs fordítás) → eredeti név', 'Tégla', $locGw->findProduct('tegla')?->name);
+\App\Core\Lang::init('hu', $langDir);
+eq('Termék HU → eredeti név', 'Tégla', $locGw->findProduct('tegla')?->name);
+
 // Takarítás (rekurzív, hogy az almappák – pl. border, axel – se maradjanak)
 $rmrf = static function (string $path) use (&$rmrf): void {
     foreach (glob($path . '/*') ?: [] as $f) {

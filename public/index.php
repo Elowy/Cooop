@@ -119,6 +119,7 @@ $pois = new PoiStore($pdo);
 $leaders = new LeaderStore($pdo);
 $productSeo = new ProductSeoStore($pdo);
 $productImages = new ProductImageStore($pdo);
+$productI18n = new App\Catalog\ProductI18nStore($pdo);
 $blog = new BlogStore($pdo);
 $services = new ServiceStore($pdo);
 $throttle = new LoginThrottle();
@@ -138,6 +139,10 @@ $axel = match ((string) $settings->get('axel_gateway', (string) ($axelCfg['gatew
     ),
     default => new MockAxelGateway(),
 };
+// A nyers kapu az adminhoz (eredeti, magyar termékadatok); a storefront a
+// fordító réteget kapja, ami a látogató nyelvére fordítja a név/rövid leírást.
+$axelRaw = $axel;
+$axel = new App\Integration\LocalizingAxelGateway($axelRaw, $productI18n);
 
 // E-mail küldő (SMTP, ha konfigurált; különben PHP mail()). Feladó-alapértékek.
 $mailFromHost = parse_url((string) $config['app']['url'], PHP_URL_HOST) ?: 'localhost';
@@ -1289,9 +1294,9 @@ $router->get('/admin', static function () use ($axel, $cats, $adminView, $guard,
     ]);
 });
 
-$router->get('/admin/termekek', static function () use ($axel, $cats, $adminView, $guard, $lowStock): string {
+$router->get('/admin/termekek', static function () use ($axelRaw, $cats, $adminView, $guard, $lowStock): string {
     $guard();
-    $products = $axel->products();
+    $products = $axelRaw->products();
     $kat = isset($_GET['kat']) ? (string) $_GET['kat'] : '';
     $q = trim((string) ($_GET['q'] ?? ''));
 
@@ -1719,11 +1724,11 @@ $router->post('/admin/palyazat', static function () use ($guard, $settings, $upl
     return $redirect('/admin/palyazat');
 });
 
-$router->get('/admin/termek-seo', static function () use ($adminView, $guard, $axel, $productSeo): string {
+$router->get('/admin/termek-seo', static function () use ($adminView, $guard, $axelRaw, $productSeo): string {
     $guard();
     $sku = (string) ($_GET['sku'] ?? '');
     $product = null;
-    foreach ($axel->products() as $p) {
+    foreach ($axelRaw->products() as $p) {
         if ($p->sku === $sku) {
             $product = $p;
             break;
@@ -1761,11 +1766,42 @@ $router->post('/admin/termek-seo', static function () use ($guard, $productSeo, 
     return $redirect('/admin/termekek');
 });
 
-$router->get('/admin/termek-kepek', static function () use ($adminView, $guard, $axel, $productImages): string {
+$router->get('/admin/termek-forditasok', static function () use ($adminView, $guard, $axelRaw, $productI18n): string {
     $guard();
     $sku = (string) ($_GET['sku'] ?? '');
     $product = null;
-    foreach ($axel->products() as $p) {
+    foreach ($axelRaw->products() as $p) {
+        if ($p->sku === $sku) {
+            $product = $p;
+            break;
+        }
+    }
+    if ($product === null) {
+        http_response_code(404);
+        return $adminView('admin/product-i18n', 'products', ['title' => 'Termékfordítás', 'product' => null, 'i18n' => []]);
+    }
+    return $adminView('admin/product-i18n', 'products', [
+        'title' => 'Fordítás · ' . $product->name,
+        'product' => $product,
+        'i18n' => $productI18n->find($sku),
+    ]);
+});
+
+$router->post('/admin/termek-forditasok', static function () use ($guard, $productI18n, $redirect): string {
+    $guard();
+    $sku = (string) ($_POST['sku'] ?? '');
+    if (Csrf::check($_POST['_csrf'] ?? null) && $sku !== '') {
+        $productI18n->save($sku, $_POST['i18n'] ?? []);
+        $_SESSION['_flash_admin'] = ['type' => 'ok', 'text' => 'Termékfordítás mentve.'];
+    }
+    return $redirect('/admin/termek-forditasok?sku=' . rawurlencode($sku));
+});
+
+$router->get('/admin/termek-kepek', static function () use ($adminView, $guard, $axelRaw, $productImages): string {
+    $guard();
+    $sku = (string) ($_GET['sku'] ?? '');
+    $product = null;
+    foreach ($axelRaw->products() as $p) {
         if ($p->sku === $sku) {
             $product = $p;
             break;

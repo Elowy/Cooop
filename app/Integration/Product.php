@@ -48,4 +48,21 @@ final class Product
     {
         return $this->stock > 0;
     }
+
+    /** Új példány lefordított név / rövid leírással; üres értéknél az eredeti marad. */
+    public function withText(string $name, string $short): self
+    {
+        return new self(
+            $this->sku,
+            $this->slug,
+            $this->category,
+            $name !== '' ? $name : $this->name,
+            $this->unit,
+            $this->priceNet,
+            $this->vat,
+            $this->stock,
+            $this->icon,
+            $short !== '' ? $short : $this->short,
+        );
+    }
 }

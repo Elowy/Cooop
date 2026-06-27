@@ -93,6 +93,11 @@ final class Schema
                 images $txt
             )$suffix",
 
+            "CREATE TABLE IF NOT EXISTS product_i18n (
+                sku VARCHAR(64) PRIMARY KEY,
+                data $txt
+            )$suffix",
+
             "CREATE TABLE IF NOT EXISTS subscribers (
                 id $id,
                 email VARCHAR(255) NOT NULL UNIQUE,
