@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Lang;
 use App\Core\View;
 use App\Settings\SettingsStore;
 
@@ -44,7 +45,7 @@ $fbPixel = trim((string) ($seo['fb_pixel'] ?? ''));
 $consent = \App\Core\Consent::parse($_COOKIE['nt_consent'] ?? '');
 ?>
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="<?= Lang::locale() ?>">
 <head>
     <script>document.documentElement.classList.add('js');</script>
     <meta charset="UTF-8">

@@ -85,6 +85,10 @@ session_set_cookie_params([
 ]);
 session_start();
 
+// Nyelv (i18n): a választott nyelv a 'lang' cookie-ban; alapértelmezett a magyar.
+// A Lang::init betölti a globális t() helpert is, így minden nézetben elérhető.
+\App\Core\Lang::init((string) ($_COOKIE['lang'] ?? 'hu'), dirname(__DIR__) . '/config/lang');
+
 // Kategóriafa (config/categories.php).
 $cats = new Categories();
 
@@ -228,6 +232,18 @@ $wantsJson = static function (): bool {
 };
 
 $router = new Router();
+
+// Nyelvváltás: a választott nyelvet cookie-ba menti, majd vissza az előző oldalra.
+$router->get('/nyelv/{lang}', static function (array $params) use ($redirect): string {
+    $lang = \App\Core\Lang::normalize((string) ($params['lang'] ?? 'hu'));
+    setcookie('lang', $lang, ['expires' => time() + 31536000, 'path' => '/', 'samesite' => 'Lax']);
+    // Biztonságos visszairányítás: csak a referer helyi útvonalát használjuk (nincs open redirect).
+    $ref = (string) ($_SERVER['HTTP_REFERER'] ?? '');
+    $path = (string) (parse_url($ref, PHP_URL_PATH) ?: '/');
+    $query = parse_url($ref, PHP_URL_QUERY);
+    if ($path === '' || $path[0] !== '/') { $path = '/'; }
+    return $redirect($path . ($query ? '?' . $query : ''));
+});
 
 $router->get('/', static function () use ($cats, $references, $leaders, $pois, $services): string {
     $flash = $_SESSION['_flash_contact'] ?? [];

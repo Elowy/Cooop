@@ -1347,3 +1347,15 @@ select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
     #map.markers-in .leaflet-marker-icon { animation: none; }
     .cart-badge.is-bump { animation: none; }
 }
+
+/* — Nyelvváltó a fejlécben — */
+.lang-switch { display: inline-flex; align-items: center; gap: 2px; margin-left: 10px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.lang-opt { padding: 4px 9px; border-radius: 999px; font-size: .76rem; font-weight: 700; letter-spacing: .04em; color: var(--muted); line-height: 1; transition: color .15s, background .15s; }
+.lang-opt:hover { color: var(--text); }
+.lang-opt.is-active { background: var(--gold-soft); color: var(--gold-2); }
+.lang-opt::after { display: none; }
+@media (max-width: 900px) {
+    .lang-switch { margin: 14px 0 0; align-self: flex-start; }
+}
+/* Hosszabb fordított címkék ne törjenek meg a fejlécben (pl. „Sign in"). */
+.account-link span, .cart-link span { white-space: nowrap; }

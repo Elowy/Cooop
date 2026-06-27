@@ -1,12 +1,13 @@
 <?php
 
+use App\Core\Lang;
 use App\Core\Markdown;
 use App\Core\View;
 
 /** @var string $heading */
 /** @var string $mdFile */
 
-$path = dirname(__DIR__, 2) . '/config/legal/' . basename($mdFile);
+$path = Lang::file(dirname(__DIR__, 2) . '/config/legal', basename($mdFile));
 $content = is_file($path) ? Markdown::toHtml((string) file_get_contents($path)) : '<p>A dokumentum jelenleg nem érhető el.</p>';
 ?>
 <section class="page-hero">

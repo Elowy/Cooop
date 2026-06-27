@@ -316,6 +316,25 @@ eq('REST: 500 → üres katalógus', 0, count($restErr->products()));
 ok('REST: 500 → createInvoice ok=false', !$restErr->createInvoice($axelOrder)->ok);
 ok('REST: üres api_url → createInvoice ok=false', !(new RestAxelGateway(''))->createInvoice($axelOrder)->ok);
 
+echo "Lang (i18n)\n";
+$langDir = $tmp . '/lang';
+@mkdir($langDir, 0775, true);
+file_put_contents($langDir . '/hu.php', "<?php return ['greet' => 'Szia {name}', 'only_hu' => 'Csak magyarul'];");
+file_put_contents($langDir . '/en.php', "<?php return ['greet' => 'Hi {name}'];");
+\App\Core\Lang::init('en', $langDir);
+eq('Lang: angol fordítás + placeholder', 'Hi Anna', \App\Core\Lang::t('greet', ['name' => 'Anna']));
+eq('Lang: hiányzó kulcs → HU fallback', 'Csak magyarul', \App\Core\Lang::t('only_hu'));
+eq('Lang: ismeretlen kulcs → maga a kulcs', 'nincs.ilyen', \App\Core\Lang::t('nincs.ilyen'));
+eq('Lang: locale()', 'en', \App\Core\Lang::locale());
+eq('Lang: normalize érvénytelen → hu', 'hu', \App\Core\Lang::normalize('xx'));
+eq('Lang: normalize de-DE → de', 'de', \App\Core\Lang::normalize('de-DE'));
+eq('Lang: globális t() helper', 'Hi Bob', t('greet', ['name' => 'Bob']));
+file_put_contents($langDir . '/doc.md', 'HU');
+file_put_contents($langDir . '/doc.en.md', 'EN');
+eq('Lang: file() lokalizált változat', $langDir . '/doc.en.md', \App\Core\Lang::file($langDir, 'doc.md'));
+\App\Core\Lang::init('hu', $langDir);
+eq('Lang: file() HU → eredeti fájl', $langDir . '/doc.md', \App\Core\Lang::file($langDir, 'doc.md'));
+
 // Takarítás (rekurzív, hogy az almappák – pl. border, axel – se maradjanak)
 $rmrf = static function (string $path) use (&$rmrf): void {
     foreach (glob($path . '/*') ?: [] as $f) {
