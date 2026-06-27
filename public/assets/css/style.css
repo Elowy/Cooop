@@ -1347,3 +1347,24 @@ select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
     #map.markers-in .leaflet-marker-icon { animation: none; }
     .cart-badge.is-bump { animation: none; }
 }
+
+/* — Nyelvváltó a fejlécben — */
+.lang-switch { display: inline-flex; align-items: center; gap: 2px; margin-left: 10px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.lang-opt { padding: 4px 9px; border-radius: 999px; font-size: .76rem; font-weight: 700; letter-spacing: .04em; color: var(--muted); line-height: 1; transition: color .15s, background .15s; }
+.lang-opt:hover { color: var(--text); }
+.lang-opt.is-active { background: var(--gold-soft); color: var(--gold-2); }
+.lang-opt::after { display: none; }
+@media (max-width: 900px) {
+    .lang-switch { margin: 14px 0 0; align-self: flex-start; }
+}
+/* Hosszabb fordított címkék ne törjenek meg a fejlécben (pl. „Sign in"). */
+.account-link span, .cart-link span { white-space: nowrap; }
+
+/* — Admin: tartalom-fordítás (EN/DE) doboz — */
+.i18n-box { margin: 0 0 18px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.02); }
+.i18n-box > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; color: var(--gold-2); list-style: none; }
+.i18n-box > summary::-webkit-details-marker { display: none; }
+.i18n-box > summary::before { content: "▸ "; }
+.i18n-box[open] > summary::before { content: "▾ "; }
+.i18n-lang { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 14px 16px; }
+.i18n-lang legend { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 0 6px; }

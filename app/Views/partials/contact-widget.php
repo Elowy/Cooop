@@ -38,7 +38,7 @@ if ($email !== '') {
     $channels[] = ['ch' => 'email', 'label' => 'E-mail', 'href' => 'mailto:' . $email, 'ext' => false];
 }
 if ($phone !== '') {
-    $channels[] = ['ch' => 'phone', 'label' => 'Telefon', 'href' => 'tel:' . str_replace(' ', '', $phone), 'ext' => false];
+    $channels[] = ['ch' => 'phone', 'label' => t('contact.phone'), 'href' => 'tel:' . str_replace(' ', '', $phone), 'ext' => false];
 }
 
 if (!$channels) {
@@ -55,7 +55,7 @@ if (!$channels) {
             </a>
         <?php endforeach; ?>
     </div>
-    <button class="fab-toggle" data-fab-toggle aria-label="Kapcsolat" aria-expanded="false">
+    <button class="fab-toggle" data-fab-toggle aria-label="<?= View::e(t('nav.contact')) ?>" aria-expanded="false">
         <span class="fab-saw" aria-hidden="true">
             <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <g class="saw-log">

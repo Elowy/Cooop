@@ -7,16 +7,16 @@ use App\Core\View;
 <section class="page-hero">
     <div class="hero-glow" aria-hidden="true"></div>
     <div class="container">
-        <p class="eyebrow"><span class="eyebrow-dot"></span> Blog</p>
-        <h1 class="display">Hírek, tippek, szakmai cikkek</h1>
-        <p class="section-sub">Csomagolásról, raklapgyártásról és logisztikáról – tapasztalatból.</p>
+        <p class="eyebrow"><span class="eyebrow-dot"></span> <?= View::e(t('nav.blog')) ?></p>
+        <h1 class="display"><?= View::e(t('blog.title')) ?></h1>
+        <p class="section-sub"><?= View::e(t('blog.sub')) ?></p>
     </div>
 </section>
 
 <section class="section section--flush-top">
     <div class="container">
         <?php if (!$posts): ?>
-            <p class="muted" style="text-align:center">Hamarosan érkeznek az első bejegyzések.</p>
+            <p class="muted" style="text-align:center"><?= View::e(t('blog.empty')) ?></p>
         <?php else: ?>
             <div class="blog-grid">
                 <?php foreach ($posts as $post):
@@ -37,7 +37,7 @@ use App\Core\View;
                             <?php if (!empty($post['excerpt'])): ?>
                                 <p><?= View::e((string) $post['excerpt']) ?></p>
                             <?php endif; ?>
-                            <a class="blog-card-link" href="/blog/<?= View::e((string) $post['slug']) ?>">Tovább olvasom →</a>
+                            <a class="blog-card-link" href="/blog/<?= View::e((string) $post['slug']) ?>"><?= View::e(t('common.read_more')) ?> →</a>
                         </div>
                     </article>
                 <?php endforeach; ?>

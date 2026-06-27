@@ -18,15 +18,15 @@ $phone = (string) ($config['contact']['phone'] ?? '');
 
 // Készlet-badge (a galériában és az ikonos nézetben is ezt használjuk).
 ob_start(); ?>
-<?php if (!$product->inStock()): ?><span class="badge badge--out">Elfogyott</span>
-<?php elseif ($product->stock <= $LOW): ?><span class="badge badge--low">Már csak <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span>
-<?php else: ?><span class="badge">Raktáron · <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span><?php endif;
+<?php if (!$product->inStock()): ?><span class="badge badge--out"><?= View::e(t('shop.out_of_stock')) ?></span>
+<?php elseif ($product->stock <= $LOW): ?><span class="badge badge--low"><?= View::e(t('shop.only_left', ['n' => (int) $product->stock, 'unit' => $product->unit])) ?></span>
+<?php else: ?><span class="badge"><?= View::e(t('shop.in_stock')) ?> · <?= (int) $product->stock ?> <?= View::e($product->unit) ?></span><?php endif;
 $badge = ob_get_clean();
 ?>
 <section class="section section--clear-top product-detail">
     <div class="container">
         <nav class="breadcrumb" aria-label="Morzsamenü">
-            <a href="/webshop">Webshop</a>
+            <a href="/webshop"><?= View::e(t('nav.shop')) ?></a>
             <?php foreach ($catPath as $key): ?>
                 <span class="sep">/</span>
                 <a href="/webshop?kat=<?= urlencode($key) ?>"><?= View::e($cats->name($key)) ?></a>
@@ -59,44 +59,44 @@ $badge = ob_get_clean();
             <?php endif; ?>
 
             <div class="detail-copy reveal">
-                <p class="eyebrow"><span class="eyebrow-dot"></span> Cikkszám: <?= View::e($product->sku) ?></p>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> <?= View::e(t('shop.sku')) ?>: <?= View::e($product->sku) ?></p>
                 <h1 class="display"><?= View::e($product->name) ?></h1>
                 <p class="detail-short"><?= View::e($product->short) ?></p>
 
                 <div class="price-block">
                     <span class="price price--lg"><?= View::huf($product->priceGross()) ?></span>
-                    <span class="price-unit">/ <?= View::e($product->unit) ?> · bruttó (nettó <?= View::huf($product->priceNet) ?> + <?= (int) $product->vat ?>% áfa)</span>
+                    <span class="price-unit">/ <?= View::e($product->unit) ?> · <?= View::e(t('shop.gross')) ?> (<?= View::e(t('shop.net')) ?> <?= View::huf($product->priceNet) ?> + <?= (int) $product->vat ?>% <?= View::e(t('shop.vat')) ?>)</span>
                 </div>
 
                 <form method="post" action="/kosar/hozzaad" class="add-form add-form--detail">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="sku" value="<?= View::e($product->sku) ?>">
                     <label class="qty">
-                        <span>Mennyiség (<?= View::e($product->unit) ?>)</span>
+                        <span><?= View::e(t('shop.quantity')) ?> (<?= View::e($product->unit) ?>)</span>
                         <input type="number" name="qty" value="1" min="1" max="<?= max(1, (int) $product->stock) ?>" inputmode="numeric"<?= $product->inStock() ? '' : ' disabled' ?>>
                     </label>
                     <button type="submit" class="btn btn--gold btn--lg"<?= $product->inStock() ? '' : ' disabled' ?>>
-                        Kosárba teszem
+                        <?= View::e(t('shop.add_to_cart')) ?>
                     </button>
                 </form>
 
                 <ul class="assurance">
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-                        <span><strong>Számla és garancia</strong><br>Minden vásárlásról számlát adunk.</span>
+                        <span><strong><?= View::e(t('shop.assure_invoice_t')) ?></strong><br><?= View::e(t('shop.assure_invoice_d')) ?></span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>
-                        <span><strong>Szállítás vagy átvétel</strong><br>Futárszolgálattal vagy személyesen.</span>
+                        <span><strong><?= View::e(t('shop.assure_delivery_t')) ?></strong><br><?= View::e(t('shop.assure_delivery_d')) ?></span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                        <span><strong>Biztonságos fizetés</strong><br>Bankkártyával vagy átutalással.</span>
+                        <span><strong><?= View::e(t('shop.assure_payment_t')) ?></strong><br><?= View::e(t('shop.assure_payment_d')) ?></span>
                     </li>
                     <?php if ($phone !== ''): ?>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
-                        <span><strong>Kérdésed van?</strong><br><a href="tel:<?= View::e(preg_replace('/\s+/', '', $phone)) ?>"><?= View::e($phone) ?></a></span>
+                        <span><strong><?= View::e(t('shop.assure_question_t')) ?></strong><br><a href="tel:<?= View::e(preg_replace('/\s+/', '', $phone)) ?>"><?= View::e($phone) ?></a></span>
                     </li>
                     <?php endif; ?>
                 </ul>
@@ -104,37 +104,37 @@ $badge = ob_get_clean();
         </div>
 
         <div class="detail-specs">
-            <h2>Termékadatok</h2>
+            <h2><?= View::e(t('shop.specs')) ?></h2>
             <table class="spec-table">
                 <tbody>
-                    <tr><th>Cikkszám</th><td><?= View::e($product->sku) ?></td></tr>
-                    <tr><th>Kategória</th><td><a href="/webshop?kat=<?= urlencode($product->category) ?>"><?= View::e($cats->name($product->category)) ?></a></td></tr>
-                    <tr><th>Kiszerelés</th><td><?= View::e($product->unit) ?></td></tr>
-                    <tr><th>Nettó egységár</th><td><?= View::huf($product->priceNet) ?> / <?= View::e($product->unit) ?></td></tr>
-                    <tr><th>ÁFA</th><td><?= (int) $product->vat ?>%</td></tr>
-                    <tr><th>Bruttó egységár</th><td><?= View::huf($product->priceGross()) ?> / <?= View::e($product->unit) ?></td></tr>
-                    <tr><th>Elérhetőség</th><td><?= $product->inStock() ? 'Raktáron (' . (int) $product->stock . ' ' . View::e($product->unit) . ')' : 'Elfogyott' ?></td></tr>
+                    <tr><th><?= View::e(t('shop.sku')) ?></th><td><?= View::e($product->sku) ?></td></tr>
+                    <tr><th><?= View::e(t('shop.spec_category')) ?></th><td><a href="/webshop?kat=<?= urlencode($product->category) ?>"><?= View::e($cats->name($product->category)) ?></a></td></tr>
+                    <tr><th><?= View::e(t('shop.spec_packaging')) ?></th><td><?= View::e($product->unit) ?></td></tr>
+                    <tr><th><?= View::e(t('shop.spec_unit_price_net')) ?></th><td><?= View::huf($product->priceNet) ?> / <?= View::e($product->unit) ?></td></tr>
+                    <tr><th><?= View::e(t('shop.vat_label')) ?></th><td><?= (int) $product->vat ?>%</td></tr>
+                    <tr><th><?= View::e(t('shop.spec_unit_price_gross')) ?></th><td><?= View::huf($product->priceGross()) ?> / <?= View::e($product->unit) ?></td></tr>
+                    <tr><th><?= View::e(t('shop.spec_availability')) ?></th><td><?= $product->inStock() ? View::e(t('shop.in_stock')) . ' (' . (int) $product->stock . ' ' . View::e($product->unit) . ')' : View::e(t('shop.out_of_stock')) ?></td></tr>
                 </tbody>
             </table>
-            <p class="note">A feltüntetett készlet tájékoztató jellegű; nagyobb mennyiség esetén kérjük, egyeztess velünk.</p>
+            <p class="note"><?= View::e(t('shop.stock_note')) ?></p>
         </div>
 
         <?php if ($related): ?>
             <div class="related">
-                <h2>Hasonló termékek</h2>
+                <h2><?= View::e(t('shop.related')) ?></h2>
                 <div class="card-grid related-grid">
                     <?php foreach ($related as $r): ?>
                         <article class="card product-card reveal">
                             <a class="product-media" href="/termek/<?= View::e($r->slug) ?>" data-icon="<?= View::e($r->icon) ?>" aria-label="<?= View::e($r->name) ?>">
-                                <?php if (!$r->inStock()): ?><span class="badge badge--out">Elfogyott</span>
-                                <?php else: ?><span class="badge">Raktáron</span><?php endif; ?>
+                                <?php if (!$r->inStock()): ?><span class="badge badge--out"><?= View::e(t('shop.out_of_stock')) ?></span>
+                                <?php else: ?><span class="badge"><?= View::e(t('shop.in_stock')) ?></span><?php endif; ?>
                             </a>
                             <h3><a href="/termek/<?= View::e($r->slug) ?>"><?= View::e($r->name) ?></a></h3>
                             <div class="price-row">
                                 <span class="price"><?= View::huf($r->priceGross()) ?></span>
                                 <span class="price-unit">/ <?= View::e($r->unit) ?></span>
                             </div>
-                            <a href="/termek/<?= View::e($r->slug) ?>" class="btn btn--outline btn--sm btn--block">Megnézem</a>
+                            <a href="/termek/<?= View::e($r->slug) ?>" class="btn btn--outline btn--sm btn--block"><?= View::e(t('shop.view')) ?></a>
                         </article>
                     <?php endforeach; ?>
                 </div>

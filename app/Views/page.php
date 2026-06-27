@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Lang;
 use App\Core\Markdown;
 use App\Core\View;
 
@@ -8,7 +9,7 @@ use App\Core\View;
 /** @var string $mdFile */
 /** @var string|null $lead */
 
-$path = dirname(__DIR__, 2) . '/config/pages/' . basename($mdFile);
+$path = Lang::file(dirname(__DIR__, 2) . '/config/pages', basename($mdFile));
 $body = is_file($path) ? Markdown::toHtml((string) file_get_contents($path)) : '<p>A tartalom jelenleg nem érhető el.</p>';
 ?>
 <section class="page-hero">

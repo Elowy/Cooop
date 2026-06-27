@@ -38,7 +38,7 @@ $hasGrant = trim((string) ($seo['grant_image'] ?? '')) !== ''
         </div>
 
         <div class="footer-col">
-            <h4>Elérhetőség</h4>
+            <h4><?= View::e(t('footer.contact_heading')) ?></h4>
             <ul>
                 <li><a href="mailto:<?= View::e($contact['email']) ?>"><?= View::e($contact['email']) ?></a></li>
                 <li><a href="tel:<?= View::e(str_replace(' ', '', $contact['phone'])) ?>"><?= View::e($contact['phone']) ?></a></li>
@@ -48,42 +48,42 @@ $hasGrant = trim((string) ($seo['grant_image'] ?? '')) !== ''
         </div>
 
         <div class="footer-col">
-            <h4>Oldal</h4>
+            <h4><?= View::e(t('footer.pages_heading')) ?></h4>
             <ul>
-                <li><a href="/webshop">Webshop</a></li>
-                <li><a href="/szolgaltatasok">Tevékenységek</a></li>
-                <li><a href="/bemutatkozas">Bemutatkozás</a></li>
-                <li><a href="/blog">Blog</a></li>
-                <li><a href="/#kapcsolat">Kapcsolat</a></li>
-                <li><a href="/admin">Vezérlőpult</a></li>
+                <li><a href="/webshop"><?= View::e(t('nav.shop')) ?></a></li>
+                <li><a href="/szolgaltatasok"><?= View::e(t('nav.services')) ?></a></li>
+                <li><a href="/bemutatkozas"><?= View::e(t('footer.about')) ?></a></li>
+                <li><a href="/blog"><?= View::e(t('nav.blog')) ?></a></li>
+                <li><a href="/#kapcsolat"><?= View::e(t('nav.contact')) ?></a></li>
+                <li><a href="/admin"><?= View::e(t('footer.dashboard')) ?></a></li>
             </ul>
         </div>
 
         <div class="footer-col">
-            <h4>Vásárlás</h4>
+            <h4><?= View::e(t('footer.shopping_heading')) ?></h4>
             <ul>
-                <li><a href="/szallitas">Szállítási információk</a></li>
-                <li><a href="/#referenciak">Referenciák</a></li>
-                <li><a href="/#hirlevel">Hírlevél</a></li>
-                <li><a href="/oldalterkep">Oldaltérkép</a></li>
+                <li><a href="/szallitas"><?= View::e(t('footer.shipping_info')) ?></a></li>
+                <li><a href="/#referenciak"><?= View::e(t('nav.references')) ?></a></li>
+                <li><a href="/#hirlevel"><?= View::e(t('footer.newsletter')) ?></a></li>
+                <li><a href="/oldalterkep"><?= View::e(t('footer.sitemap')) ?></a></li>
             </ul>
         </div>
     </div>
 
     <div class="container footer-bottom">
-        <small>&copy; <?= date('Y') ?> <?= View::e($config['app']['name']) ?> Kft. — Minden jog fenntartva.</small>
+        <small>&copy; <?= date('Y') ?> <?= View::e($config['app']['name']) ?> Kft. — <?= View::e(t('footer.rights')) ?></small>
         <nav class="footer-legal">
-            <a href="/aszf">ÁSZF</a>
-            <a href="/adatkezeles">Adatkezelési tájékoztató</a>
-            <?php if ($hasGrant): ?><a href="/palyazat">Pályázati közzététel</a><?php endif; ?>
-            <a href="/oldalterkep">Oldaltérkép</a>
-            <a href="#" data-cookie-open>Cookie-beállítások</a>
+            <a href="/aszf"><?= View::e(t('footer.terms')) ?></a>
+            <a href="/adatkezeles"><?= View::e(t('footer.privacy')) ?></a>
+            <?php if ($hasGrant): ?><a href="/palyazat"><?= View::e(t('footer.grant')) ?></a><?php endif; ?>
+            <a href="/oldalterkep"><?= View::e(t('footer.sitemap')) ?></a>
+            <a href="#" data-cookie-open><?= View::e(t('footer.cookie_settings')) ?></a>
         </nav>
     </div>
 
     <div class="container footer-credit">
-        <a href="https://luiz-tech.hu" target="_blank" rel="noopener" class="credit" aria-label="Készítette: luiz-tech.hu">
-            <span class="credit-label">Készítette</span>
+        <a href="https://luiz-tech.hu" target="_blank" rel="noopener" class="credit" aria-label="<?= View::e(t('footer.made_by')) ?>: luiz-tech.hu">
+            <span class="credit-label"><?= View::e(t('footer.made_by')) ?></span>
             <span class="credit-spark" aria-hidden="true">&lt;/&gt;</span>
             <span class="credit-name">luiz-tech.hu</span>
             <span class="credit-heart" aria-hidden="true">❤️</span>

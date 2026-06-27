@@ -29,7 +29,7 @@ if ($cover !== '') {
 ?>
 <section class="section section--clear-top">
     <div class="container narrow">
-        <p class="breadcrumb"><a href="/blog">← Blog</a></p>
+        <p class="breadcrumb"><a href="/blog">← <?= View::e(t('nav.blog')) ?></a></p>
 
         <article class="blog-post">
             <header class="blog-post-head">
@@ -50,13 +50,13 @@ if ($cover !== '') {
             <?php endif; ?>
 
             <div class="legal-doc blog-post-body">
-                <?= $bodyHtml !== '' ? $bodyHtml : '<p class="muted">Ehhez a bejegyzéshez még nincs tartalom.</p>' ?>
+                <?= $bodyHtml !== '' ? $bodyHtml : '<p class="muted">' . View::e(t('blog.no_content')) . '</p>' ?>
             </div>
         </article>
 
         <?php if (!empty($recent)): ?>
             <aside class="blog-recent">
-                <h2 class="blog-recent-title">További bejegyzések</h2>
+                <h2 class="blog-recent-title"><?= View::e(t('blog.more_posts')) ?></h2>
                 <ul class="blog-recent-list">
                     <?php foreach ($recent as $r): ?>
                         <li>

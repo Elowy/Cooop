@@ -16,12 +16,12 @@ $vatTotal = $total - $netTotal;
 ?>
 <section class="section section--clear-top">
     <div class="container cart-wrap">
-        <h1 class="display">Kosár</h1>
+        <h1 class="display"><?= View::e(t('nav.cart')) ?></h1>
 
         <?php if (!$lines): ?>
             <div class="empty-cart">
-                <p>A kosarad jelenleg üres.</p>
-                <a href="/webshop" class="btn btn--gold">Irány a webshop</a>
+                <p><?= View::e(t('shop.cart_empty')) ?></p>
+                <a href="/webshop" class="btn btn--gold"><?= View::e(t('home.hero_cta_shop')) ?></a>
             </div>
         <?php else: ?>
             <div class="cart-table">
@@ -35,14 +35,14 @@ $vatTotal = $total - $netTotal;
                         <form method="post" action="/kosar/frissit" class="cart-qty">
                             <?= Csrf::field() ?>
                             <input type="hidden" name="sku" value="<?= View::e($p->sku) ?>">
-                            <input type="number" name="qty" value="<?= (int) $line['qty'] ?>" min="1" max="<?= max(1, (int) $p->stock) ?>" aria-label="Mennyiség">
-                            <button type="submit" class="btn btn--outline btn--sm">Frissít</button>
+                            <input type="number" name="qty" value="<?= (int) $line['qty'] ?>" min="1" max="<?= max(1, (int) $p->stock) ?>" aria-label="<?= View::e(t('shop.quantity')) ?>">
+                            <button type="submit" class="btn btn--outline btn--sm"><?= View::e(t('shop.update')) ?></button>
                         </form>
                         <span class="cart-sub"><?= View::huf($line['subtotal']) ?></span>
                         <form method="post" action="/kosar/torol" class="cart-del">
                             <?= Csrf::field() ?>
                             <input type="hidden" name="sku" value="<?= View::e($p->sku) ?>">
-                            <button type="submit" class="icon-btn" aria-label="Törlés">×</button>
+                            <button type="submit" class="icon-btn" aria-label="<?= View::e(t('shop.delete')) ?>">×</button>
                         </form>
                     </div>
                 <?php endforeach; ?>
@@ -50,16 +50,16 @@ $vatTotal = $total - $netTotal;
 
             <div class="cart-summary">
                 <div class="cart-totals">
-                    <div class="cart-line"><span>Nettó összesen</span><span><?= View::huf($netTotal) ?></span></div>
-                    <div class="cart-line"><span>ÁFA</span><span><?= View::huf($vatTotal) ?></span></div>
-                    <div class="cart-total"><span>Végösszeg (bruttó)</span><strong class="display"><?= View::huf($total) ?></strong></div>
+                    <div class="cart-line"><span><?= View::e(t('shop.net_total')) ?></span><span><?= View::huf($netTotal) ?></span></div>
+                    <div class="cart-line"><span><?= View::e(t('shop.vat_label')) ?></span><span><?= View::huf($vatTotal) ?></span></div>
+                    <div class="cart-total"><span><?= View::e(t('shop.grand_total')) ?></span><strong class="display"><?= View::huf($total) ?></strong></div>
                 </div>
-                <a href="/penztar" class="btn btn--gold btn--lg btn--block">Tovább a pénztárhoz</a>
-                <a href="/webshop" class="cart-continue">← Vásárlás folytatása</a>
+                <a href="/penztar" class="btn btn--gold btn--lg btn--block"><?= View::e(t('shop.to_checkout')) ?></a>
+                <a href="/webshop" class="cart-continue">← <?= View::e(t('shop.continue_shopping')) ?></a>
                 <ul class="trust-row">
-                    <li>Biztonságos fizetés</li>
-                    <li>Számla és garancia</li>
-                    <li>Gyors kiszállítás</li>
+                    <li><?= View::e(t('shop.trust_payment')) ?></li>
+                    <li><?= View::e(t('shop.trust_invoice')) ?></li>
+                    <li><?= View::e(t('shop.trust_delivery')) ?></li>
                 </ul>
             </div>
         <?php endif; ?>

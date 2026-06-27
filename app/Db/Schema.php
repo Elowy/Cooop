@@ -153,6 +153,10 @@ final class Schema
         self::addColumn($pdo, $driver, 'refs', 'url', "VARCHAR(500) NOT NULL DEFAULT ''");
         self::addColumn($pdo, $driver, 'refs', 'featured', 'INT NOT NULL DEFAULT 0');
         self::addColumn($pdo, $driver, 'services', 'image', "VARCHAR(500) NOT NULL DEFAULT ''");
+        // Tartalom-lokalizáció: nyelvenkénti fordítások JSON-ban ({"en":{...},"de":{...}}).
+        self::addColumn($pdo, $driver, 'services', 'i18n', 'TEXT');
+        self::addColumn($pdo, $driver, 'posts', 'i18n', 'TEXT');
+        self::addColumn($pdo, $driver, 'refs', 'i18n', 'TEXT');
     }
 
     private static function addColumn(PDO $pdo, string $driver, string $table, string $col, string $definition): void
