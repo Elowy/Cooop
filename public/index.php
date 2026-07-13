@@ -87,7 +87,9 @@ session_start();
 
 // Nyelv (i18n): a választott nyelv a 'lang' cookie-ban; alapértelmezett a magyar.
 // A Lang::init betölti a globális t() helpert is, így minden nézetben elérhető.
-\App\Core\Lang::init((string) ($_COOKIE['lang'] ?? 'hu'), dirname(__DIR__) . '/config/lang');
+// Elsőbbség: ?lang= (megosztható/hreflang URL, crawler), különben a 'lang' cookie.
+$reqLang = isset($_GET['lang']) ? (string) $_GET['lang'] : (string) ($_COOKIE['lang'] ?? 'hu');
+\App\Core\Lang::init($reqLang, dirname(__DIR__) . '/config/lang');
 
 // Kategóriafa (config/categories.php).
 $cats = new Categories();

@@ -31,7 +31,7 @@ use App\Core\View;
                         </a>
                         <div class="blog-card-body">
                             <?php if (!empty($post['created'])): ?>
-                                <time class="blog-card-date" datetime="<?= View::e((string) $post['created']) ?>"><?= View::e(View::dateHu((string) $post['created'])) ?></time>
+                                <time class="blog-card-date" datetime="<?= View::e((string) $post['created']) ?>"><?= View::e(View::date((string) $post['created'])) ?></time>
                             <?php endif; ?>
                             <h2><a href="/blog/<?= View::e((string) $post['slug']) ?>"><?= View::e((string) $post['title']) ?></a></h2>
                             <?php if (!empty($post['excerpt'])): ?>

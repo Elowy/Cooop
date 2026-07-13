@@ -34,7 +34,7 @@ if ($cover !== '') {
         <article class="blog-post">
             <header class="blog-post-head">
                 <p class="blog-post-meta">
-                    <?php if ($created !== ''): ?><time datetime="<?= View::e($created) ?>"><?= View::e(View::dateHu($created)) ?></time><?php endif; ?>
+                    <?php if ($created !== ''): ?><time datetime="<?= View::e($created) ?>"><?= View::e(View::date($created)) ?></time><?php endif; ?>
                     <?php if ($author !== ''): ?><?= $created !== '' ? ' · ' : '' ?><span><?= View::e($author) ?></span><?php endif; ?>
                 </p>
                 <h1 class="display"><?= View::e((string) $post['title']) ?></h1>
@@ -61,7 +61,7 @@ if ($cover !== '') {
                     <?php foreach ($recent as $r): ?>
                         <li>
                             <a href="/blog/<?= View::e((string) $r['slug']) ?>"><?= View::e((string) $r['title']) ?></a>
-                            <?php if (!empty($r['created'])): ?><span class="muted"><?= View::e(View::dateHu((string) $r['created'])) ?></span><?php endif; ?>
+                            <?php if (!empty($r['created'])): ?><span class="muted"><?= View::e(View::date((string) $r['created'])) ?></span><?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>

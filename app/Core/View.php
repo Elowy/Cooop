@@ -67,6 +67,29 @@ final class View
         return date('Y', $ts) . '. ' . $months[(int) date('n', $ts)] . ' ' . date('j', $ts) . '.';
     }
 
+    /** ISO dátum a látogató nyelvén (HU: 2026. május 5. · EN: 5 May 2026 · DE: 5. Mai 2026). */
+    public static function date(string $iso): string
+    {
+        $ts = strtotime($iso);
+        if ($ts === false) {
+            return '';
+        }
+        $months = [
+            'hu' => [1 => 'január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
+            'en' => [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            'de' => [1 => 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+        ];
+        $loc = \App\Core\Lang::locale();
+        $name = $months[$loc][(int) date('n', $ts)] ?? $months['hu'][(int) date('n', $ts)];
+        $y = date('Y', $ts);
+        $d = (int) date('j', $ts);
+        return match ($loc) {
+            'en' => "{$d} {$name} {$y}",
+            'de' => "{$d}. {$name} {$y}",
+            default => "{$y}. {$name} {$d}.",
+        };
+    }
+
     /**
      * Statikus asset URL cache-busting verzióval (?v=fájl-mtime). Így a böngésző
      * sokáig cache-elheti a fájlt, de deploy/módosítás után azonnal újratölti.
