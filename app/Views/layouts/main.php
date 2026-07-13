@@ -37,8 +37,18 @@ $pageTitle = $ovTitle !== '' ? $ovTitle : ((isset($title) && $title) ? "{$title}
 $metaDesc = trim((string) ($meta['description'] ?? '')) ?: (trim((string) ($seo['seo_description'] ?? '')) ?: $defaultDesc);
 $metaKeywords = trim((string) ($meta['keywords'] ?? '')) ?: trim((string) ($seo['seo_keywords'] ?? ''));
 $ogImage = trim((string) ($meta['og_image'] ?? '')) ?: trim((string) ($seo['seo_og_image'] ?? ''));
-$ogUrl = rtrim((string) $config['app']['url'], '/') . ($_SERVER['REQUEST_URI'] ?? '/');
 $ogType = trim((string) ($meta['og_type'] ?? '')) ?: 'website';
+
+// Nyelvi URL-ek: kanonikus (tiszta útvonal, ?lang nélkül) + hreflang alternatívák.
+$siteBase = rtrim((string) $config['app']['url'], '/');
+$reqPath = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
+parse_str((string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_QUERY) ?: ''), $reqQs);
+unset($reqQs['lang']);
+$cleanQuery = http_build_query($reqQs);
+$canonicalUrl = $siteBase . $reqPath . ($cleanQuery !== '' ? '?' . $cleanQuery : '');
+$altLangUrl = static fn (string $code): string => $siteBase . $reqPath . '?' . http_build_query($reqQs + ['lang' => $code]);
+$ogLocales = ['hu' => 'hu_HU', 'en' => 'en_US', 'de' => 'de_DE'];
+$ogUrl = $canonicalUrl;
 
 $gaId = trim((string) ($seo['ga_id'] ?? ''));
 $fbPixel = trim((string) ($seo['fb_pixel'] ?? ''));
@@ -68,6 +78,12 @@ $consent = \App\Core\Consent::parse($_COOKIE['nt_consent'] ?? '');
     <meta property="product:price:currency" content="<?= View::e((string) ($meta['product_currency'] ?? 'HUF')) ?>">
     <meta property="og:availability" content="<?= View::e((string) ($meta['product_availability'] ?? '')) ?>">
     <?php endif; ?>
+    <meta property="og:locale" content="<?= View::e($ogLocales[Lang::locale()] ?? 'hu_HU') ?>">
+    <link rel="canonical" href="<?= View::e($canonicalUrl) ?>">
+    <?php foreach (Lang::available() as $langCode => $langName): ?>
+    <link rel="alternate" hreflang="<?= View::e($langCode) ?>" href="<?= View::e($altLangUrl($langCode)) ?>">
+    <?php endforeach; ?>
+    <link rel="alternate" hreflang="x-default" href="<?= View::e($canonicalUrl) ?>">
     <link rel="stylesheet" href="<?= View::e(View::asset('/assets/css/style.css')) ?>">
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
     <?php if ($gaId !== '' && $consent['analytics']): ?>
